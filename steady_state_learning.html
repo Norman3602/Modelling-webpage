@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EE3011 | Steady-State Error</title>
+    <link rel="stylesheet" href="home-style.css" />
+    <style>
+      .site-header {
+        height: 90px;
+        background: #0b1f3a;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        padding: 0 4.5%;
+        gap: 48px;
+        position: relative;
+        z-index: 500;
+        box-shadow: 0 5px 20px #08182b2b;
+        font-family: Arial, sans-serif;
+      }
+      .site-header .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin-right: auto;
+        color: white;
+        text-decoration: none;
+      }
+      .site-header .brand-icon {
+        width: 46px;
+        height: 46px;
+        border: 1px solid #4fc9ef;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        color: #5edcff;
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .site-header .brand b,
+      .site-header .brand small {
+        display: block;
+      }
+      .site-header .brand b {
+        font: 700 28px Georgia;
+      }
+      .site-header .brand small {
+        font-size: 12px;
+        letter-spacing: 1.8px;
+        color: #8ca4bf;
+        margin-top: 2px;
+      }
+      .site-nav {
+        display: flex;
+        align-items: center;
+        gap: 34px;
+        font-size: 18px;
+      }
+      .site-nav > a {
+        color: #aebdd0;
+        text-decoration: none;
+        padding: 35px 0;
+      }
+      .site-nav .nav-group {
+        position: relative;
+      }
+      .site-nav .nav-button {
+        border: 0;
+        background: none;
+        color: #aebdd0;
+        cursor: pointer;
+        padding: 34px 0;
+        font-size: 18px;
+      }
+      .site-nav .nav-button:hover,
+      .site-nav a:hover {
+        color: white;
+      }
+      .site-nav .dropdown {
+        display: none;
+        position: absolute;
+        top: 69px;
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 220px;
+        padding: 7px;
+        background: white;
+        border: 1px solid #dce8f3;
+        border-radius: 10px;
+        box-shadow: 0 15px 40px #09213d2b;
+        z-index: 900;
+      }
+      .site-nav .dropdown.show {
+        display: block;
+      }
+      .site-nav .dropdown a {
+        display: block;
+        color: #23415f;
+        text-decoration: none;
+        padding: 12px 14px;
+        border-radius: 6px;
+        font-size: 16px;
+      }
+      .site-nav .dropdown a:hover {
+        background: #edf7ff;
+        color: #168cc0;
+      }
+      @media (max-width: 800px) {
+        .site-header {
+          height: auto;
+          min-height: 90px;
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 12px 4%;
+        }
+        .site-nav {
+          width: 100%;
+          flex-wrap: wrap;
+          gap: 15px;
+          font-size: 14px;
+        }
+        .site-nav .nav-button {
+          font-size: 14px;
+          padding: 12px 0;
+        }
+        .site-nav > a {
+          padding: 12px 0;
+        }
+        .site-nav .dropdown {
+          top: 38px;
+          left: 0;
+          transform: none;
+        }
+      }
+
+      body {
+        background: #f4f8fc;
+        color: #142b47;
+        font:
+          17px/1.65 Arial,
+          sans-serif;
+      }
+      .site-header {
+        position: sticky;
+        top: 0;
+      }
+      .lesson-hero {
+        background: #0b1f3a;
+        color: white;
+        padding: 68px max(6%, calc((100% - 1300px) / 2));
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 35px;
+        align-items: center;
+      }
+      .lesson-hero .eyebrow {
+        color: #6fdaff;
+        letter-spacing: 2px;
+        font-size: 13px;
+      }
+      .lesson-hero h1 {
+        font: 700 clamp(36px, 4vw, 60px)/1.12 Georgia;
+        margin: 14px 0;
+      }
+      .lesson-hero h1 span {
+        color: #56d4fa;
+      }
+      .lesson-hero p {
+        color: #b6cadc;
+        max-width: 690px;
+        font-size: 19px;
+      }
+      .hero-card {
+        background: #143455;
+        border: 1px solid #41718e;
+        border-radius: 18px;
+        padding: 26px;
+      }
+      .hero-card b {
+        display: block;
+        color: #76dcff;
+        margin-bottom: 15px;
+      }
+      .hero-card .equation {
+        color: white;
+        font-size: 24px;
+      }
+      .lesson-wrap {
+        max-width: 1250px;
+        margin: 0 auto;
+        padding: 40px 25px 90px;
+      }
+      .lesson-tabs {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 0 0 26px;
+      }
+      .lesson-tabs button,
+      .btn {
+        border: 1px solid #c9dce9;
+        background: white;
+        border-radius: 9px;
+        padding: 12px 17px;
+        color: #214361;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 15px;
+      }
+      .lesson-tabs button.active,
+      .btn.primary {
+        background: #1589bd;
+        color: white;
+        border-color: #1589bd;
+      }
+      .lesson-card {
+        background: white;
+        border: 1px solid #dce6ef;
+        box-shadow: 0 8px 28px #153b560d;
+        border-radius: 16px;
+        padding: clamp(22px, 3vw, 40px);
+        margin-bottom: 20px;
+      }
+      .lesson-card h2 {
+        font: 700 32px Georgia;
+        margin: 8px 0 16px;
+      }
+      .lesson-card h3 {
+        font: 700 22px Georgia;
+      }
+      .step-tag {
+        font-size: 12px;
+        letter-spacing: 1.6px;
+        color: #168fc2;
+        font-weight: bold;
+      }
+      .lesson-card p {
+        color: #4d657b;
+      }
+      .math {
+        background: #eef7fc;
+        border-left: 4px solid #2ba9d6;
+        border-radius: 9px;
+        padding: 20px;
+        margin: 18px 0;
+        text-align: center;
+        overflow-x: auto;
+        color: #133958;
+        font-size: 20px;
+      }
+      .concept-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      .concept {
+        background: #f3f9fd;
+        border: 1px solid #dce9f1;
+        border-radius: 12px;
+        padding: 18px;
+      }
+      .concept strong {
+        display: block;
+        color: #147ca8;
+      }
+      .concept p {
+        margin-bottom: 0;
+        font-size: 15px;
+      }
+
+      .response-explainer {
+        margin: 18px 0 0;
+        padding: 16px 18px;
+        background: #f3f9fd;
+        border: 1px solid #dce9f1;
+        border-radius: 12px;
+      }
+      .response-title {
+        color: #147ca8;
+        font-weight: 800;
+        font-size: 16px;
+        margin-bottom: 12px;
+      }
+      .response-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 14px;
+        align-items: center;
+      }
+      .response-item {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        min-width: 0;
+      }
+      .response-label {
+        flex: 0 0 auto;
+        font-weight: 800;
+        color: #0f6f9b;
+      }
+      .response-text {
+        color: #385a76;
+        line-height: 1.45;
+      }
+      .response-text b {
+        color: #173a57;
+      }
+      .response-arrow {
+        color: #1e91bd;
+        font-size: 24px;
+        font-weight: 800;
+      }
+      @media (max-width: 900px) {
+        .response-row {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+        .response-arrow {
+          transform: rotate(90deg);
+          justify-self: center;
+        }
+        .response-item {
+          align-items: flex-start;
+        }
+      }
+      .lesson-panel[hidden] {
+        display: none;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 25px;
+      }
+      .feedback {
+        min-height: 28px;
+        font-weight: bold;
+        color: #126c9d;
+      }
+      .quiz-option {
+        display: block;
+        padding: 11px 14px;
+        border: 1px solid #dce6ef;
+        border-radius: 8px;
+        margin: 9px 0;
+        cursor: pointer;
+      }
+      .quiz-option:has(input:checked) {
+        background: #e3f6ff;
+        border-color: #29a7d4;
+      }
+      .lesson-card table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .lesson-card th,
+      .lesson-card td {
+        text-align: left;
+        padding: 13px;
+        border-bottom: 1px solid #dce6ef;
+      }
+      .lesson-card th {
+        background: #eef7fc;
+      }
+      .lesson-footer {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 25px;
+      }
+      .muted {
+        color: #668198;
+      }
+      .diagram {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 25px;
+        background: #f0f8fc;
+        border-radius: 12px;
+      }
+      .diagram span {
+        background: #174c6f;
+        color: white;
+        padding: 14px;
+        border-radius: 8px;
+      }
+      .diagram b {
+        color: #168fc2;
+      }
+      @media (max-width: 800px) {
+        .lesson-hero {
+          grid-template-columns: 1fr;
+          padding: 38px 6%;
+        }
+        .concept-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-card table {
+          font-size: 13px;
+        }
+        .lesson-card th,
+        .lesson-card td {
+          padding: 7px;
+        }
+        .hero-card .equation {
+          font-size: 19px;
+        }
+      }
+      .lesson-tabs button.active::after {
+        content: none !important;
+        display: none !important;
+      }
+      .lesson-tabs button {
+        position: relative;
+      }
+      .feedback-diagram {
+        background: #edf8ff;
+        border: 1px solid #cfe6f5;
+        border-radius: 16px;
+        padding: 20px 24px;
+        margin: 0 0 24px;
+      }
+      .feedback-diagram h2 {
+        font: 700 21px Georgia;
+        margin: 0 0 5px;
+      }
+      .feedback-diagram p {
+        margin: 0 0 10px;
+        color: #536c84;
+        font-size: 14px;
+      }
+      .feedback-diagram svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 210px;
+      }
+      .feedback-diagram svg text {
+        font-family: Arial, sans-serif;
+      }
+      @media (max-width: 650px) {
+        .feedback-diagram {
+          padding: 12px;
+        }
+        .feedback-diagram svg {
+          min-width: 560px;
+        }
+        .diagram-scroll {
+          overflow-x: auto;
+        }
+      }
+      .lesson-bot {
+        display: block;
+        width: 110px;
+        height: 125px;
+        object-fit: contain;
+        float: right;
+        margin: -10px -5px 0 14px;
+      }
+      .hero-card {
+        min-height: 210px;
+      }
+      @media (max-width: 650px) {
+        .lesson-bot {
+          width: 82px;
+          height: 105px;
+        }
+      }
+
+      .derive-btn {
+        margin-top: 14px;
+      }
+      .derive-modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 31, 55, 0.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        z-index: 9999;
+      }
+      .derive-modal.open {
+        display: flex;
+      }
+      .derive-dialog {
+        width: min(760px, 96vw);
+        max-height: 88vh;
+        overflow-y: auto;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+        padding: 28px 30px;
+        position: relative;
+        text-align: left;
+      }
+      .derive-dialog h3 {
+        margin: 0 44px 8px 0;
+        color: #142f52;
+        font-size: 1.55rem;
+      }
+      .derive-dialog .derive-intro {
+        color: #52677f;
+        margin-bottom: 18px;
+      }
+      .derive-close {
+        position: absolute;
+        right: 18px;
+        top: 16px;
+        border: 0;
+        background: #eef6fb;
+        color: #173a5e;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        font-size: 24px;
+        cursor: pointer;
+      }
+      .derive-step {
+        border-left: 4px solid #2baed8;
+        background: #f5fbfe;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin: 12px 0;
+      }
+      .derive-step strong {
+        color: #173a5e;
+      }
+      .derive-step .math {
+        margin: 10px 0 2px;
+        padding: 8px 10px;
+      }
+    </style>
+    <script>
+      window.MathJax = { tex: { inlineMath: [["\\(", "\\)"]] } };
+    </script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+    ></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="home.html"
+        ><span class="brand-icon">EE</span>
+        <div><b>EE3011</b><small>MODELLING &amp; CONTROL</small></div></a
+      >
+      <nav class="site-nav">
+        <a href="home.html">Home</a>
+        <div class="nav-group">
+          <button
+            class="nav-button"
+            type="button"
+            onclick="toggleMenu('part1', this)"
+          >
+            Control Fundamentals <span class="chevron"></span>
+          </button>
+          <div class="dropdown" id="part1">
+            <a href="root_locus.html">Root Locus</a
+            ><a href="drone.html">PID Control</a
+            ><a href="steady_state_learning.html">Steady-State Error</a
+            ><a href="pt1_quiz.html">PT1 Quiz</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button
+            class="nav-button"
+            type="button"
+            onclick="toggleMenu('part2', this)"
+          >
+            Frequency Response <span class="chevron"></span>
+          </button>
+          <div class="dropdown" id="part2">
+            <a href="root_locus.html">Root Locus</a
+            ><a href="drone.html">PID Control</a
+            ><a href="pt2_quiz.html">PT2 Quiz</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <section class="lesson-hero">
+      <div>
+        <div class="eyebrow">CONTROL FUNDAMENTALS · GUIDED LESSON</div>
+        <h1>Why doesn't the drone <span>reach 10 m?</span></h1>
+        <p>
+          Learn how to predict steady-state error before you compare P, PD, PI
+          and PID in the altitude simulator.
+        </p>
+        <a class="btn primary" href="drone.html">Open drone experiment →</a>
+      </div>
+      <div class="hero-card">
+        <img
+          class="lesson-bot"
+          src="bot-explaining.png"
+          alt="ControlBot explaining a step response"
+        /><b>THE KEY QUESTION</b>
+        <div class="equation">\[e_{ss}=\lim_{t\to\infty}(r(t)-y(t))\]</div>
+        <p>
+          Does the tracking error disappear, or does a permanent offset remain?
+        </p>
+      </div>
+    </section>
+    <main class="lesson-wrap">
+      <section
+        class="feedback-diagram"
+        aria-label="Unity feedback block diagram shown throughout the lesson"
+      >
+        <h2>Keep this feedback loop in mind</h2>
+        <p>
+          The reference enters at +; measured altitude returns to −. The
+          controller acts on the difference.
+        </p>
+        <div class="diagram-scroll">
+          <svg
+            viewBox="0 0 850 195"
+            role="img"
+            aria-label="Reference R(s) enters positive summing junction; output Y(s) feeds back to negative input; error E(s) enters controller C(s); command U(s) enters plant Gp(s); output Y(s) is measured altitude"
+          >
+            <defs>
+              <marker
+                id="lessonArrow"
+                markerWidth="8"
+                markerHeight="8"
+                refX="7"
+                refY="4"
+                orient="auto"
+              >
+                <path d="M0 0 L8 4 L0 8Z" fill="#236c99" />
+              </marker>
+            </defs>
+            <g
+              stroke="#236c99"
+              stroke-width="2.5"
+              fill="none"
+              marker-end="url(#lessonArrow)"
+            >
+              <path d="M18 73 H112" />
+              <path d="M156 73 H219" />
+              <path d="M379 73 H440" />
+              <path d="M602 73 H826" />
+              <path d="M757 73 V168 H134 V97" />
+            </g>
+            <circle
+              cx="134"
+              cy="73"
+              r="23"
+              fill="white"
+              stroke="#236c99"
+              stroke-width="2.5"
+            />
+            <text x="128" y="66" font-size="19" fill="#123e61">+</text>
+            <text x="128" y="90" font-size="19" fill="#123e61">−</text>
+            <rect
+              x="219"
+              y="37"
+              width="160"
+              height="72"
+              rx="9"
+              fill="#174e75"
+            />
+            <rect
+              x="440"
+              y="37"
+              width="162"
+              height="72"
+              rx="9"
+              fill="#174e75"
+            />
+            <g font-size="16" fill="#fff" text-anchor="middle">
+              <text x="299" y="65">Controller</text>
+              <text x="299" y="89">C(s)</text>
+              <text x="521" y="65">Altitude plant</text>
+              <text x="521" y="89">Gₚ(s)</text>
+            </g>
+            <g font-size="16" fill="#153e5e">
+              <text x="15" y="51">R(s)</text>
+              <text x="165" y="52">E(s)</text>
+              <text x="391" y="52">U(s)</text>
+              <text x="788" y="51">Y(s)</text>
+              <text x="325" y="158">Negative unity feedback: H(s) = 1</text>
+            </g>
+          </svg>
+        </div>
+      </section>
+      <div class="lesson-tabs" role="tablist" aria-label="Lesson sections">
+        <button class="active" data-step="0">01 · Tracking error</button
+        ><button data-step="1">02 · Steady-state error</button
+        ><button data-step="2">03 · System type</button
+        ><button data-step="3">04 · Controller comparison</button
+        ><button data-step="4">05 · Quick check</button>
+      </div>
+      <section class="lesson-panel" data-panel="0">
+        <article class="lesson-card">
+          <div class="step-tag">01 / 05 · THE CONCEPT</div>
+          <h2>What is tracking error?</h2>
+          <p>
+            The controller compares the <strong>desired altitude</strong> with
+            the <strong>actual altitude</strong>. Their difference is the
+            tracking error.
+          </p>
+          <div class="math">\[\boxed{e(t)=r(t)-y(t)}\]</div>
+          <div class="concept-grid">
+            <div class="concept">
+              <strong>At 10.00 m</strong>
+              <p>\(e(t)=10-10=0\) m.</p>
+            </div>
+            <div class="concept">
+              <strong>At 9.90 m</strong>
+              <p>\(e(t)=10-9.90=+0.10\) m.</p>
+            </div>
+            <div class="concept">
+              <strong>During takeoff</strong>
+              <p>The tracking error keeps changing as the drone moves.</p>
+            </div>
+          </div>
+          <p>
+            Tracking error changes throughout the response. But what error
+            remains after the system has settled?
+          </p>
+          <div class="actions">
+            <button class="btn primary" data-next="1">
+              Next: steady-state error →
+            </button>
+          </div>
+        </article>
+      </section>
+      <section class="lesson-panel" data-panel="1" hidden>
+        <article class="lesson-card">
+          <div class="step-tag">02 / 05 · STEADY-STATE ERROR</div>
+          <h2>What error remains after the drone settles?</h2>
+          <p>
+            <strong>Steady-state error</strong> is the tracking error that
+            remains after the system has settled.
+          </p>
+          <div class="math">\[\boxed{e_{ss}=\lim_{t\to\infty}e(t)}\]</div>
+          <p>
+            Example: if the target is 10 m and the drone settles at 9.9 m,
+            \(e_{ss}=10-9.9=0.1\text{ m}\).
+          </p>
+
+          <h3>How do we calculate it?</h3>
+          <p>
+            The same tracking error can be written in the Laplace domain. Here,
+            <strong>R(s)</strong> is the desired altitude and
+            <strong>Y(s)</strong> is the actual altitude:
+          </p>
+          <div class="math">\[\boxed{E(s)=R(s)-Y(s)}\]</div>
+          <p>
+            <strong>E(s) is not the steady-state error.</strong> It is the
+            tracking error in the Laplace domain.
+          </p>
+          <p>
+            For unity feedback, \(Y(s)=\frac{L(s)}{1+L(s)}R(s)\). Therefore:
+          </p>
+          <div class="math">
+            \[E(s)=R(s)-\frac{L(s)}{1+L(s)}R(s) =\boxed{\frac{R(s)}{1+L(s)}}\]
+          </div>
+          <button class="btn derive-btn" id="openDerivation" type="button">
+            Why does it simplify to this?
+          </button>
+          <p>
+            Now use the <strong>Final Value Theorem</strong> to find the error
+            after settling:
+          </p>
+          <div class="math">\[\boxed{e_{ss}=\lim_{s\to0}sE(s)}\]</div>
+          <p>For the 10 m step, \(R(s)=10/s\):</p>
+          <div class="math">\[e_{ss}=\lim_{s\to0}\frac{10}{1+L(s)}\]</div>
+          <p>
+            <strong>Important:</strong> the Final Value Theorem is used only
+            when the relevant closed-loop error dynamics satisfy its stability
+            conditions.
+          </p>
+          <div class="actions">
+            <button class="btn" data-next="0">← Previous</button
+            ><button class="btn primary" data-next="2">
+              Next: identify system type →
+            </button>
+          </div>
+        </article>
+      </section>
+      <section class="lesson-panel" data-panel="2" hidden>
+        <article class="lesson-card">
+          <div class="step-tag">03 / 05 · THE RULE</div>
+          <h2>Count the integrators in the open loop</h2>
+          <p>
+            The system type is the number of uncancelled poles at the origin in
+            the open-loop transfer function \(L(s)\). It helps predict tracking
+            error for step, ramp and parabolic references.
+          </p>
+          <div class="concept-grid">
+            <div class="concept">
+              <strong>Type 0</strong>
+              <div>\[L(s)=\frac{K}{s+2}\]</div>
+              <p>No pole at the origin. A step can leave a nonzero error.</p>
+            </div>
+            <div class="concept">
+              <strong>Type 1</strong>
+              <div>\[L(s)=\frac{K}{s(s+2)}\]</div>
+              <p>
+                One pole at the origin. Stable closed loop → zero step error.
+              </p>
+            </div>
+            <div class="concept">
+              <strong>Type 2</strong>
+              <div>\[L(s)=\frac{K}{s^2(s+2)}\]</div>
+              <p>
+                Two poles at the origin. Stable closed loop → zero step and ramp
+                error.
+              </p>
+            </div>
+          </div>
+          <p class="muted">
+            For the drone comparison, the step-reference error and the
+            constant-disturbance response are two different tests. Do not use
+            the wind-on result as the wind-free step-error prediction.
+          </p>
+          <div class="actions">
+            <button class="btn" data-next="1">← Previous</button
+            ><button class="btn primary" data-next="3">
+              Next: compare controllers →
+            </button>
+          </div>
+        </article>
+      </section>
+      <section class="lesson-panel" data-panel="3" hidden>
+        <article class="lesson-card">
+          <div class="step-tag">04 / 05 · APPLY THE IDEA</div>
+          <h2>What should you see in Experiment 1?</h2>
+          <p>
+            The comparison plant has no integrator. Adding integral action in PI
+            or PID changes the open-loop type. Keep the plant and proportional
+            gain fixed when comparing controllers.
+          </p>
+          <div class="response-explainer">
+            <div class="response-title">What is transient response?</div>
+            <div class="response-row">
+              <div class="response-item">
+                <span class="response-label">Transient response</span>
+                <span class="response-text"
+                  ><b>Before settling</b> — rise time, overshoot and settling
+                  time.</span
+                >
+              </div>
+              <div class="response-arrow">→</div>
+              <div class="response-item">
+                <span class="response-label">Steady state</span>
+                <span class="response-text"
+                  ><b>After settling</b> — the final output and remaining
+                  error.</span
+                >
+              </div>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Controller</th>
+                <th>Step-reference result (stable loop)</th>
+                <th>What to observe</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>P</td>
+                <td>Nonzero \(e_{ss}\)</td>
+                <td>Altitude settles below the 10 m reference.</td>
+              </tr>
+              <tr>
+                <td>PD</td>
+                <td>Nonzero \(e_{ss}\)</td>
+                <td>
+                  Derivative action changes how the system behaves before
+                  settling (the transient response), but does not remove the
+                  steady-state error at the same \(K_P\).
+                </td>
+              </tr>
+              <tr>
+                <td>PI</td>
+                <td>Zero \(e_{ss}\)</td>
+                <td>
+                  Integral action removes the persistent step-reference offset.
+                </td>
+              </tr>
+              <tr>
+                <td>PID</td>
+                <td>Zero \(e_{ss}\)</td>
+                <td>
+                  Integral action removes the steady-state error; derivative
+                  action changes how the system behaves before settling.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="math">
+            \[e_{ss,\,P}=e_{ss,\,PD}=\frac{10}{1+K_PG_p(0)}\qquad
+            e_{ss,\,PI}=e_{ss,\,PID}=0\]
+          </div>
+          <p>
+            These predictions are for a wind-free step reference and stable
+            closed-loop operation. After recording all four controllers, try the
+            constant disturbance as a separate recovery exercise.
+          </p>
+          <div class="actions">
+            <button class="btn" data-next="2">← Previous</button
+            ><button class="btn primary" data-next="4">
+              Next: quick check →
+            </button>
+          </div>
+        </article>
+      </section>
+      <section class="lesson-panel" data-panel="4" hidden>
+        <article class="lesson-card">
+          <div class="step-tag">05 / 05 · KNOWLEDGE CHECK</div>
+          <h2>Check your understanding</h2>
+          <p>
+            For the same stable comparison plant and proportional gain, which
+            controllers eliminate the steady-state error to a constant 10 m step
+            reference?
+          </p>
+          <label class="quiz-option"
+            ><input type="radio" name="q" value="a" /> P and PD</label
+          ><label class="quiz-option"
+            ><input type="radio" name="q" value="b" /> PI and PID</label
+          ><label class="quiz-option"
+            ><input type="radio" name="q" value="c" /> All four
+            controllers</label
+          ><button class="btn primary" id="checkAnswer">Check answer</button>
+          <p class="feedback" id="feedback" aria-live="polite"></p>
+          <div class="lesson-footer">
+            <button class="btn" data-next="3">← Previous</button
+            ><a class="btn primary" href="drone.html">Try Experiment 1 →</a
+            ><a class="btn" href="home.html">Return home</a>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div
+      class="derive-modal"
+      id="derivationModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="deriveTitle"
+    >
+      <div class="derive-dialog">
+        <button
+          class="derive-close"
+          id="closeDerivation"
+          type="button"
+          aria-label="Close"
+        >
+          &times;
+        </button>
+        <h3 id="deriveTitle">Why is \(E(s)=R(s)-Y(s)\)?</h3>
+        <p class="derive-intro">
+          The error is simply the gap between what we want and what we actually
+          get.
+        </p>
+        <div class="derive-step">
+          <strong>1. Identify the two signals</strong>
+          <p>
+            \(R(s)\) = desired drone altitude. \(Y(s)\) = actual drone altitude.
+          </p>
+          <div>\[\boxed{E(s)=R(s)-Y(s)}\]</div>
+        </div>
+        <div class="derive-step">
+          <strong>2. Substitute the unity-feedback output</strong>
+          <div>\[Y(s)=\frac{L(s)}{1+L(s)}R(s)\]</div>
+          <div>\[E(s)=R(s)-\frac{L(s)}{1+L(s)}R(s)\]</div>
+        </div>
+        <div class="derive-step">
+          <strong>3. Simplify</strong>
+          <p>Factor out \(R(s)\), then combine the terms inside the bracket:</p>
+          <div>
+            \[E(s)=R(s)\left(1-\frac{L(s)}{1+L(s)}\right)=R(s)\left(\frac{1+L(s)-L(s)}{1+L(s)}\right)=\boxed{\frac{R(s)}{1+L(s)}}\]
+          </div>
+          <p>
+            The \(+L(s)\) and \(-L(s)\) cancel. Here \(L(s)=C(s)G_p(s)\), which
+            represents the controller and plant together.
+          </p>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <div><b>EE3011</b> Interactive Learning Platform</div>
+      <p>
+        © 2026 Nanyang Technological University — School of Electrical &amp;
+        Electronic Engineering
+      </p>
+    </footer>
+    <script>
+      function toggleMenu(id) {
+        document
+          .querySelectorAll(".site-nav .dropdown")
+          .forEach((m) =>
+            m.classList.toggle(
+              "show",
+              m.id === id ? !m.classList.contains("show") : false,
+            ),
+          );
+      }
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".site-nav .nav-group"))
+          document
+            .querySelectorAll(".site-nav .dropdown")
+            .forEach((m) => m.classList.remove("show"));
+      });
+    </script>
+    <script>
+      const derivationModal = document.getElementById("derivationModal");
+      document
+        .getElementById("openDerivation")
+        .addEventListener("click", () => {
+          derivationModal.classList.add("open");
+          if (window.MathJax && MathJax.typesetPromise)
+            MathJax.typesetPromise([derivationModal]);
+        });
+      document
+        .getElementById("closeDerivation")
+        .addEventListener("click", () =>
+          derivationModal.classList.remove("open"),
+        );
+      derivationModal.addEventListener("click", (e) => {
+        if (e.target === derivationModal)
+          derivationModal.classList.remove("open");
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") derivationModal.classList.remove("open");
+      });
+      const steps = [...document.querySelectorAll("[data-step]")],
+        panels = [...document.querySelectorAll("[data-panel]")];
+      function go(n) {
+        steps.forEach((b) => {
+          const active = Number(b.dataset.step) === n;
+          b.classList.toggle("active", active);
+          b.setAttribute("aria-selected", active ? "true" : "false");
+        });
+        panels.forEach((p) => (p.hidden = Number(p.dataset.panel) !== n));
+      }
+      steps.forEach((b) =>
+        b.addEventListener("click", () => go(Number(b.dataset.step))),
+      );
+      document
+        .querySelectorAll("[data-next]")
+        .forEach((b) =>
+          b.addEventListener("click", () => go(Number(b.dataset.next))),
+        );
+      document.getElementById("checkAnswer").addEventListener("click", () => {
+        const choice = document.querySelector("input[name=q]:checked");
+        document.getElementById("feedback").textContent = !choice
+          ? "Select an answer first."
+          : choice.value === "b"
+            ? "Correct. Integral action in PI and PID removes the step-reference offset for a stable closed loop."
+            : "Not quite. Which controllers include integral action?";
+      });
+    </script>
+  </body>
+</html>

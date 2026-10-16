@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EE3011 | Modelling &amp; Control</title>
+    <link rel="stylesheet" href="home-style.css" />
+    <script src="script.js" defer></script>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <a class="brand" href="home.html">
+        <span class="brand-icon">EE</span>
+        <div>
+          <b>EE3011</b>
+          <small>MODELLING &amp; CONTROL</small>
+        </div>
+      </a>
+
+      <nav class="site-nav" aria-label="Main navigation">
+        <a href="home.html" class="current">Home</a>
+
+        <div class="nav-group">
+          <button
+            class="nav-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="part1"
+          >
+            Control Fundamentals <span class="chevron"></span>
+          </button>
+          <div class="dropdown" id="part1">
+            <a href="root_locus.html">Root Locus</a>
+            <a href="drone.html">PID Control</a>
+            <a href="steady_state_learning.html">Steady-State Error</a>
+            <a href="pt1_quiz.html">PT1 Quiz</a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <button
+            class="nav-button"
+            type="button"
+            aria-expanded="false"
+            aria-controls="part2"
+          >
+            Frequency Response <span class="chevron"></span>
+          </button>
+          <div class="dropdown" id="part2">
+            <a href="root_locus.html">Root Locus</a>
+            <a href="drone.html">PID Control</a>
+            <a href="pt2_quiz.html">PT2 Quiz</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="overline">INTERACTIVE LEARNING PLATFORM</p>
+            <h1>Learn. Interact.<br /><em>Visualise. Control.</em></h1>
+            <p class="intro">
+              Explore EE3011 Modelling &amp; Control through guided lessons,
+              visualisations, simulations and quizzes.
+            </p>
+            <div class="actions">
+              <a class="btn primary" href="steady_state_learning.html">
+                Start Learning <span aria-hidden="true">&rarr;</span>
+              </a>
+              <button class="btn secondary" id="askBot" type="button">
+                Ask ControlBot
+              </button>
+            </div>
+            <div class="stats">
+              <div><strong>2</strong><span>Main learning parts</span></div>
+              <div><strong>4</strong><span>Topic experiences</span></div>
+              <div>
+                <strong>&infin;</strong><span>Practice at your pace</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-art">
+            <span class="orbit orbit-one" aria-hidden="true"></span>
+            <span class="orbit orbit-two" aria-hidden="true"></span>
+            <span class="bubble bubble-one" aria-hidden="true"></span>
+            <span class="bubble bubble-two" aria-hidden="true"></span>
+            <span class="bubble bubble-three" aria-hidden="true"></span>
+
+            <div class="robot-halo">
+              <img src="bot-hello.png" alt="Friendly ControlBot robot" />
+            </div>
+
+            <div class="speech">
+              <small>CONTROLBOT</small>
+              <strong>Hi there! &#128075;</strong>
+              <p>
+                I'll guide you through control systems one concept at a time.
+              </p>
+            </div>
+
+            <div class="online">
+              <span class="dot"></span> CONTROLBOT ONLINE
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="learning-path" aria-label="Learning path">
+        <span class="path-title">LEARNING PATH</span>
+        <div class="path-step selected"><b>01</b>Control Fundamentals</div>
+        <span class="separator" aria-hidden="true">&rarr;</span>
+        <div class="path-step"><b>02</b>Frequency Response</div>
+        <span class="separator" aria-hidden="true">&rarr;</span>
+        <div class="path-step"><b>03</b>Quiz &amp; Practice</div>
+      </section>
+
+      <section class="topics" id="topics">
+        <div class="content-wrap">
+          <p class="overline">CHOOSE A TOPIC</p>
+          <h2>What would you like to learn?</h2>
+
+          <div class="topic-grid">
+            <a
+              class="topic-card blue"
+              href="root_locus.html"
+              data-bot-tip="Root Locus shows how closed-loop poles move as system gain changes."
+            >
+              <div class="card-label">
+                <b>01</b><small>CONTROL FUNDAMENTALS</small>
+              </div>
+              <div class="visual root-visual">
+                <span class="axis-x"></span>
+                <span class="axis-y"></span>
+                <span class="pole left">&times;</span>
+                <span class="pole right">&times;</span>
+                <span class="root-ring"></span>
+              </div>
+              <h3>Root Locus</h3>
+              <p>
+                Visualise pole movement and understand how controller gain
+                affects system behaviour.
+              </p>
+              <span class="card-action"> Start topic <span>&rarr;</span> </span>
+            </a>
+
+            <a
+              class="topic-card cyan"
+              href="steady_state_learning.html"
+              data-bot-tip="PID combines proportional, integral and derivative actions to shape the response."
+            >
+              <div class="card-label">
+                <b>02</b><small>CONTROL FUNDAMENTALS</small>
+              </div>
+              <div class="visual pid-visual">
+                <div><b>P</b><small>PRESENT</small></div>
+                <span>&plus;</span>
+                <div><b>I</b><small>PAST</small></div>
+                <span>&plus;</span>
+                <div><b>D</b><small>TREND</small></div>
+              </div>
+              <h3>PID &amp; Steady-State Error</h3>
+              <p>
+                Learn error constants and P/PI/PD/PID control before testing
+                your drone.
+              </p>
+              <span class="card-action">
+                Start guided lesson <span>&rarr;</span>
+              </span>
+            </a>
+
+            <a
+              class="topic-card purple"
+              href="root_locus.html"
+              data-bot-tip="Frequency Response studies how a system behaves when the input frequency changes."
+            >
+              <div class="card-label">
+                <b>03</b><small>FREQUENCY RESPONSE</small>
+              </div>
+              <div class="visual wave-visual">
+                <svg viewBox="0 0 300 100" aria-hidden="true">
+                  <path
+                    d="M0 50 C25 0 50 0 75 50 S125 100 150 50 S200 0 225 50 S275 100 300 50"
+                  />
+                </svg>
+              </div>
+              <h3>Frequency Response</h3>
+              <p>
+                Explore the second part of the course using your team's existing
+                learning materials.
+              </p>
+              <span class="card-action">
+                Explore topic <span>&rarr;</span>
+              </span>
+            </a>
+
+            <div class="topic-card amber">
+              <div class="card-label">
+                <b>04</b><small>KNOWLEDGE CHECK</small>
+              </div>
+              <div class="visual quiz-visual">
+                <span class="question">&quest;</span>
+                <strong>Test what<br />you know</strong>
+              </div>
+              <h3>Practice Quizzes</h3>
+              <p>
+                Check your understanding after each part before moving to the
+                next stage.
+              </p>
+              <div class="quiz-buttons">
+                <a href="pt1_quiz.html">PT1 Quiz</a>
+                <a href="pt2_quiz.html">PT2 Quiz</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="guide content-wrap">
+        <img src="bot-learn.png" alt="ControlBot ready to teach" />
+        <div>
+          <p class="overline">CONTROLBOT RECOMMENDS</p>
+          <h2>Not sure where to begin?</h2>
+          <p>
+            Start with <strong>Control Fundamentals</strong>. Learn Root Locus
+            and PID, complete PT1 Quiz, then continue to Frequency Response and
+            PT2 Quiz.
+          </p>
+        </div>
+        <a class="btn primary" href="steady_state_learning.html">
+          Begin Control Fundamentals &rarr;
+        </a>
+      </section>
+    </main>
+
+    <aside
+      class="bot-popup"
+      id="botPopup"
+      role="status"
+      aria-live="polite"
+      hidden
+    >
+      <img src="bot-thinking.png" alt="ControlBot" />
+      <div>
+        <small>CONTROLBOT</small>
+        <button type="button" id="closeBot" aria-label="Close message">
+          &times;
+        </button>
+        <p id="botText"></p>
+      </div>
+    </aside>
+
+    <footer>
+      <div><b>EE3011</b> Interactive Learning Platform</div>
+      <p>
+        &copy; 2026 Nanyang Technological University &mdash; School of
+        Electrical &amp; Electronic Engineering
+      </p>
+    </footer>
+
+    <script>
+      document
+        .querySelectorAll(".site-header .nav-button")
+        .forEach((button) => {
+          button.addEventListener("click", () => {
+            const menu = document.getElementById(
+              button.getAttribute("aria-controls"),
+            );
+            if (!menu) return;
+
+            const opening = !menu.classList.contains("show");
+
+            document
+              .querySelectorAll(".site-header .dropdown")
+              .forEach((dropdown) => dropdown.classList.remove("show"));
+
+            document
+              .querySelectorAll(".site-header .nav-button")
+              .forEach((btn) => btn.setAttribute("aria-expanded", "false"));
+
+            menu.classList.toggle("show", opening);
+            button.setAttribute("aria-expanded", String(opening));
+          });
+        });
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".site-header .nav-group")) {
+          document
+            .querySelectorAll(".site-header .dropdown")
+            .forEach((menu) => menu.classList.remove("show"));
+
+          document
+            .querySelectorAll(".site-header .nav-button")
+            .forEach((btn) => btn.setAttribute("aria-expanded", "false"));
+        }
+      });
+    </script>
+  </body>
+</html>
