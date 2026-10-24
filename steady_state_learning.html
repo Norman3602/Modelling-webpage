@@ -2,23 +2,59 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>EE3011 | Steady-State Error</title>
     <link rel="stylesheet" href="home-style.css" />
+
     <style>
+      body {
+        margin: 0;
+        background: #e7edf4;
+        color: #173451;
+        font:
+          16px/1.75 Arial,
+          sans-serif;
+      }
+
+      .site-header *,
+      .lesson-hero *,
+      .lesson-wrap *,
+      .derive-modal * {
+        box-sizing: border-box;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+      [hidden] {
+        display: none !important;
+      }
+
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      .table-scroll:focus-visible {
+        outline: 3px solid #49b7dc;
+        outline-offset: 4px;
+      }
+
+      /* Header */
       .site-header {
-        height: 90px;
-        background: #0b1f3a;
-        color: #fff;
+        position: sticky;
+        top: 0;
+        z-index: 500;
         display: flex;
         align-items: center;
+        gap: 40px;
+        min-height: 90px;
         padding: 0 4.5%;
-        gap: 48px;
-        position: relative;
-        z-index: 500;
+        background: #0b1f3a;
+        color: white;
         box-shadow: 0 5px 20px #08182b2b;
         font-family: Arial, sans-serif;
       }
+
       .site-header .brand {
         display: flex;
         align-items: center;
@@ -27,594 +63,1035 @@
         color: white;
         text-decoration: none;
       }
+
       .site-header .brand-icon {
+        display: grid;
+        place-items: center;
         width: 46px;
         height: 46px;
         border: 1px solid #4fc9ef;
         border-radius: 8px;
-        display: grid;
-        place-items: center;
         color: #5edcff;
         font-weight: bold;
-        font-size: 16px;
       }
-      .site-header .brand b,
+
+      .site-header .brand b {
+        display: block;
+        font:
+          700 28px Georgia,
+          serif;
+      }
+
       .site-header .brand small {
         display: block;
-      }
-      .site-header .brand b {
-        font: 700 28px Georgia;
-      }
-      .site-header .brand small {
-        font-size: 12px;
-        letter-spacing: 1.8px;
-        color: #8ca4bf;
         margin-top: 2px;
+        color: #9cb1c7;
+        font-size: 11px;
+        letter-spacing: 1.8px;
       }
+
       .site-nav {
         display: flex;
         align-items: center;
-        gap: 34px;
-        font-size: 18px;
+        gap: 30px;
       }
-      .site-nav > a {
-        color: #aebdd0;
+
+      .site-nav > a,
+      .site-nav .nav-button {
+        display: inline-block;
+        padding: 30px 0;
+        border: 0;
+        background: none;
+        color: #bdcbd9;
         text-decoration: none;
-        padding: 35px 0;
+        font-size: 16px;
+        cursor: pointer;
       }
+
+      .site-nav > a:hover,
+      .site-nav .nav-button:hover {
+        color: white;
+      }
+
       .site-nav .nav-group {
         position: relative;
       }
-      .site-nav .nav-button {
-        border: 0;
-        background: none;
-        color: #aebdd0;
-        cursor: pointer;
-        padding: 34px 0;
-        font-size: 18px;
+
+      .site-nav .chevron {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        margin: 0 0 3px 6px;
+        border-right: 1.5px solid currentColor;
+        border-bottom: 1.5px solid currentColor;
+        transform: rotate(45deg);
       }
-      .site-nav .nav-button:hover,
-      .site-nav a:hover {
-        color: white;
-      }
+
       .site-nav .dropdown {
         display: none;
         position: absolute;
-        top: 69px;
+        top: calc(100% - 8px);
         left: 50%;
         transform: translateX(-50%);
         min-width: 220px;
         padding: 7px;
-        background: white;
-        border: 1px solid #dce8f3;
+        border: 1px solid #b3c5d5;
         border-radius: 10px;
+        background: white;
         box-shadow: 0 15px 40px #09213d2b;
         z-index: 900;
       }
+
       .site-nav .dropdown.show {
         display: block;
       }
+
       .site-nav .dropdown a {
         display: block;
+        padding: 11px 14px;
+        border-radius: 6px;
         color: #23415f;
         text-decoration: none;
-        padding: 12px 14px;
-        border-radius: 6px;
-        font-size: 16px;
-      }
-      .site-nav .dropdown a:hover {
-        background: #edf7ff;
-        color: #168cc0;
-      }
-      @media (max-width: 800px) {
-        .site-header {
-          height: auto;
-          min-height: 90px;
-          flex-wrap: wrap;
-          gap: 8px;
-          padding: 12px 4%;
-        }
-        .site-nav {
-          width: 100%;
-          flex-wrap: wrap;
-          gap: 15px;
-          font-size: 14px;
-        }
-        .site-nav .nav-button {
-          font-size: 14px;
-          padding: 12px 0;
-        }
-        .site-nav > a {
-          padding: 12px 0;
-        }
-        .site-nav .dropdown {
-          top: 38px;
-          left: 0;
-          transform: none;
-        }
-      }
-
-      body {
-        background: #f4f8fc;
-        color: #142b47;
-        font:
-          17px/1.65 Arial,
-          sans-serif;
-      }
-      .site-header {
-        position: sticky;
-        top: 0;
-      }
-      .lesson-hero {
-        background: #0b1f3a;
-        color: white;
-        padding: 68px max(6%, calc((100% - 1300px) / 2));
-        display: grid;
-        grid-template-columns: 1.5fr 1fr;
-        gap: 35px;
-        align-items: center;
-      }
-      .lesson-hero .eyebrow {
-        color: #6fdaff;
-        letter-spacing: 2px;
-        font-size: 13px;
-      }
-      .lesson-hero h1 {
-        font: 700 clamp(36px, 4vw, 60px)/1.12 Georgia;
-        margin: 14px 0;
-      }
-      .lesson-hero h1 span {
-        color: #56d4fa;
-      }
-      .lesson-hero p {
-        color: #b6cadc;
-        max-width: 690px;
-        font-size: 19px;
-      }
-      .hero-card {
-        background: #143455;
-        border: 1px solid #41718e;
-        border-radius: 18px;
-        padding: 26px;
-      }
-      .hero-card b {
-        display: block;
-        color: #76dcff;
-        margin-bottom: 15px;
-      }
-      .hero-card .equation {
-        color: white;
-        font-size: 24px;
-      }
-      .lesson-wrap {
-        max-width: 1250px;
-        margin: 0 auto;
-        padding: 40px 25px 90px;
-      }
-      .lesson-tabs {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin: 0 0 26px;
-      }
-      .lesson-tabs button,
-      .btn {
-        border: 1px solid #c9dce9;
-        background: white;
-        border-radius: 9px;
-        padding: 12px 17px;
-        color: #214361;
-        font-weight: bold;
-        cursor: pointer;
-        text-decoration: none;
-        font-size: 15px;
-      }
-      .lesson-tabs button.active,
-      .btn.primary {
-        background: #1589bd;
-        color: white;
-        border-color: #1589bd;
-      }
-      .lesson-card {
-        background: white;
-        border: 1px solid #dce6ef;
-        box-shadow: 0 8px 28px #153b560d;
-        border-radius: 16px;
-        padding: clamp(22px, 3vw, 40px);
-        margin-bottom: 20px;
-      }
-      .lesson-card h2 {
-        font: 700 32px Georgia;
-        margin: 8px 0 16px;
-      }
-      .lesson-card h3 {
-        font: 700 22px Georgia;
-      }
-      .step-tag {
-        font-size: 12px;
-        letter-spacing: 1.6px;
-        color: #168fc2;
-        font-weight: bold;
-      }
-      .lesson-card p {
-        color: #4d657b;
-      }
-      .math {
-        background: #eef7fc;
-        border-left: 4px solid #2ba9d6;
-        border-radius: 9px;
-        padding: 20px;
-        margin: 18px 0;
-        text-align: center;
-        overflow-x: auto;
-        color: #133958;
-        font-size: 20px;
-      }
-      .concept-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-      }
-      .concept {
-        background: #f3f9fd;
-        border: 1px solid #dce9f1;
-        border-radius: 12px;
-        padding: 18px;
-      }
-      .concept strong {
-        display: block;
-        color: #147ca8;
-      }
-      .concept p {
-        margin-bottom: 0;
-        font-size: 15px;
-      }
-
-      .response-explainer {
-        margin: 18px 0 0;
-        padding: 16px 18px;
-        background: #f3f9fd;
-        border: 1px solid #dce9f1;
-        border-radius: 12px;
-      }
-      .response-title {
-        color: #147ca8;
-        font-weight: 800;
-        font-size: 16px;
-        margin-bottom: 12px;
-      }
-      .response-row {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        gap: 14px;
-        align-items: center;
-      }
-      .response-item {
-        display: flex;
-        align-items: baseline;
-        gap: 10px;
-        min-width: 0;
-      }
-      .response-label {
-        flex: 0 0 auto;
-        font-weight: 800;
-        color: #0f6f9b;
-      }
-      .response-text {
-        color: #385a76;
-        line-height: 1.45;
-      }
-      .response-text b {
-        color: #173a57;
-      }
-      .response-arrow {
-        color: #1e91bd;
-        font-size: 24px;
-        font-weight: 800;
-      }
-      @media (max-width: 900px) {
-        .response-row {
-          grid-template-columns: 1fr;
-          gap: 8px;
-        }
-        .response-arrow {
-          transform: rotate(90deg);
-          justify-self: center;
-        }
-        .response-item {
-          align-items: flex-start;
-        }
-      }
-      .lesson-panel[hidden] {
-        display: none;
-      }
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 25px;
-      }
-      .feedback {
-        min-height: 28px;
-        font-weight: bold;
-        color: #126c9d;
-      }
-      .quiz-option {
-        display: block;
-        padding: 11px 14px;
-        border: 1px solid #dce6ef;
-        border-radius: 8px;
-        margin: 9px 0;
-        cursor: pointer;
-      }
-      .quiz-option:has(input:checked) {
-        background: #e3f6ff;
-        border-color: #29a7d4;
-      }
-      .lesson-card table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      .lesson-card th,
-      .lesson-card td {
-        text-align: left;
-        padding: 13px;
-        border-bottom: 1px solid #dce6ef;
-      }
-      .lesson-card th {
-        background: #eef7fc;
-      }
-      .lesson-footer {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-top: 25px;
-      }
-      .muted {
-        color: #668198;
-      }
-      .diagram {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        padding: 25px;
-        background: #f0f8fc;
-        border-radius: 12px;
-      }
-      .diagram span {
-        background: #174c6f;
-        color: white;
-        padding: 14px;
-        border-radius: 8px;
-      }
-      .diagram b {
-        color: #168fc2;
-      }
-      @media (max-width: 800px) {
-        .lesson-hero {
-          grid-template-columns: 1fr;
-          padding: 38px 6%;
-        }
-        .concept-grid {
-          grid-template-columns: 1fr;
-        }
-        .lesson-card table {
-          font-size: 13px;
-        }
-        .lesson-card th,
-        .lesson-card td {
-          padding: 7px;
-        }
-        .hero-card .equation {
-          font-size: 19px;
-        }
-      }
-      .lesson-tabs button.active::after {
-        content: none !important;
-        display: none !important;
-      }
-      .lesson-tabs button {
-        position: relative;
-      }
-      .feedback-diagram {
-        background: #edf8ff;
-        border: 1px solid #cfe6f5;
-        border-radius: 16px;
-        padding: 20px 24px;
-        margin: 0 0 24px;
-      }
-      .feedback-diagram h2 {
-        font: 700 21px Georgia;
-        margin: 0 0 5px;
-      }
-      .feedback-diagram p {
-        margin: 0 0 10px;
-        color: #536c84;
         font-size: 14px;
       }
+
+      .site-nav .dropdown a:hover {
+        background: #edf7ff;
+        color: #167fa9;
+      }
+
+      /* Introduction */
+      .lesson-hero {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        align-items: center;
+        gap: 48px;
+        padding: 58px max(5%, calc((100% - 1180px) / 2));
+        border-bottom: 4px solid #36b7df;
+        background:
+          radial-gradient(
+            circle at 90% 10%,
+            rgba(56, 189, 248, 0.14),
+            transparent 45%
+          ),
+          #0b1f3a;
+        color: white;
+      }
+
+      .eyebrow {
+        display: inline-block;
+        padding: 6px 12px;
+        border: 1px solid #547894;
+        border-radius: 6px;
+        background: #14314b;
+        color: #a4e7ff;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+      }
+
+      .lesson-hero h1 {
+        margin: 20px 0 16px;
+        color: white;
+        font:
+          700 clamp(32px, 3.6vw, 49px)/1.18 Georgia,
+          serif;
+        letter-spacing: -0.7px;
+      }
+
+      .lesson-hero h1 span {
+        color: #69d6f6;
+      }
+
+      .lesson-hero p {
+        max-width: 590px;
+        margin: 0 0 25px;
+        color: #d0dce7;
+        font-size: 16px;
+        line-height: 1.8;
+      }
+
+      .hero-card {
+        min-width: 0;
+        padding: 27px;
+        border: 1.5px solid #547894;
+        border-radius: 16px;
+        background: #18334e;
+        box-shadow: 0 15px 35px #00000016;
+      }
+
+      .hero-card > b {
+        display: block;
+        margin-bottom: 15px;
+        color: #a4e7ff;
+        font-size: 11px;
+        letter-spacing: 1.8px;
+      }
+
+      .hero-card .equation {
+        clear: both;
+        overflow-x: auto;
+        color: white;
+        font-size: clamp(17px, 1.8vw, 22px);
+      }
+
+      .hero-card p {
+        margin: 12px 0 0;
+        font-size: 14px;
+      }
+
+      .lesson-bot {
+        float: right;
+        width: 82px;
+        height: 90px;
+        margin: -10px -5px 0 12px;
+        object-fit: contain;
+      }
+
+      /* Learning area */
+      .lesson-wrap {
+        display: block;
+        width: auto;
+        max-width: 1230px;
+        margin: 0 auto;
+        padding: 32px 25px 75px;
+        box-sizing: border-box;
+      }
+
+      .feedback-diagram {
+        margin-bottom: 26px;
+        padding: 22px 26px 12px;
+        border: 1.5px solid #9eb3c7;
+        border-radius: 14px;
+        background: #f8fbfe;
+      }
+
+      .feedback-diagram h2 {
+        margin: 0 0 5px;
+        color: #193855;
+        font:
+          700 19px/1.4 Arial,
+          sans-serif;
+      }
+
+      .feedback-diagram p {
+        margin: 6px 0 10px;
+        color: #405b73;
+        font-size: 14px;
+      }
+
       .feedback-diagram svg {
         display: block;
         width: 100%;
         height: auto;
-        max-height: 210px;
+        max-height: 165px;
       }
+
       .feedback-diagram svg text {
         font-family: Arial, sans-serif;
       }
+      .diagram-scroll {
+        overflow-x: auto;
+      }
+
+      /* Progress */
+      .learning-progress {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 24px 0 14px;
+      }
+
+      .learning-progress-label {
+        flex-shrink: 0;
+        color: #284b69;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+      }
+
+      .learning-progress-track {
+        flex: 1;
+        height: 7px;
+        overflow: hidden;
+        border-radius: 20px;
+        background: #c1d0de;
+      }
+
+      .learning-progress-fill {
+        width: 20%;
+        height: 100%;
+        border-radius: inherit;
+        background: #167fa9;
+        transition: width 0.25s;
+      }
+
+      /* Navigation */
+      .lesson-tabs {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 9px;
+        margin: 0 0 24px;
+        padding: 8px;
+        border: 1.5px solid #9eb3c7;
+        border-radius: 13px;
+        background: #dce6ef;
+      }
+
+      .lesson-tabs button {
+        position: relative;
+        min-width: 0;
+        min-height: 58px;
+        padding: 12px 9px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        color: #2e4c66;
+        font:
+          700 13px/1.45 Arial,
+          sans-serif;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          color 0.15s;
+      }
+
+      .lesson-tabs button::after {
+        display: none !important;
+      }
+
+      .lesson-tabs button:hover {
+        background: white;
+        color: #173c60;
+      }
+
+      .lesson-tabs button.active {
+        border-color: #173858;
+        background: #173858;
+        color: white;
+      }
+
+      /* Content */
+      .lesson-panel {
+        min-width: 0;
+        scroll-margin-top: 115px;
+      }
+
+      .lesson-card {
+        padding: clamp(24px, 4vw, 44px);
+        border: 1.5px solid #91aabd;
+        border-top: 5px solid #208bad;
+        border-radius: 15px;
+        background: white;
+        box-shadow: 0 6px 20px #1734510d;
+      }
+
+      .step-tag {
+        display: inline-block;
+        margin-bottom: 10px;
+        padding: 6px 11px;
+        border-radius: 5px;
+        background: #173858;
+        color: #e0f4ff;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.3px;
+      }
+
+      .lesson-card h2 {
+        max-width: 760px;
+        margin: 12px 0 22px;
+        color: #163451;
+        font:
+          700 clamp(27px, 3vw, 37px)/1.3 Georgia,
+          serif;
+        letter-spacing: -0.3px;
+      }
+
+      .lesson-card h3 {
+        margin: 30px 0 12px;
+        color: #1d3e5c;
+        font:
+          700 20px/1.4 Arial,
+          sans-serif;
+      }
+
+      .lesson-card p {
+        margin: 14px 0;
+        color: #344e67;
+        line-height: 1.85;
+      }
+
+      .lesson-card strong {
+        color: #142f49;
+      }
+
+      .math {
+        margin: 23px 0;
+        padding: 20px 22px;
+        overflow-x: auto;
+        border: 1.5px solid #91b6cb;
+        border-left: 4px solid #187fa5;
+        border-radius: 10px;
+        background: #e6f1f8;
+        color: #143752;
+        font-size: clamp(16px, 1.8vw, 20px);
+        text-align: center;
+      }
+
+      .math mjx-container[display="true"],
+      .hero-card mjx-container[display="true"] {
+        margin: 0.7em 0 !important;
+      }
+
+      .concept-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 15px;
+        margin: 25px 0;
+      }
+
+      .concept {
+        min-width: 0;
+        padding: 22px 20px;
+        border: 1px solid #97b0c5;
+        border-top: 3px solid #208bad;
+        border-radius: 10px;
+        background: #edf3f8;
+      }
+
+      .concept > strong {
+        display: block;
+        margin-bottom: 10px;
+        color: #155f80;
+        font-size: 15px;
+      }
+
+      .concept > div {
+        overflow-x: auto;
+      }
+
+      .concept p {
+        margin-bottom: 0;
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .lesson-card .muted {
+        padding: 15px 18px;
+        border-left: 4px solid #6c91ad;
+        border-radius: 6px;
+        background: #e9f0f6;
+        color: #344e67;
+        font-size: 14px;
+      }
+
+      /* Interactive illustration */
+      .tracking-demo {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        overflow: hidden;
+        margin: 28px 0;
+        border: 1px solid #527b99;
+        border-radius: 15px;
+        background: #102d47;
+      }
+
+      .tracking-demo-scene {
+        min-width: 0;
+        padding: 20px;
+        background:
+          linear-gradient(#ffffff05 1px, transparent 1px),
+          linear-gradient(90deg, #ffffff05 1px, transparent 1px), #102d47;
+        background-size: 28px 28px;
+      }
+
+      .tracking-demo-tag {
+        color: #9adff7;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+      }
+
+      .tracking-demo svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .tracking-demo-controls {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 0;
+        padding: 30px;
+        background: #e9f2f8;
+      }
+
+      .tracking-demo-controls h3 {
+        margin: 0 0 12px;
+        color: #173858;
+        font:
+          700 23px/1.3 Georgia,
+          serif;
+      }
+
+      .tracking-demo-controls p {
+        margin: 0 0 20px;
+        color: #344e67;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .tracking-demo-controls label {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        color: #294b67;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .tracking-demo-controls input {
+        width: 100%;
+        margin: 15px 0 22px;
+        accent-color: #167fa9;
+        cursor: pointer;
+      }
+
+      .tracking-demo-result {
+        padding: 16px;
+        border: 1px solid #9ab6ca;
+        border-radius: 9px;
+        background: white;
+        color: #173858;
+        font-size: 16px;
+        font-weight: 700;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .tracking-demo-controls .tracking-demo-message {
+        min-height: 46px;
+        margin: 13px 0 0;
+        color: #37556f;
+        font-size: 12px;
+      }
+
+      /* Transient response */
+      .response-explainer {
+        margin: 25px 0;
+        padding: 22px;
+        border: 1.5px solid #a2b9cc;
+        border-radius: 12px;
+        background: #edf3f8;
+      }
+
+      .response-title {
+        margin-bottom: 17px;
+        color: #254b69;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .response-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .response-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #155f80;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .response-text {
+        display: block;
+        color: #344e67;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .response-arrow {
+        color: #247b9e;
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      /* Comparison table */
+      .table-scroll {
+        overflow-x: auto;
+        margin: 24px 0;
+        border: 1.5px solid #9eb3c7;
+        border-radius: 10px;
+      }
+
+      .lesson-card table {
+        width: 100%;
+        min-width: 540px;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      .lesson-card th {
+        padding: 15px 17px;
+        border-bottom: 1px solid #9eb3c7;
+        background: #dfeaf3;
+        color: #203e59;
+        font-size: 12px;
+        line-height: 1.5;
+        text-align: left;
+      }
+
+      .lesson-card td {
+        padding: 17px;
+        border-bottom: 1px solid #c0cfdd;
+        color: #344e67;
+        vertical-align: top;
+        line-height: 1.75;
+      }
+
+      .lesson-card td:first-child {
+        color: #155f80;
+        font-weight: 700;
+      }
+
+      .lesson-card tbody tr:nth-child(even) {
+        background: #f0f5f9;
+      }
+      .lesson-card tbody tr:last-child td {
+        border-bottom: 0;
+      }
+
+      /* Actions */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 10px 18px;
+        border: 1px solid #91aabd;
+        border-radius: 8px;
+        background: white;
+        color: #29465f;
+        font:
+          700 14px/1.5 Arial,
+          sans-serif;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+
+      .btn:hover {
+        border-color: #5689a7;
+        background: #eaf3f9;
+      }
+
+      .btn.primary {
+        border-color: #173858;
+        background: #173858;
+        color: white;
+      }
+
+      .btn.primary:hover {
+        border-color: #225477;
+        background: #225477;
+      }
+
+      .lesson-hero .btn.primary {
+        border-color: #75d5f0;
+        background: #75d5f0;
+        color: #0d2d46;
+      }
+
+      .actions,
+      .lesson-footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding-top: 24px;
+        margin-top: 30px;
+        border-top: 1px solid #b7c8d7;
+      }
+
+      .actions .btn.primary {
+        margin-left: auto;
+      }
+
+      .derive-btn {
+        min-height: 38px;
+        padding: 8px 13px;
+        background: #eef4f8;
+        font-size: 13px;
+      }
+
+      /* Knowledge check */
+      .quiz-option {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        min-height: 60px;
+        padding: 17px 20px;
+        margin: 12px 0;
+        border: 1.5px solid #9eb3c7;
+        border-radius: 10px;
+        background: #f3f7fb;
+        color: #29465f;
+        font-size: 15px;
+        cursor: pointer;
+      }
+
+      .quiz-option:hover {
+        border-color: #5689a7;
+        background: #eaf3f9;
+      }
+
+      .quiz-option:has(input:checked) {
+        border-color: #167fa9;
+        background: #deeff8;
+        box-shadow: inset 4px 0 #167fa9;
+      }
+
+      .quiz-option input {
+        flex-shrink: 0;
+        width: 17px;
+        height: 17px;
+        margin: 0;
+        accent-color: #167fa9;
+      }
+
+      #checkAnswer {
+        margin-top: 14px;
+      }
+
+      .feedback {
+        min-height: 28px;
+        margin-top: 18px;
+        color: #155f80;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      /* Derivation popup */
+      .derive-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(7, 24, 44, 0.65);
+      }
+
+      .derive-dialog {
+        position: relative;
+        width: min(800px, 96vw);
+        max-height: 88vh;
+        overflow-y: auto;
+        padding: 34px;
+        border: 1.5px solid #9eb3c7;
+        border-radius: 16px;
+        background: white;
+        box-shadow: 0 25px 80px #07182c40;
+      }
+
+      .derive-dialog h3 {
+        margin: 0 44px 12px 0;
+        color: #173451;
+        font:
+          700 25px/1.4 Georgia,
+          serif;
+      }
+
+      .derive-intro {
+        color: #344e67;
+        font-size: 15px;
+      }
+
+      .derive-step {
+        padding: 18px 20px;
+        margin: 17px 0;
+        overflow-x: auto;
+        border: 1.5px solid #a2b9cc;
+        border-left: 4px solid #187fa5;
+        border-radius: 10px;
+        background: #edf3f8;
+        font-size: 15px;
+      }
+
+      .derive-step p {
+        color: #344e67;
+      }
+
+      .derive-close {
+        position: absolute;
+        top: 16px;
+        right: 18px;
+        display: grid;
+        place-items: center;
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        border: 1px solid #9eb3c7;
+        border-radius: 50%;
+        background: #e6eef5;
+        color: #173a5e;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
+      /* Smaller screens */
+      @media (max-width: 900px) {
+        .site-header {
+          flex-wrap: wrap;
+          gap: 6px;
+          padding: 14px 4%;
+        }
+
+        .site-nav {
+          flex-wrap: wrap;
+          gap: 20px;
+          width: 100%;
+        }
+
+        .site-nav > a,
+        .site-nav .nav-button {
+          padding: 10px 0;
+          font-size: 14px;
+        }
+
+        .site-nav .dropdown {
+          top: 100%;
+          left: 0;
+          transform: none;
+        }
+
+        .lesson-hero {
+          grid-template-columns: 1fr;
+          gap: 28px;
+          padding: 40px 6%;
+        }
+
+        .hero-card {
+          max-width: 640px;
+        }
+
+        .lesson-tabs {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .response-row {
+          grid-template-columns: 1fr;
+          gap: 12px;
+        }
+
+        .response-arrow {
+          transform: rotate(90deg);
+          justify-self: center;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .tracking-demo {
+          grid-template-columns: 1fr;
+        }
+        .tracking-demo-controls {
+          padding: 24px;
+        }
+        .tracking-demo-scene {
+          padding: 18px;
+        }
+      }
+
       @media (max-width: 650px) {
+        .site-header {
+          position: relative;
+        }
+        .lesson-wrap {
+          padding: 22px 14px 45px;
+        }
+        .lesson-hero h1 {
+          font-size: 34px;
+        }
+
+        .lesson-tabs {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 6px;
+          padding: 6px;
+        }
+
+        .lesson-tabs button {
+          min-height: 47px;
+          font-size: 12px;
+        }
+
+        .lesson-tabs button:last-child {
+          grid-column: 1 / -1;
+        }
+        .lesson-card {
+          padding: 24px 18px;
+        }
+        .concept-grid {
+          grid-template-columns: 1fr;
+        }
+        .concept {
+          padding: 18px;
+        }
+        .math {
+          padding: 13px 12px;
+          font-size: 16px;
+        }
+
+        .actions .btn,
+        .lesson-footer .btn {
+          flex: 1 1 150px;
+        }
+
+        .actions .btn.primary {
+          margin-left: 0;
+        }
+        .derive-dialog {
+          padding: 26px 18px;
+        }
+        .derive-dialog h3 {
+          font-size: 22px;
+        }
+        .derive-step {
+          padding: 15px 12px;
+        }
         .feedback-diagram {
-          padding: 12px;
+          padding: 18px 14px 10px;
         }
         .feedback-diagram svg {
           min-width: 560px;
         }
-        .diagram-scroll {
-          overflow-x: auto;
-        }
-      }
-      .lesson-bot {
-        display: block;
-        width: 110px;
-        height: 125px;
-        object-fit: contain;
-        float: right;
-        margin: -10px -5px 0 14px;
-      }
-      .hero-card {
-        min-height: 210px;
-      }
-      @media (max-width: 650px) {
-        .lesson-bot {
-          width: 82px;
-          height: 105px;
-        }
       }
 
-      .derive-btn {
-        margin-top: 14px;
-      }
-      .derive-modal {
-        position: fixed;
-        inset: 0;
-        background: rgba(10, 31, 55, 0.55);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-        z-index: 9999;
-      }
-      .derive-modal.open {
-        display: flex;
-      }
-      .derive-dialog {
-        width: min(760px, 96vw);
-        max-height: 88vh;
-        overflow-y: auto;
-        background: #fff;
-        border-radius: 18px;
-        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
-        padding: 28px 30px;
-        position: relative;
-        text-align: left;
-      }
-      .derive-dialog h3 {
-        margin: 0 44px 8px 0;
-        color: #142f52;
-        font-size: 1.55rem;
-      }
-      .derive-dialog .derive-intro {
-        color: #52677f;
-        margin-bottom: 18px;
-      }
-      .derive-close {
-        position: absolute;
-        right: 18px;
-        top: 16px;
-        border: 0;
-        background: #eef6fb;
-        color: #173a5e;
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        font-size: 24px;
-        cursor: pointer;
-      }
-      .derive-step {
-        border-left: 4px solid #2baed8;
-        background: #f5fbfe;
-        border-radius: 10px;
-        padding: 14px 16px;
-        margin: 12px 0;
-      }
-      .derive-step strong {
-        color: #173a5e;
-      }
-      .derive-step .math {
-        margin: 10px 0 2px;
-        padding: 8px 10px;
+      @media (prefers-reduced-motion: reduce) {
+        .learning-progress-fill,
+        .lesson-tabs button,
+        .btn {
+          transition: none;
+        }
       }
     </style>
+
     <script>
-      window.MathJax = { tex: { inlineMath: [["\\(", "\\)"]] } };
+      window.MathJax = {
+        tex: {
+          inlineMath: [["\\(", "\\)"]],
+          displayMath: [["\\[", "\\]"]],
+        },
+      };
     </script>
+
     <script
       defer
       src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
     ></script>
   </head>
+
   <body>
     <header class="site-header">
-      <a class="brand" href="home.html"
-        ><span class="brand-icon">EE</span>
-        <div><b>EE3011</b><small>MODELLING &amp; CONTROL</small></div></a
-      >
-      <nav class="site-nav">
+      <a class="brand" href="home.html">
+        <span class="brand-icon">EE</span>
+        <div>
+          <b>EE3011</b>
+          <small>MODELLING &amp; CONTROL</small>
+        </div>
+      </a>
+
+      <nav class="site-nav" aria-label="Main navigation">
         <a href="home.html">Home</a>
+
         <div class="nav-group">
           <button
             class="nav-button"
             type="button"
+            aria-expanded="false"
+            aria-controls="part1"
             onclick="toggleMenu('part1', this)"
           >
             Control Fundamentals <span class="chevron"></span>
           </button>
+
           <div class="dropdown" id="part1">
-            <a href="root_locus.html">Root Locus</a
-            ><a href="drone.html">PID Control</a
-            ><a href="steady_state_learning.html">Steady-State Error</a
-            ><a href="pt1_quiz.html">PT1 Quiz</a>
+            <a href="root_locus.html">Root Locus</a>
+            <a href="drone.html">PID Control</a>
+            <a href="steady_state_learning.html">Steady-State Error</a>
+            <a href="pt1_quiz.html">PT1 Quiz</a>
           </div>
         </div>
+
         <div class="nav-group">
           <button
             class="nav-button"
             type="button"
+            aria-expanded="false"
+            aria-controls="part2"
             onclick="toggleMenu('part2', this)"
           >
             Frequency Response <span class="chevron"></span>
           </button>
+
           <div class="dropdown" id="part2">
-            <a href="root_locus.html">Root Locus</a
-            ><a href="drone.html">PID Control</a
-            ><a href="pt2_quiz.html">PT2 Quiz</a>
+            <a href="root_locus.html">Root Locus</a>
+            <a href="drone.html">PID Control</a>
+            <a href="pt2_quiz.html">PT2 Quiz</a>
           </div>
         </div>
       </nav>
     </header>
+
     <section class="lesson-hero">
       <div>
         <div class="eyebrow">CONTROL FUNDAMENTALS · GUIDED LESSON</div>
         <h1>Why doesn't the drone <span>reach 10 m?</span></h1>
+
         <p>
           Learn how to predict steady-state error before you compare P, PD, PI
           and PID in the altitude simulator.
         </p>
-        <a class="btn primary" href="drone.html">Open drone experiment →</a>
+
+        <a class="btn primary" href="drone.html"> Open drone experiment → </a>
       </div>
+
       <div class="hero-card">
         <img
           class="lesson-bot"
           src="bot-explaining.png"
           alt="ControlBot explaining a step response"
-        /><b>THE KEY QUESTION</b>
+        />
+
+        <b>THE KEY QUESTION</b>
+
         <div class="equation">\[e_{ss}=\lim_{t\to\infty}(r(t)-y(t))\]</div>
+
         <p>
           Does the tracking error disappear, or does a permanent offset remain?
         </p>
       </div>
     </section>
+
     <main class="lesson-wrap">
       <section
         class="feedback-diagram"
         aria-label="Unity feedback block diagram shown throughout the lesson"
       >
         <h2>Keep this feedback loop in mind</h2>
+
         <p>
           The reference enters at +; measured altitude returns to −. The
           controller acts on the difference.
         </p>
+
         <div class="diagram-scroll">
           <svg
             viewBox="0 0 850 195"
@@ -633,6 +1110,7 @@
                 <path d="M0 0 L8 4 L0 8Z" fill="#236c99" />
               </marker>
             </defs>
+
             <g
               stroke="#236c99"
               stroke-width="2.5"
@@ -645,6 +1123,7 @@
               <path d="M602 73 H826" />
               <path d="M757 73 V168 H134 V97" />
             </g>
+
             <circle
               cx="134"
               cy="73"
@@ -653,8 +1132,10 @@
               stroke="#236c99"
               stroke-width="2.5"
             />
+
             <text x="128" y="66" font-size="19" fill="#123e61">+</text>
             <text x="128" y="90" font-size="19" fill="#123e61">−</text>
+
             <rect
               x="219"
               y="37"
@@ -663,6 +1144,7 @@
               rx="9"
               fill="#174e75"
             />
+
             <rect
               x="440"
               y="37"
@@ -671,12 +1153,14 @@
               rx="9"
               fill="#174e75"
             />
+
             <g font-size="16" fill="#fff" text-anchor="middle">
               <text x="299" y="65">Controller</text>
               <text x="299" y="89">C(s)</text>
               <text x="521" y="65">Altitude plant</text>
               <text x="521" y="89">Gₚ(s)</text>
             </g>
+
             <g font-size="16" fill="#153e5e">
               <text x="15" y="51">R(s)</text>
               <text x="165" y="52">E(s)</text>
@@ -687,117 +1171,432 @@
           </svg>
         </div>
       </section>
-      <div class="lesson-tabs" role="tablist" aria-label="Lesson sections">
-        <button class="active" data-step="0">01 · Tracking error</button
-        ><button data-step="1">02 · Steady-state error</button
-        ><button data-step="2">03 · System type</button
-        ><button data-step="3">04 · Controller comparison</button
-        ><button data-step="4">05 · Quick check</button>
+
+      <div class="learning-progress">
+        <span class="learning-progress-label" id="learningProgressLabel">
+          SECTION 1 OF 5
+        </span>
+
+        <div class="learning-progress-track" aria-hidden="true">
+          <div class="learning-progress-fill" id="learningProgressFill"></div>
+        </div>
       </div>
-      <section class="lesson-panel" data-panel="0">
+
+      <div class="lesson-tabs" role="tablist" aria-label="Lesson sections">
+        <button
+          class="active"
+          id="tab0"
+          data-step="0"
+          role="tab"
+          aria-controls="panel0"
+          aria-selected="true"
+          tabindex="0"
+        >
+          01 · Tracking error
+        </button>
+
+        <button
+          id="tab1"
+          data-step="1"
+          role="tab"
+          aria-controls="panel1"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          02 · Steady-state error
+        </button>
+
+        <button
+          id="tab2"
+          data-step="2"
+          role="tab"
+          aria-controls="panel2"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          03 · System type
+        </button>
+
+        <button
+          id="tab3"
+          data-step="3"
+          role="tab"
+          aria-controls="panel3"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          04 · Controller comparison
+        </button>
+
+        <button
+          id="tab4"
+          data-step="4"
+          role="tab"
+          aria-controls="panel4"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          05 · Quick check
+        </button>
+      </div>
+
+      <!-- Tracking error -->
+      <section
+        class="lesson-panel"
+        id="panel0"
+        data-panel="0"
+        role="tabpanel"
+        aria-labelledby="tab0"
+        tabindex="0"
+      >
         <article class="lesson-card">
           <div class="step-tag">01 / 05 · THE CONCEPT</div>
           <h2>What is tracking error?</h2>
+
           <p>
             The controller compares the <strong>desired altitude</strong> with
             the <strong>actual altitude</strong>. Their difference is the
             tracking error.
           </p>
+
           <div class="math">\[\boxed{e(t)=r(t)-y(t)}\]</div>
+
+          <section
+            class="tracking-demo"
+            aria-label="Interactive tracking error example"
+          >
+            <div class="tracking-demo-scene">
+              <div class="tracking-demo-tag">EXPLORE THE ERROR</div>
+
+              <svg
+                viewBox="0 0 440 280"
+                role="img"
+                aria-labelledby="trackingSceneTitle trackingSceneDescription"
+              >
+                <title id="trackingSceneTitle">
+                  Target altitude and actual drone altitude
+                </title>
+
+                <desc id="trackingSceneDescription">
+                  Move the altitude slider to compare actual altitude with a 10
+                  metre target
+                </desc>
+
+                <line
+                  x1="55"
+                  y1="235"
+                  x2="400"
+                  y2="235"
+                  stroke="#688ca6"
+                  stroke-width="2"
+                />
+
+                <line
+                  x1="55"
+                  y1="35"
+                  x2="55"
+                  y2="235"
+                  stroke="#688ca6"
+                  stroke-width="2"
+                />
+
+                <line
+                  x1="55"
+                  y1="68.33"
+                  x2="400"
+                  y2="68.33"
+                  stroke="#f3bd63"
+                  stroke-width="2"
+                  stroke-dasharray="7 6"
+                />
+
+                <text
+                  x="68"
+                  y="52"
+                  fill="#f3bd63"
+                  font-family="Arial"
+                  font-size="12"
+                >
+                  TARGET · 10 m
+                </text>
+
+                <text
+                  x="17"
+                  y="239"
+                  fill="#bfd3e2"
+                  font-family="Arial"
+                  font-size="11"
+                >
+                  0 m
+                </text>
+
+                <text
+                  x="11"
+                  y="39"
+                  fill="#bfd3e2"
+                  font-family="Arial"
+                  font-size="11"
+                >
+                  12 m
+                </text>
+
+                <line
+                  id="trackingErrorLine"
+                  x1="350"
+                  y1="68.33"
+                  x2="350"
+                  y2="103.33"
+                  stroke="#77d9fa"
+                  stroke-width="3"
+                />
+
+                <line
+                  x1="343"
+                  y1="68.33"
+                  x2="357"
+                  y2="68.33"
+                  stroke="#77d9fa"
+                  stroke-width="2"
+                />
+
+                <line
+                  id="trackingErrorCap"
+                  x1="343"
+                  y1="103.33"
+                  x2="357"
+                  y2="103.33"
+                  stroke="#77d9fa"
+                  stroke-width="2"
+                />
+
+                <g id="trackingDrone" transform="translate(220 103.33)">
+                  <line
+                    x1="-48"
+                    y1="0"
+                    x2="48"
+                    y2="0"
+                    stroke="#90b8d2"
+                    stroke-width="5"
+                  />
+
+                  <ellipse
+                    cx="-38"
+                    cy="-13"
+                    rx="27"
+                    ry="4"
+                    fill="none"
+                    stroke="#90d9f2"
+                    stroke-width="2"
+                  />
+
+                  <ellipse
+                    cx="38"
+                    cy="-13"
+                    rx="27"
+                    ry="4"
+                    fill="none"
+                    stroke="#90d9f2"
+                    stroke-width="2"
+                  />
+
+                  <rect
+                    x="-22"
+                    y="-13"
+                    width="44"
+                    height="29"
+                    rx="8"
+                    fill="#e8f7ff"
+                    stroke="#58c9ed"
+                    stroke-width="2"
+                  />
+
+                  <circle cx="0" cy="1" r="5" fill="#1784b0" />
+                </g>
+
+                <text
+                  id="trackingAltitudeLabel"
+                  x="220"
+                  y="142"
+                  fill="#dff6ff"
+                  text-anchor="middle"
+                  font-family="Arial"
+                  font-size="13"
+                >
+                  ACTUAL · 7.90 m
+                </text>
+              </svg>
+            </div>
+
+            <div class="tracking-demo-controls">
+              <h3>Move the drone. Watch the error.</h3>
+
+              <p>
+                The target stays at 10 m. Change the actual altitude and see how
+                the tracking error changes.
+              </p>
+
+              <label for="trackingAltitude">
+                <span>Actual altitude</span>
+                <output id="trackingAltitudeOutput" for="trackingAltitude">
+                  7.90 m
+                </output>
+              </label>
+
+              <input
+                id="trackingAltitude"
+                type="range"
+                min="0"
+                max="12"
+                step="0.1"
+                value="7.9"
+              />
+
+              <div class="tracking-demo-result" id="trackingCalculation">
+                10.00 − 7.90 = +2.10 m
+              </div>
+
+              <p class="tracking-demo-message" id="trackingExplanation">
+                Below target: the tracking error is positive.
+              </p>
+            </div>
+          </section>
+
           <div class="concept-grid">
             <div class="concept">
               <strong>At 10.00 m</strong>
               <p>\(e(t)=10-10=0\) m.</p>
             </div>
+
             <div class="concept">
               <strong>At 9.90 m</strong>
               <p>\(e(t)=10-9.90=+0.10\) m.</p>
             </div>
+
             <div class="concept">
               <strong>During takeoff</strong>
               <p>The tracking error keeps changing as the drone moves.</p>
             </div>
           </div>
+
           <p>
             Tracking error changes throughout the response. But what error
             remains after the system has settled?
           </p>
+
           <div class="actions">
-            <button class="btn primary" data-next="1">
+            <button class="btn primary" data-next="1" type="button">
               Next: steady-state error →
             </button>
           </div>
         </article>
       </section>
-      <section class="lesson-panel" data-panel="1" hidden>
+
+      <!-- Steady-state error -->
+      <section
+        class="lesson-panel"
+        id="panel1"
+        data-panel="1"
+        role="tabpanel"
+        aria-labelledby="tab1"
+        tabindex="0"
+        hidden
+      >
         <article class="lesson-card">
           <div class="step-tag">02 / 05 · STEADY-STATE ERROR</div>
           <h2>What error remains after the drone settles?</h2>
+
           <p>
             <strong>Steady-state error</strong> is the tracking error that
             remains after the system has settled.
           </p>
+
           <div class="math">\[\boxed{e_{ss}=\lim_{t\to\infty}e(t)}\]</div>
+
           <p>
             Example: if the target is 10 m and the drone settles at 9.9 m,
             \(e_{ss}=10-9.9=0.1\text{ m}\).
           </p>
 
           <h3>How do we calculate it?</h3>
+
           <p>
             The same tracking error can be written in the Laplace domain. Here,
             <strong>R(s)</strong> is the desired altitude and
             <strong>Y(s)</strong> is the actual altitude:
           </p>
+
           <div class="math">\[\boxed{E(s)=R(s)-Y(s)}\]</div>
+
           <p>
-            <strong>E(s) is not the steady-state error.</strong> It is the
-            tracking error in the Laplace domain.
+            <strong>E(s) is not the steady-state error.</strong>
+            It is the tracking error in the Laplace domain.
           </p>
+
           <p>
             For unity feedback, \(Y(s)=\frac{L(s)}{1+L(s)}R(s)\). Therefore:
           </p>
+
           <div class="math">
-            \[E(s)=R(s)-\frac{L(s)}{1+L(s)}R(s) =\boxed{\frac{R(s)}{1+L(s)}}\]
+            \[ E(s)=R(s)-\frac{L(s)}{1+L(s)}R(s) =\boxed{\frac{R(s)}{1+L(s)}} \]
           </div>
+
           <button class="btn derive-btn" id="openDerivation" type="button">
             Why does it simplify to this?
           </button>
+
           <p>
             Now use the <strong>Final Value Theorem</strong> to find the error
             after settling:
           </p>
+
           <div class="math">\[\boxed{e_{ss}=\lim_{s\to0}sE(s)}\]</div>
+
           <p>For the 10 m step, \(R(s)=10/s\):</p>
+
           <div class="math">\[e_{ss}=\lim_{s\to0}\frac{10}{1+L(s)}\]</div>
+
           <p>
             <strong>Important:</strong> the Final Value Theorem is used only
             when the relevant closed-loop error dynamics satisfy its stability
             conditions.
           </p>
+
           <div class="actions">
-            <button class="btn" data-next="0">← Previous</button
-            ><button class="btn primary" data-next="2">
+            <button class="btn" data-next="0" type="button">← Previous</button>
+            <button class="btn primary" data-next="2" type="button">
               Next: identify system type →
             </button>
           </div>
         </article>
       </section>
-      <section class="lesson-panel" data-panel="2" hidden>
+
+      <!-- System type -->
+      <section
+        class="lesson-panel"
+        id="panel2"
+        data-panel="2"
+        role="tabpanel"
+        aria-labelledby="tab2"
+        tabindex="0"
+        hidden
+      >
         <article class="lesson-card">
           <div class="step-tag">03 / 05 · THE RULE</div>
           <h2>Count the integrators in the open loop</h2>
+
           <p>
             The system type is the number of uncancelled poles at the origin in
             the open-loop transfer function \(L(s)\). It helps predict tracking
             error for step, ramp and parabolic references.
           </p>
+
           <div class="concept-grid">
             <div class="concept">
               <strong>Type 0</strong>
               <div>\[L(s)=\frac{K}{s+2}\]</div>
               <p>No pole at the origin. A step can leave a nonzero error.</p>
             </div>
+
             <div class="concept">
               <strong>Type 1</strong>
               <div>\[L(s)=\frac{K}{s(s+2)}\]</div>
@@ -805,6 +1604,7 @@
                 One pole at the origin. Stable closed loop → zero step error.
               </p>
             </div>
+
             <div class="concept">
               <strong>Type 2</strong>
               <div>\[L(s)=\frac{K}{s^2(s+2)}\]</div>
@@ -814,153 +1614,216 @@
               </p>
             </div>
           </div>
+
           <p class="muted">
             For the drone comparison, the step-reference error and the
             constant-disturbance response are two different tests. Do not use
             the wind-on result as the wind-free step-error prediction.
           </p>
+
           <div class="actions">
-            <button class="btn" data-next="1">← Previous</button
-            ><button class="btn primary" data-next="3">
+            <button class="btn" data-next="1" type="button">← Previous</button>
+            <button class="btn primary" data-next="3" type="button">
               Next: compare controllers →
             </button>
           </div>
         </article>
       </section>
-      <section class="lesson-panel" data-panel="3" hidden>
+
+      <!-- Controller comparison -->
+      <section
+        class="lesson-panel"
+        id="panel3"
+        data-panel="3"
+        role="tabpanel"
+        aria-labelledby="tab3"
+        tabindex="0"
+        hidden
+      >
         <article class="lesson-card">
           <div class="step-tag">04 / 05 · APPLY THE IDEA</div>
           <h2>What should you see in Experiment 1?</h2>
+
           <p>
             The comparison plant has no integrator. Adding integral action in PI
             or PID changes the open-loop type. Keep the plant and proportional
             gain fixed when comparing controllers.
           </p>
+
           <div class="response-explainer">
             <div class="response-title">What is transient response?</div>
+
             <div class="response-row">
               <div class="response-item">
                 <span class="response-label">Transient response</span>
-                <span class="response-text"
-                  ><b>Before settling</b> — rise time, overshoot and settling
-                  time.</span
-                >
+                <span class="response-text">
+                  <b>Before settling</b> — rise time, overshoot and settling
+                  time.
+                </span>
               </div>
-              <div class="response-arrow">→</div>
+
+              <div class="response-arrow" aria-hidden="true">→</div>
+
               <div class="response-item">
                 <span class="response-label">Steady state</span>
-                <span class="response-text"
-                  ><b>After settling</b> — the final output and remaining
-                  error.</span
-                >
+                <span class="response-text">
+                  <b>After settling</b> — the final output and remaining error.
+                </span>
               </div>
             </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Controller</th>
-                <th>Step-reference result (stable loop)</th>
-                <th>What to observe</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>P</td>
-                <td>Nonzero \(e_{ss}\)</td>
-                <td>Altitude settles below the 10 m reference.</td>
-              </tr>
-              <tr>
-                <td>PD</td>
-                <td>Nonzero \(e_{ss}\)</td>
-                <td>
-                  Derivative action changes how the system behaves before
-                  settling (the transient response), but does not remove the
-                  steady-state error at the same \(K_P\).
-                </td>
-              </tr>
-              <tr>
-                <td>PI</td>
-                <td>Zero \(e_{ss}\)</td>
-                <td>
-                  Integral action removes the persistent step-reference offset.
-                </td>
-              </tr>
-              <tr>
-                <td>PID</td>
-                <td>Zero \(e_{ss}\)</td>
-                <td>
-                  Integral action removes the steady-state error; derivative
-                  action changes how the system behaves before settling.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="math">
-            \[e_{ss,\,P}=e_{ss,\,PD}=\frac{10}{1+K_PG_p(0)}\qquad
-            e_{ss,\,PI}=e_{ss,\,PID}=0\]
+
+          <div
+            class="table-scroll"
+            role="region"
+            aria-label="Controller comparison table"
+            tabindex="0"
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Controller</th>
+                  <th scope="col">Step-reference result (stable loop)</th>
+                  <th scope="col">What to observe</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>P</td>
+                  <td>Nonzero \(e_{ss}\)</td>
+                  <td>Altitude settles below the 10 m reference.</td>
+                </tr>
+
+                <tr>
+                  <td>PD</td>
+                  <td>Nonzero \(e_{ss}\)</td>
+                  <td>
+                    Derivative action changes how the system behaves before
+                    settling (the transient response), but does not remove the
+                    steady-state error at the same \(K_P\).
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>PI</td>
+                  <td>Zero \(e_{ss}\)</td>
+                  <td>
+                    Integral action removes the persistent step-reference
+                    offset.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>PID</td>
+                  <td>Zero \(e_{ss}\)</td>
+                  <td>
+                    Integral action removes the steady-state error; derivative
+                    action changes how the system behaves before settling.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
+
+          <div class="math">
+            \[ e_{ss,\,P}=e_{ss,\,PD}=\frac{10}{1+K_PG_p(0)} \qquad
+            e_{ss,\,PI}=e_{ss,\,PID}=0 \]
+          </div>
+
           <p>
             These predictions are for a wind-free step reference and stable
             closed-loop operation. After recording all four controllers, try the
             constant disturbance as a separate recovery exercise.
           </p>
+
           <div class="actions">
-            <button class="btn" data-next="2">← Previous</button
-            ><button class="btn primary" data-next="4">
+            <button class="btn" data-next="2" type="button">← Previous</button>
+            <button class="btn primary" data-next="4" type="button">
               Next: quick check →
             </button>
           </div>
         </article>
       </section>
-      <section class="lesson-panel" data-panel="4" hidden>
+
+      <!-- Knowledge check -->
+      <section
+        class="lesson-panel"
+        id="panel4"
+        data-panel="4"
+        role="tabpanel"
+        aria-labelledby="tab4"
+        tabindex="0"
+        hidden
+      >
         <article class="lesson-card">
           <div class="step-tag">05 / 05 · KNOWLEDGE CHECK</div>
           <h2>Check your understanding</h2>
-          <p>
-            For the same stable comparison plant and proportional gain, which
-            controllers eliminate the steady-state error to a constant 10 m step
-            reference?
-          </p>
-          <label class="quiz-option"
-            ><input type="radio" name="q" value="a" /> P and PD</label
-          ><label class="quiz-option"
-            ><input type="radio" name="q" value="b" /> PI and PID</label
-          ><label class="quiz-option"
-            ><input type="radio" name="q" value="c" /> All four
-            controllers</label
-          ><button class="btn primary" id="checkAnswer">Check answer</button>
+
+          <fieldset style="border: 0; padding: 0; margin: 0; min-width: 0">
+            <legend style="padding: 0; margin-bottom: 14px; color: #344e67">
+              For the same stable comparison plant and proportional gain, which
+              controllers eliminate the steady-state error to a constant 10 m
+              step reference?
+            </legend>
+
+            <label class="quiz-option">
+              <input type="radio" name="q" value="a" />
+              P and PD
+            </label>
+
+            <label class="quiz-option">
+              <input type="radio" name="q" value="b" />
+              PI and PID
+            </label>
+
+            <label class="quiz-option">
+              <input type="radio" name="q" value="c" />
+              All four controllers
+            </label>
+          </fieldset>
+
+          <button class="btn primary" id="checkAnswer" type="button">
+            Check answer
+          </button>
+
           <p class="feedback" id="feedback" aria-live="polite"></p>
+
           <div class="lesson-footer">
-            <button class="btn" data-next="3">← Previous</button
-            ><a class="btn primary" href="drone.html">Try Experiment 1 →</a
-            ><a class="btn" href="home.html">Return home</a>
+            <button class="btn" data-next="3" type="button">← Previous</button>
+            <a class="btn primary" href="drone.html">Try Experiment 1 →</a>
+            <a class="btn" href="home.html">Return home</a>
           </div>
         </article>
       </section>
     </main>
 
+    <!-- Derivation popup -->
     <div
       class="derive-modal"
       id="derivationModal"
       role="dialog"
       aria-modal="true"
       aria-labelledby="deriveTitle"
+      hidden
     >
       <div class="derive-dialog">
         <button
           class="derive-close"
           id="closeDerivation"
           type="button"
-          aria-label="Close"
+          aria-label="Close derivation"
         >
-          &times;
+          ×
         </button>
+
         <h3 id="deriveTitle">Why is \(E(s)=R(s)-Y(s)\)?</h3>
+
         <p class="derive-intro">
           The error is simply the gap between what we want and what we actually
           get.
         </p>
+
         <div class="derive-step">
           <strong>1. Identify the two signals</strong>
           <p>
@@ -968,17 +1831,23 @@
           </p>
           <div>\[\boxed{E(s)=R(s)-Y(s)}\]</div>
         </div>
+
         <div class="derive-step">
           <strong>2. Substitute the unity-feedback output</strong>
           <div>\[Y(s)=\frac{L(s)}{1+L(s)}R(s)\]</div>
           <div>\[E(s)=R(s)-\frac{L(s)}{1+L(s)}R(s)\]</div>
         </div>
+
         <div class="derive-step">
           <strong>3. Simplify</strong>
           <p>Factor out \(R(s)\), then combine the terms inside the bracket:</p>
+
           <div>
-            \[E(s)=R(s)\left(1-\frac{L(s)}{1+L(s)}\right)=R(s)\left(\frac{1+L(s)-L(s)}{1+L(s)}\right)=\boxed{\frac{R(s)}{1+L(s)}}\]
+            \[ \begin{aligned} E(s) &=R(s)\left(1-\frac{L(s)}{1+L(s)}\right)\\
+            &=R(s)\left(\frac{1+L(s)-L(s)}{1+L(s)}\right)\\
+            &=\boxed{\frac{R(s)}{1+L(s)}} \end{aligned} \]
           </div>
+
           <p>
             The \(+L(s)\) and \(-L(s)\) cancel. Here \(L(s)=C(s)G_p(s)\), which
             represents the controller and plant together.
@@ -986,6 +1855,8 @@
         </div>
       </div>
     </div>
+
+    <!-- Original footer -->
     <footer>
       <div><b>EE3011</b> Interactive Learning Platform</div>
       <p>
@@ -993,65 +1864,215 @@
         Electronic Engineering
       </p>
     </footer>
+
     <script>
-      function toggleMenu(id) {
+      // Header navigation
+      function closeMenus() {
+        document.querySelectorAll(".site-nav .dropdown").forEach((menu) => {
+          menu.classList.remove("show");
+        });
+
+        document.querySelectorAll(".site-nav .nav-button").forEach((button) => {
+          button.setAttribute("aria-expanded", "false");
+        });
+      }
+
+      function toggleMenu(id, button) {
+        const menu = document.getElementById(id);
+        const shouldOpen = !menu.classList.contains("show");
+
+        closeMenus();
+
+        if (shouldOpen) {
+          menu.classList.add("show");
+          button.setAttribute("aria-expanded", "true");
+        }
+      }
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".site-nav .nav-group")) closeMenus();
+      });
+
+      document.querySelectorAll(".site-nav .nav-group").forEach((group) => {
+        group.addEventListener("keydown", (event) => {
+          if (event.key !== "Escape") return;
+          closeMenus();
+          group.querySelector(".nav-button").focus();
+        });
+      });
+
+      // Lesson navigation
+      const steps = [...document.querySelectorAll("[data-step]")];
+      const panels = [...document.querySelectorAll("[data-panel]")];
+
+      function go(number, focusPanel = false) {
+        steps.forEach((button) => {
+          const active = Number(button.dataset.step) === number;
+
+          button.classList.toggle("active", active);
+          button.setAttribute("aria-selected", String(active));
+          button.tabIndex = active ? 0 : -1;
+        });
+
+        panels.forEach((panel) => {
+          panel.hidden = Number(panel.dataset.panel) !== number;
+        });
+
+        document.getElementById("learningProgressLabel").textContent =
+          `SECTION ${number + 1} OF ${steps.length}`;
+
+        document.getElementById("learningProgressFill").style.width =
+          `${((number + 1) / steps.length) * 100}%`;
+
+        const panel = panels[number];
+
+        if (focusPanel) {
+          panel.focus({ preventScroll: true });
+
+          panel.scrollIntoView({
+            behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
+              .matches
+              ? "auto"
+              : "smooth",
+            block: "start",
+          });
+        }
+
+        if (window.MathJax?.typesetPromise) {
+          MathJax.typesetPromise([panel]).catch(() => {});
+        }
+      }
+
+      steps.forEach((button, index) => {
+        button.addEventListener("click", () => go(index));
+
+        button.addEventListener("keydown", (event) => {
+          let next = index;
+
+          if (event.key === "ArrowRight") {
+            next = (index + 1) % steps.length;
+          } else if (event.key === "ArrowLeft") {
+            next = (index - 1 + steps.length) % steps.length;
+          } else if (event.key === "Home") {
+            next = 0;
+          } else if (event.key === "End") {
+            next = steps.length - 1;
+          } else {
+            return;
+          }
+
+          event.preventDefault();
+          go(next);
+          steps[next].focus();
+        });
+      });
+
+      document.querySelectorAll("[data-next]").forEach((button) => {
+        button.addEventListener("click", () => {
+          go(Number(button.dataset.next), true);
+        });
+      });
+
+      // Interactive altitude illustration
+      const altitudeSlider = document.getElementById("trackingAltitude");
+
+      function updateTrackingDemo() {
+        const altitude = Number(altitudeSlider.value);
+        const error = 10 - altitude;
+        const position = 235 - (altitude / 12) * 200;
+        const signedError = `${error > 0 ? "+" : ""}${error.toFixed(2)}`;
+
+        document.getElementById("trackingAltitudeOutput").textContent =
+          `${altitude.toFixed(2)} m`;
+
+        document.getElementById("trackingCalculation").textContent =
+          `10.00 − ${altitude.toFixed(2)} = ${signedError} m`;
+
+        altitudeSlider.setAttribute(
+          "aria-valuetext",
+          `${altitude.toFixed(1)} metres`,
+        );
+
         document
-          .querySelectorAll(".site-nav .dropdown")
-          .forEach((m) =>
-            m.classList.toggle(
-              "show",
-              m.id === id ? !m.classList.contains("show") : false,
-            ),
-          );
+          .getElementById("trackingDrone")
+          .setAttribute("transform", `translate(220 ${position})`);
+
+        const altitudeLabel = document.getElementById("trackingAltitudeLabel");
+        altitudeLabel.setAttribute("y", position + 39);
+        altitudeLabel.textContent = `ACTUAL · ${altitude.toFixed(2)} m`;
+
+        document
+          .getElementById("trackingErrorLine")
+          .setAttribute("y2", position);
+
+        const cap = document.getElementById("trackingErrorCap");
+        cap.setAttribute("y1", position);
+        cap.setAttribute("y2", position);
+
+        document.getElementById("trackingExplanation").textContent =
+          Math.abs(error) < 0.001
+            ? "At the target: the tracking error is zero."
+            : error > 0
+              ? "Below target: the tracking error is positive."
+              : "Above target: the tracking error is negative.";
+
+        document.getElementById("trackingSceneDescription").textContent =
+          `Target 10 metres, actual altitude ${altitude.toFixed(2)} metres, ` +
+          `tracking error ${signedError} metres`;
       }
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest(".site-nav .nav-group"))
-          document
-            .querySelectorAll(".site-nav .dropdown")
-            .forEach((m) => m.classList.remove("show"));
-      });
-    </script>
-    <script>
+
+      altitudeSlider.addEventListener("input", updateTrackingDemo);
+      updateTrackingDemo();
+
+      // Derivation popup
       const derivationModal = document.getElementById("derivationModal");
-      document
-        .getElementById("openDerivation")
-        .addEventListener("click", () => {
-          derivationModal.classList.add("open");
-          if (window.MathJax && MathJax.typesetPromise)
-            MathJax.typesetPromise([derivationModal]);
-        });
-      document
-        .getElementById("closeDerivation")
-        .addEventListener("click", () =>
-          derivationModal.classList.remove("open"),
-        );
-      derivationModal.addEventListener("click", (e) => {
-        if (e.target === derivationModal)
-          derivationModal.classList.remove("open");
-      });
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") derivationModal.classList.remove("open");
-      });
-      const steps = [...document.querySelectorAll("[data-step]")],
-        panels = [...document.querySelectorAll("[data-panel]")];
-      function go(n) {
-        steps.forEach((b) => {
-          const active = Number(b.dataset.step) === n;
-          b.classList.toggle("active", active);
-          b.setAttribute("aria-selected", active ? "true" : "false");
-        });
-        panels.forEach((p) => (p.hidden = Number(p.dataset.panel) !== n));
+      const openDerivation = document.getElementById("openDerivation");
+      const closeDerivation = document.getElementById("closeDerivation");
+
+      let previousOverflow = "";
+
+      function showDerivation() {
+        previousOverflow = document.body.style.overflow;
+        derivationModal.hidden = false;
+        document.body.style.overflow = "hidden";
+        closeDerivation.focus();
+
+        if (window.MathJax?.typesetPromise) {
+          MathJax.typesetPromise([derivationModal]).catch(() => {});
+        }
       }
-      steps.forEach((b) =>
-        b.addEventListener("click", () => go(Number(b.dataset.step))),
-      );
-      document
-        .querySelectorAll("[data-next]")
-        .forEach((b) =>
-          b.addEventListener("click", () => go(Number(b.dataset.next))),
-        );
+
+      function hideDerivation() {
+        if (derivationModal.hidden) return;
+
+        derivationModal.hidden = true;
+        document.body.style.overflow = previousOverflow;
+        openDerivation.focus();
+      }
+
+      openDerivation.addEventListener("click", showDerivation);
+      closeDerivation.addEventListener("click", hideDerivation);
+
+      derivationModal.addEventListener("click", (event) => {
+        if (event.target === derivationModal) hideDerivation();
+      });
+
+      derivationModal.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          hideDerivation();
+        }
+
+        if (event.key === "Tab") {
+          event.preventDefault();
+          closeDerivation.focus();
+        }
+      });
+
+      // Knowledge check
       document.getElementById("checkAnswer").addEventListener("click", () => {
-        const choice = document.querySelector("input[name=q]:checked");
+        const choice = document.querySelector('input[name="q"]:checked');
+
         document.getElementById("feedback").textContent = !choice
           ? "Select an answer first."
           : choice.value === "b"
