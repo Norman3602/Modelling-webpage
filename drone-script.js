@@ -1,2084 +1,2432 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>EE3011 | Steady-State Error</title>
-    <link rel="stylesheet" href="home-style.css" />
-
-    <style>
-      body {
-        margin: 0;
-        background: #e7edf4;
-        color: #173451;
-        font:
-          16px/1.75 Arial,
-          sans-serif;
-      }
-
-      .site-header *,
-      .lesson-hero *,
-      .lesson-wrap *,
-      .derive-modal * {
-        box-sizing: border-box;
-      }
-
-      button,
-      input {
-        font: inherit;
-      }
-      [hidden] {
-        display: none !important;
-      }
-
-      button:focus-visible,
-      a:focus-visible,
-      input:focus-visible,
-      .table-scroll:focus-visible {
-        outline: 3px solid #49b7dc;
-        outline-offset: 4px;
-      }
-
-      /* Header */
-      .site-header {
-        position: sticky;
-        top: 0;
-        z-index: 500;
-        display: flex;
-        align-items: center;
-        gap: 40px;
-        min-height: 90px;
-        padding: 0 4.5%;
-        background: #0b1f3a;
-        color: white;
-        box-shadow: 0 5px 20px #08182b2b;
-        font-family: Arial, sans-serif;
-      }
-
-      .site-header .brand {
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        margin-right: auto;
-        color: white;
-        text-decoration: none;
-      }
-
-      .site-header .brand-icon {
-        display: grid;
-        place-items: center;
-        width: 46px;
-        height: 46px;
-        border: 1px solid #4fc9ef;
-        border-radius: 8px;
-        color: #5edcff;
-        font-weight: bold;
-      }
-
-      .site-header .brand b {
-        display: block;
-        font:
-          700 28px Georgia,
-          serif;
-      }
-
-      .site-header .brand small {
-        display: block;
-        margin-top: 2px;
-        color: #9cb1c7;
-        font-size: 11px;
-        letter-spacing: 1.8px;
-      }
-
-      .site-nav {
-        display: flex;
-        align-items: center;
-        gap: 30px;
-      }
-
-      .site-nav > a,
-      .site-nav .nav-button {
-        display: inline-block;
-        padding: 30px 0;
-        border: 0;
-        background: none;
-        color: #bdcbd9;
-        text-decoration: none;
-        font-size: 16px;
-        cursor: pointer;
-      }
-
-      .site-nav > a:hover,
-      .site-nav .nav-button:hover {
-        color: white;
-      }
-
-      .site-nav .nav-group {
-        position: relative;
-      }
-
-      .site-nav .chevron {
-        display: inline-block;
-        width: 6px;
-        height: 6px;
-        margin: 0 0 3px 6px;
-        border-right: 1.5px solid currentColor;
-        border-bottom: 1.5px solid currentColor;
-        transform: rotate(45deg);
-      }
-
-      .site-nav .dropdown {
-        display: none;
-        position: absolute;
-        top: calc(100% - 8px);
-        left: 50%;
-        transform: translateX(-50%);
-        min-width: 220px;
-        padding: 7px;
-        border: 1px solid #b3c5d5;
-        border-radius: 10px;
-        background: white;
-        box-shadow: 0 15px 40px #09213d2b;
-        z-index: 900;
-      }
-
-      .site-nav .dropdown.show {
-        display: block;
-      }
-
-      .site-nav .dropdown a {
-        display: block;
-        padding: 11px 14px;
-        border-radius: 6px;
-        color: #23415f;
-        text-decoration: none;
-        font-size: 14px;
-      }
-
-      .site-nav .dropdown a:hover {
-        background: #edf7ff;
-        color: #167fa9;
-      }
-
-      /* Introduction */
-      .lesson-hero {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr;
-        align-items: center;
-        gap: 48px;
-        padding: 58px max(5%, calc((100% - 1180px) / 2));
-        border-bottom: 4px solid #36b7df;
-        background:
-          radial-gradient(
-            circle at 90% 10%,
-            rgba(56, 189, 248, 0.14),
-            transparent 45%
-          ),
-          #0b1f3a;
-        color: white;
-      }
-
-      .eyebrow {
-        display: inline-block;
-        padding: 6px 12px;
-        border: 1px solid #547894;
-        border-radius: 6px;
-        background: #14314b;
-        color: #a4e7ff;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-      }
-
-      .lesson-hero h1 {
-        margin: 20px 0 16px;
-        color: white;
-        font:
-          700 clamp(32px, 3.6vw, 49px)/1.18 Georgia,
-          serif;
-        letter-spacing: -0.7px;
-      }
-
-      .lesson-hero h1 span {
-        color: #69d6f6;
-      }
-
-      .lesson-hero p {
-        max-width: 590px;
-        margin: 0 0 25px;
-        color: #d0dce7;
-        font-size: 16px;
-        line-height: 1.8;
-      }
-
-      .hero-card {
-        min-width: 0;
-        padding: 27px;
-        border: 1.5px solid #547894;
-        border-radius: 16px;
-        background: #18334e;
-        box-shadow: 0 15px 35px #00000016;
-      }
-
-      .hero-card > b {
-        display: block;
-        margin-bottom: 15px;
-        color: #a4e7ff;
-        font-size: 11px;
-        letter-spacing: 1.8px;
-      }
-
-      .hero-card .equation {
-        clear: both;
-        overflow-x: auto;
-        color: white;
-        font-size: clamp(17px, 1.8vw, 22px);
-      }
-
-      .hero-card p {
-        margin: 12px 0 0;
-        font-size: 14px;
-      }
-
-      .lesson-bot {
-        float: right;
-        width: 82px;
-        height: 90px;
-        margin: -10px -5px 0 12px;
-        object-fit: contain;
-      }
-
-      /* Learning area */
-      .lesson-wrap {
-        display: block;
-        width: auto;
-        max-width: 1230px;
-        margin: 0 auto;
-        padding: 32px 25px 75px;
-        box-sizing: border-box;
-      }
-
-      .feedback-diagram {
-        margin-bottom: 26px;
-        padding: 22px 26px 12px;
-        border: 1.5px solid #9eb3c7;
-        border-radius: 14px;
-        background: #f8fbfe;
-      }
-
-      .feedback-diagram h2 {
-        margin: 0 0 5px;
-        color: #193855;
-        font:
-          700 19px/1.4 Arial,
-          sans-serif;
-      }
-
-      .feedback-diagram p {
-        margin: 6px 0 10px;
-        color: #405b73;
-        font-size: 14px;
-      }
-
-      .feedback-diagram svg {
-        display: block;
-        width: 100%;
-        height: auto;
-        max-height: 165px;
-      }
-
-      .feedback-diagram svg text {
-        font-family: Arial, sans-serif;
-      }
-      .diagram-scroll {
-        overflow-x: auto;
-      }
-
-      /* Progress */
-      .learning-progress {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin: 24px 0 14px;
-      }
-
-      .learning-progress-label {
-        flex-shrink: 0;
-        color: #284b69;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 0.8px;
-      }
-
-      .learning-progress-track {
-        flex: 1;
-        height: 7px;
-        overflow: hidden;
-        border-radius: 20px;
-        background: #c1d0de;
-      }
-
-      .learning-progress-fill {
-        width: 20%;
-        height: 100%;
-        border-radius: inherit;
-        background: #167fa9;
-        transition: width 0.25s;
-      }
-
-      /* Navigation */
-      .lesson-tabs {
-        display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 9px;
-        margin: 0 0 24px;
-        padding: 8px;
-        border: 1.5px solid #9eb3c7;
-        border-radius: 13px;
-        background: #dce6ef;
-      }
-
-      .lesson-tabs button {
-        position: relative;
-        min-width: 0;
-        min-height: 58px;
-        padding: 12px 9px;
-        border: 1px solid transparent;
-        border-radius: 8px;
-        background: transparent;
-        color: #2e4c66;
-        font:
-          700 13px/1.45 Arial,
-          sans-serif;
-        cursor: pointer;
-        transition:
-          background 0.15s,
-          color 0.15s;
-      }
-
-      .lesson-tabs button::after {
-        display: none !important;
-      }
-
-      .lesson-tabs button:hover {
-        background: white;
-        color: #173c60;
-      }
-
-      .lesson-tabs button.active {
-        border-color: #173858;
-        background: #173858;
-        color: white;
-      }
-
-      /* Content */
-      .lesson-panel {
-        min-width: 0;
-        scroll-margin-top: 115px;
-      }
-
-      .lesson-card {
-        padding: clamp(24px, 4vw, 44px);
-        border: 1.5px solid #91aabd;
-        border-top: 5px solid #208bad;
-        border-radius: 15px;
-        background: white;
-        box-shadow: 0 6px 20px #1734510d;
-      }
-
-      .step-tag {
-        display: inline-block;
-        margin-bottom: 10px;
-        padding: 6px 11px;
-        border-radius: 5px;
-        background: #173858;
-        color: #e0f4ff;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1.3px;
-      }
-
-      .lesson-card h2 {
-        max-width: 760px;
-        margin: 12px 0 22px;
-        color: #163451;
-        font:
-          700 clamp(27px, 3vw, 37px)/1.3 Georgia,
-          serif;
-        letter-spacing: -0.3px;
-      }
-
-      .lesson-card h3 {
-        margin: 30px 0 12px;
-        color: #1d3e5c;
-        font:
-          700 20px/1.4 Arial,
-          sans-serif;
-      }
-
-      .lesson-card p {
-        margin: 14px 0;
-        color: #344e67;
-        line-height: 1.85;
-      }
-
-      .lesson-card strong {
-        color: #142f49;
-      }
-
-      .math {
-        margin: 23px 0;
-        padding: 20px 22px;
-        overflow-x: auto;
-        border: 1.5px solid #91b6cb;
-        border-left: 4px solid #187fa5;
-        border-radius: 10px;
-        background: #e6f1f8;
-        color: #143752;
-        font-size: clamp(16px, 1.8vw, 20px);
-        text-align: center;
-      }
-
-      .math mjx-container[display="true"],
-      .hero-card mjx-container[display="true"] {
-        margin: 0.7em 0 !important;
-      }
-
-      .concept-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 15px;
-        margin: 25px 0;
-      }
-
-      .concept {
-        min-width: 0;
-        padding: 22px 20px;
-        border: 1px solid #97b0c5;
-        border-top: 3px solid #208bad;
-        border-radius: 10px;
-        background: #edf3f8;
-      }
-
-      .concept > strong {
-        display: block;
-        margin-bottom: 10px;
-        color: #155f80;
-        font-size: 15px;
-      }
-
-      .concept > div {
-        overflow-x: auto;
-      }
-
-      .concept p {
-        margin-bottom: 0;
-        font-size: 14px;
-        line-height: 1.75;
-      }
-
-      .lesson-card .muted {
-        padding: 15px 18px;
-        border-left: 4px solid #6c91ad;
-        border-radius: 6px;
-        background: #e9f0f6;
-        color: #344e67;
-        font-size: 14px;
-      }
-
-      /* Interactive illustration */
-      .tracking-demo {
-        display: grid;
-        grid-template-columns: 1.1fr 1fr;
-        overflow: hidden;
-        margin: 28px 0;
-        border: 1px solid #527b99;
-        border-radius: 15px;
-        background: #102d47;
-      }
-
-      .tracking-demo-scene {
-        min-width: 0;
-        padding: 20px;
-        background:
-          linear-gradient(#ffffff05 1px, transparent 1px),
-          linear-gradient(90deg, #ffffff05 1px, transparent 1px), #102d47;
-        background-size: 28px 28px;
-      }
-
-      .tracking-demo-tag {
-        color: #9adff7;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-      }
-
-      .tracking-demo svg {
-        display: block;
-        width: 100%;
-        height: auto;
-      }
-
-      .tracking-demo-controls {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        min-width: 0;
-        padding: 30px;
-        background: #e9f2f8;
-      }
-
-      .tracking-demo-controls h3 {
-        margin: 0 0 12px;
-        color: #173858;
-        font:
-          700 23px/1.3 Georgia,
-          serif;
-      }
-
-      .tracking-demo-controls p {
-        margin: 0 0 20px;
-        color: #344e67;
-        font-size: 14px;
-        line-height: 1.7;
-      }
-
-      .tracking-demo-controls label {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        color: #294b67;
-        font-size: 13px;
-        font-weight: 700;
-      }
-
-      .tracking-demo-controls input {
-        width: 100%;
-        margin: 15px 0 22px;
-        accent-color: #167fa9;
-        cursor: pointer;
-      }
-
-      .tracking-demo-result {
-        padding: 16px;
-        border: 1px solid #9ab6ca;
-        border-radius: 9px;
-        background: white;
-        color: #173858;
-        font-size: 16px;
-        font-weight: 700;
-        text-align: center;
-        font-variant-numeric: tabular-nums;
-      }
-
-      .tracking-demo-controls .tracking-demo-message {
-        min-height: 46px;
-        margin: 13px 0 0;
-        color: #37556f;
-        font-size: 12px;
-      }
-
-      /* Transient response */
-      .response-explainer {
-        margin: 25px 0;
-        padding: 22px;
-        border: 1.5px solid #a2b9cc;
-        border-radius: 12px;
-        background: #edf3f8;
-      }
-
-      .response-title {
-        margin-bottom: 17px;
-        color: #254b69;
-        font-size: 15px;
-        font-weight: 700;
-      }
-
-      .response-row {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        align-items: center;
-        gap: 20px;
-      }
-
-      .response-label {
-        display: block;
-        margin-bottom: 7px;
-        color: #155f80;
-        font-size: 14px;
-        font-weight: 700;
-      }
-
-      .response-text {
-        display: block;
-        color: #344e67;
-        font-size: 14px;
-        line-height: 1.7;
-      }
-
-      .response-arrow {
-        color: #247b9e;
-        font-size: 24px;
-        font-weight: 700;
-      }
-
-      /* Comparison table */
-      .table-scroll {
-        overflow-x: auto;
-        margin: 24px 0;
-        border: 1.5px solid #9eb3c7;
-        border-radius: 10px;
-      }
-
-      .lesson-card table {
-        width: 100%;
-        min-width: 540px;
-        border-collapse: collapse;
-        font-size: 14px;
-      }
-
-      .lesson-card th {
-        padding: 15px 17px;
-        border-bottom: 1px solid #9eb3c7;
-        background: #dfeaf3;
-        color: #203e59;
-        font-size: 12px;
-        line-height: 1.5;
-        text-align: left;
-      }
-
-      .lesson-card td {
-        padding: 17px;
-        border-bottom: 1px solid #c0cfdd;
-        color: #344e67;
-        vertical-align: top;
-        line-height: 1.75;
-      }
-
-      .lesson-card td:first-child {
-        color: #155f80;
-        font-weight: 700;
-      }
-
-      .lesson-card tbody tr:nth-child(even) {
-        background: #f0f5f9;
-      }
-      .lesson-card tbody tr:last-child td {
-        border-bottom: 0;
-      }
-
-      /* Actions */
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 44px;
-        padding: 10px 18px;
-        border: 1px solid #91aabd;
-        border-radius: 8px;
-        background: white;
-        color: #29465f;
-        font:
-          700 14px/1.5 Arial,
-          sans-serif;
-        text-decoration: none;
-        cursor: pointer;
-        transition:
-          background 0.15s,
-          border-color 0.15s;
-      }
-
-      .btn:hover {
-        border-color: #5689a7;
-        background: #eaf3f9;
-      }
-
-      .btn.primary {
-        border-color: #173858;
-        background: #173858;
-        color: white;
-      }
-
-      .btn.primary:hover {
-        border-color: #225477;
-        background: #225477;
-      }
-
-      .lesson-hero .btn.primary {
-        border-color: #75d5f0;
-        background: #75d5f0;
-        color: #0d2d46;
-      }
-
-      .actions,
-      .lesson-footer {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        padding-top: 24px;
-        margin-top: 30px;
-        border-top: 1px solid #b7c8d7;
-      }
-
-      .actions .btn.primary {
-        margin-left: auto;
-      }
-
-      .derive-btn {
-        min-height: 38px;
-        padding: 8px 13px;
-        background: #eef4f8;
-        font-size: 13px;
-      }
-
-      /* Knowledge check */
-      .quiz-option {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-        min-height: 60px;
-        padding: 17px 20px;
-        margin: 12px 0;
-        border: 1.5px solid #9eb3c7;
-        border-radius: 10px;
-        background: #f3f7fb;
-        color: #29465f;
-        font-size: 15px;
-        cursor: pointer;
-      }
-
-      .quiz-option:hover {
-        border-color: #5689a7;
-        background: #eaf3f9;
-      }
-
-      .quiz-option:has(input:checked) {
-        border-color: #167fa9;
-        background: #deeff8;
-        box-shadow: inset 4px 0 #167fa9;
-      }
-
-      .quiz-option input {
-        flex-shrink: 0;
-        width: 17px;
-        height: 17px;
-        margin: 0;
-        accent-color: #167fa9;
-      }
-
-      #checkAnswer {
-        margin-top: 14px;
-      }
-
-      .feedback {
-        min-height: 28px;
-        margin-top: 18px;
-        color: #155f80;
-        font-size: 14px;
-        font-weight: 700;
-      }
-
-      /* Derivation popup */
-      .derive-modal {
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        background: rgba(7, 24, 44, 0.65);
-      }
-
-      .derive-dialog {
-        position: relative;
-        width: min(800px, 96vw);
-        max-height: 88vh;
-        overflow-y: auto;
-        padding: 34px;
-        border: 1.5px solid #9eb3c7;
-        border-radius: 16px;
-        background: white;
-        box-shadow: 0 25px 80px #07182c40;
-      }
-
-      .derive-dialog h3 {
-        margin: 0 44px 12px 0;
-        color: #173451;
-        font:
-          700 25px/1.4 Georgia,
-          serif;
-      }
-
-      .derive-intro {
-        color: #344e67;
-        font-size: 15px;
-      }
-
-      .derive-step {
-        padding: 18px 20px;
-        margin: 17px 0;
-        overflow-x: auto;
-        border: 1.5px solid #a2b9cc;
-        border-left: 4px solid #187fa5;
-        border-radius: 10px;
-        background: #edf3f8;
-        font-size: 15px;
-      }
-
-      .derive-step p {
-        color: #344e67;
-      }
-
-      .derive-close {
-        position: absolute;
-        top: 16px;
-        right: 18px;
-        display: grid;
-        place-items: center;
-        width: 38px;
-        height: 38px;
-        padding: 0;
-        border: 1px solid #9eb3c7;
-        border-radius: 50%;
-        background: #e6eef5;
-        color: #173a5e;
-        font-size: 24px;
-        cursor: pointer;
-      }
-
-      /* Smaller screens */
-      @media (max-width: 900px) {
-        .site-header {
-          flex-wrap: wrap;
-          gap: 6px;
-          padding: 14px 4%;
-        }
-
-        .site-nav {
-          flex-wrap: wrap;
-          gap: 20px;
-          width: 100%;
-        }
-
-        .site-nav > a,
-        .site-nav .nav-button {
-          padding: 10px 0;
-          font-size: 14px;
-        }
-
-        .site-nav .dropdown {
-          top: 100%;
-          left: 0;
-          transform: none;
-        }
-
-        .lesson-hero {
-          grid-template-columns: 1fr;
-          gap: 28px;
-          padding: 40px 6%;
-        }
-
-        .hero-card {
-          max-width: 640px;
-        }
-
-        .lesson-tabs {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        .response-row {
-          grid-template-columns: 1fr;
-          gap: 12px;
-        }
-
-        .response-arrow {
-          transform: rotate(90deg);
-          justify-self: center;
-        }
-      }
-
-      @media (max-width: 760px) {
-        .tracking-demo {
-          grid-template-columns: 1fr;
-        }
-        .tracking-demo-controls {
-          padding: 24px;
-        }
-        .tracking-demo-scene {
-          padding: 18px;
-        }
-      }
-
-      @media (max-width: 650px) {
-        .site-header {
-          position: relative;
-        }
-        .lesson-wrap {
-          padding: 22px 14px 45px;
-        }
-        .lesson-hero h1 {
-          font-size: 34px;
-        }
-
-        .lesson-tabs {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 6px;
-          padding: 6px;
-        }
-
-        .lesson-tabs button {
-          min-height: 47px;
-          font-size: 12px;
-        }
-
-        .lesson-tabs button:last-child {
-          grid-column: 1 / -1;
-        }
-        .lesson-card {
-          padding: 24px 18px;
-        }
-        .concept-grid {
-          grid-template-columns: 1fr;
-        }
-        .concept {
-          padding: 18px;
-        }
-        .math {
-          padding: 13px 12px;
-          font-size: 16px;
-        }
-
-        .actions .btn,
-        .lesson-footer .btn {
-          flex: 1 1 150px;
-        }
-
-        .actions .btn.primary {
-          margin-left: 0;
-        }
-        .derive-dialog {
-          padding: 26px 18px;
-        }
-        .derive-dialog h3 {
-          font-size: 22px;
-        }
-        .derive-step {
-          padding: 15px 12px;
-        }
-        .feedback-diagram {
-          padding: 18px 14px 10px;
-        }
-        .feedback-diagram svg {
-          min-width: 560px;
-        }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        .learning-progress-fill,
-        .lesson-tabs button,
-        .btn {
-          transition: none;
-        }
-      }
-    </style>
-
-    <script>
-      window.MathJax = {
-        tex: {
-          inlineMath: [["\\(", "\\)"]],
-          displayMath: [["\\[", "\\]"]],
-        },
-      };
-    </script>
-
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
-    ></script>
-  </head>
-
-  <body>
-    <header class="site-header">
-      <a class="brand" href="home.html">
-        <span class="brand-icon">EE</span>
-        <div>
-          <b>EE3011</b>
-          <small>MODELLING &amp; CONTROL</small>
-        </div>
-      </a>
-
-      <nav class="site-nav" aria-label="Main navigation">
-        <a href="home.html">Home</a>
-
-        <div class="nav-group">
-          <button
-            class="nav-button"
-            type="button"
-            aria-expanded="false"
-            aria-controls="part1"
-            onclick="toggleMenu('part1', this)"
-          >
-            Control Fundamentals <span class="chevron"></span>
-          </button>
-
-          <div class="dropdown" id="part1">
-            <a href="root_locus.html">Root Locus</a>
-            <a href="drone.html">PID Control</a>
-            <a href="steady_state_learning.html">Steady-State Error</a>
-            <a href="pt1_quiz.html">PT1 Quiz</a>
-          </div>
-        </div>
-
-        <div class="nav-group">
-          <button
-            class="nav-button"
-            type="button"
-            aria-expanded="false"
-            aria-controls="part2"
-            onclick="toggleMenu('part2', this)"
-          >
-            Frequency Response <span class="chevron"></span>
-          </button>
-
-          <div class="dropdown" id="part2">
-            <a href="root_locus.html">Root Locus</a>
-            <a href="drone.html">PID Control</a>
-            <a href="pt2_quiz.html">PT2 Quiz</a>
-          </div>
-        </div>
-      </nav>
-    </header>
-
-    <section class="lesson-hero">
-      <div>
-        <div class="eyebrow">CONTROL FUNDAMENTALS · GUIDED LESSON</div>
-        <h1>Why doesn't the drone <span>reach 10 m?</span></h1>
-
-        <p>
-          Learn how to predict steady-state error before you compare P, PD, PI
-          and PID in the altitude simulator.
-        </p>
-
-        <a class="btn primary" href="drone.html"> Open drone experiment → </a>
-      </div>
-
-      <div class="hero-card">
-        <img
-          class="lesson-bot"
-          src="bot-explaining.png"
-          alt="ControlBot explaining a step response"
-        />
-
-        <b>THE KEY QUESTION</b>
-
-        <div class="equation">\[e_{ss}=\lim_{t\to\infty}(r(t)-y(t))\]</div>
-
-        <p>
-          Does the tracking error disappear, or does a permanent offset remain?
-        </p>
-      </div>
-    </section>
-
-    <main class="lesson-wrap">
-      <section
-        class="feedback-diagram"
-        aria-label="Unity feedback block diagram shown throughout the lesson"
-      >
-        <h2>Keep this feedback loop in mind</h2>
-
-        <p>
-          The reference enters at +; measured altitude returns to −. The
-          controller acts on the difference.
-        </p>
-
-        <div class="diagram-scroll">
-          <svg
-            viewBox="0 0 850 195"
-            role="img"
-            aria-label="Reference R(s) enters positive summing junction; output Y(s) feeds back to negative input; error E(s) enters controller C(s); command U(s) enters plant Gp(s); output Y(s) is measured altitude"
-          >
-            <defs>
-              <marker
-                id="lessonArrow"
-                markerWidth="8"
-                markerHeight="8"
-                refX="7"
-                refY="4"
-                orient="auto"
-              >
-                <path d="M0 0 L8 4 L0 8Z" fill="#236c99" />
-              </marker>
-            </defs>
-
-            <g
-              stroke="#236c99"
-              stroke-width="2.5"
-              fill="none"
-              marker-end="url(#lessonArrow)"
-            >
-              <path d="M18 73 H112" />
-              <path d="M156 73 H219" />
-              <path d="M379 73 H440" />
-              <path d="M602 73 H826" />
-              <path d="M757 73 V168 H134 V97" />
-            </g>
-
-            <circle
-              cx="134"
-              cy="73"
-              r="23"
-              fill="white"
-              stroke="#236c99"
-              stroke-width="2.5"
-            />
-
-            <text x="128" y="66" font-size="19" fill="#123e61">+</text>
-            <text x="128" y="90" font-size="19" fill="#123e61">−</text>
-
-            <rect
-              x="219"
-              y="37"
-              width="160"
-              height="72"
-              rx="9"
-              fill="#174e75"
-            />
-
-            <rect
-              x="440"
-              y="37"
-              width="162"
-              height="72"
-              rx="9"
-              fill="#174e75"
-            />
-
-            <g font-size="16" fill="#fff" text-anchor="middle">
-              <text x="299" y="65">Controller</text>
-              <text x="299" y="89">C(s)</text>
-              <text x="521" y="65">Altitude plant</text>
-              <text x="521" y="89">Gₚ(s)</text>
-            </g>
-
-            <g font-size="16" fill="#153e5e">
-              <text x="15" y="51">R(s)</text>
-              <text x="165" y="52">E(s)</text>
-              <text x="391" y="52">U(s)</text>
-              <text x="788" y="51">Y(s)</text>
-              <text x="325" y="158">Negative unity feedback: H(s) = 1</text>
-            </g>
-          </svg>
-        </div>
-      </section>
-
-      <div class="learning-progress">
-        <span class="learning-progress-label" id="learningProgressLabel">
-          SECTION 1 OF 5
-        </span>
-
-        <div class="learning-progress-track" aria-hidden="true">
-          <div class="learning-progress-fill" id="learningProgressFill"></div>
-        </div>
-      </div>
-
-      <div class="lesson-tabs" role="tablist" aria-label="Lesson sections">
-        <button
-          class="active"
-          id="tab0"
-          data-step="0"
-          role="tab"
-          aria-controls="panel0"
-          aria-selected="true"
-          tabindex="0"
-        >
-          01 · Tracking error
-        </button>
-
-        <button
-          id="tab1"
-          data-step="1"
-          role="tab"
-          aria-controls="panel1"
-          aria-selected="false"
-          tabindex="-1"
-        >
-          02 · Steady-state error
-        </button>
-
-        <button
-          id="tab2"
-          data-step="2"
-          role="tab"
-          aria-controls="panel2"
-          aria-selected="false"
-          tabindex="-1"
-        >
-          03 · System type
-        </button>
-
-        <button
-          id="tab3"
-          data-step="3"
-          role="tab"
-          aria-controls="panel3"
-          aria-selected="false"
-          tabindex="-1"
-        >
-          04 · Controller comparison
-        </button>
-
-        <button
-          id="tab4"
-          data-step="4"
-          role="tab"
-          aria-controls="panel4"
-          aria-selected="false"
-          tabindex="-1"
-        >
-          05 · Quick check
-        </button>
-      </div>
-
-      <!-- Tracking error -->
-      <section
-        class="lesson-panel"
-        id="panel0"
-        data-panel="0"
-        role="tabpanel"
-        aria-labelledby="tab0"
-        tabindex="0"
-      >
-        <article class="lesson-card">
-          <div class="step-tag">01 / 05 · THE CONCEPT</div>
-          <h2>What is tracking error?</h2>
-
-          <p>
-            The controller compares the <strong>desired altitude</strong> with
-            the <strong>actual altitude</strong>. Their difference is the
-            tracking error.
-          </p>
-
-          <div class="math">\[\boxed{e(t)=r(t)-y(t)}\]</div>
-
-          <section
-            class="tracking-demo"
-            aria-label="Interactive tracking error example"
-          >
-            <div class="tracking-demo-scene">
-              <div class="tracking-demo-tag">EXPLORE THE ERROR</div>
-
-              <svg
-                viewBox="0 0 440 280"
-                role="img"
-                aria-labelledby="trackingSceneTitle trackingSceneDescription"
-              >
-                <title id="trackingSceneTitle">
-                  Target altitude and actual drone altitude
-                </title>
-
-                <desc id="trackingSceneDescription">
-                  Move the altitude slider to compare actual altitude with a 10
-                  metre target
-                </desc>
-
-                <line
-                  x1="55"
-                  y1="235"
-                  x2="400"
-                  y2="235"
-                  stroke="#688ca6"
-                  stroke-width="2"
-                />
-
-                <line
-                  x1="55"
-                  y1="35"
-                  x2="55"
-                  y2="235"
-                  stroke="#688ca6"
-                  stroke-width="2"
-                />
-
-                <line
-                  x1="55"
-                  y1="68.33"
-                  x2="400"
-                  y2="68.33"
-                  stroke="#f3bd63"
-                  stroke-width="2"
-                  stroke-dasharray="7 6"
-                />
-
-                <text
-                  x="68"
-                  y="52"
-                  fill="#f3bd63"
-                  font-family="Arial"
-                  font-size="12"
-                >
-                  TARGET · 10 m
-                </text>
-
-                <text
-                  x="17"
-                  y="239"
-                  fill="#bfd3e2"
-                  font-family="Arial"
-                  font-size="11"
-                >
-                  0 m
-                </text>
-
-                <text
-                  x="11"
-                  y="39"
-                  fill="#bfd3e2"
-                  font-family="Arial"
-                  font-size="11"
-                >
-                  12 m
-                </text>
-
-                <line
-                  id="trackingErrorLine"
-                  x1="350"
-                  y1="68.33"
-                  x2="350"
-                  y2="103.33"
-                  stroke="#77d9fa"
-                  stroke-width="3"
-                />
-
-                <line
-                  x1="343"
-                  y1="68.33"
-                  x2="357"
-                  y2="68.33"
-                  stroke="#77d9fa"
-                  stroke-width="2"
-                />
-
-                <line
-                  id="trackingErrorCap"
-                  x1="343"
-                  y1="103.33"
-                  x2="357"
-                  y2="103.33"
-                  stroke="#77d9fa"
-                  stroke-width="2"
-                />
-
-                <g id="trackingDrone" transform="translate(220 103.33)">
-                  <line
-                    x1="-48"
-                    y1="0"
-                    x2="48"
-                    y2="0"
-                    stroke="#90b8d2"
-                    stroke-width="5"
-                  />
-
-                  <ellipse
-                    cx="-38"
-                    cy="-13"
-                    rx="27"
-                    ry="4"
-                    fill="none"
-                    stroke="#90d9f2"
-                    stroke-width="2"
-                  />
-
-                  <ellipse
-                    cx="38"
-                    cy="-13"
-                    rx="27"
-                    ry="4"
-                    fill="none"
-                    stroke="#90d9f2"
-                    stroke-width="2"
-                  />
-
-                  <rect
-                    x="-22"
-                    y="-13"
-                    width="44"
-                    height="29"
-                    rx="8"
-                    fill="#e8f7ff"
-                    stroke="#58c9ed"
-                    stroke-width="2"
-                  />
-
-                  <circle cx="0" cy="1" r="5" fill="#1784b0" />
-                </g>
-
-                <text
-                  id="trackingAltitudeLabel"
-                  x="220"
-                  y="142"
-                  fill="#dff6ff"
-                  text-anchor="middle"
-                  font-family="Arial"
-                  font-size="13"
-                >
-                  ACTUAL · 7.90 m
-                </text>
-              </svg>
-            </div>
-
-            <div class="tracking-demo-controls">
-              <h3>Move the drone. Watch the error.</h3>
-
-              <p>
-                The target stays at 10 m. Change the actual altitude and see how
-                the tracking error changes.
-              </p>
-
-              <label for="trackingAltitude">
-                <span>Actual altitude</span>
-                <output id="trackingAltitudeOutput" for="trackingAltitude">
-                  7.90 m
-                </output>
-              </label>
-
-              <input
-                id="trackingAltitude"
-                type="range"
-                min="0"
-                max="12"
-                step="0.1"
-                value="7.9"
-              />
-
-              <div class="tracking-demo-result" id="trackingCalculation">
-                10.00 − 7.90 = +2.10 m
-              </div>
-
-              <p class="tracking-demo-message" id="trackingExplanation">
-                Below target: the tracking error is positive.
-              </p>
-            </div>
-          </section>
-
-          <div class="concept-grid">
-            <div class="concept">
-              <strong>At 10.00 m</strong>
-              <p>\(e(t)=10-10=0\) m.</p>
-            </div>
-
-            <div class="concept">
-              <strong>At 9.90 m</strong>
-              <p>\(e(t)=10-9.90=+0.10\) m.</p>
-            </div>
-
-            <div class="concept">
-              <strong>During takeoff</strong>
-              <p>The tracking error keeps changing as the drone moves.</p>
-            </div>
-          </div>
-
-          <p>
-            Tracking error changes throughout the response. But what error
-            remains after the system has settled?
-          </p>
-
-          <div class="actions">
-            <button class="btn primary" data-next="1" type="button">
-              Next: steady-state error →
-            </button>
-          </div>
-        </article>
-      </section>
-
-      <!-- Steady-state error -->
-      <section
-        class="lesson-panel"
-        id="panel1"
-        data-panel="1"
-        role="tabpanel"
-        aria-labelledby="tab1"
-        tabindex="0"
-        hidden
-      >
-        <article class="lesson-card">
-          <div class="step-tag">02 / 05 · STEADY-STATE ERROR</div>
-          <h2>What error remains after the drone settles?</h2>
-
-          <p>
-            <strong>Steady-state error</strong> is the tracking error that
-            remains after the system has settled.
-          </p>
-
-          <div class="math">\[\boxed{e_{ss}=\lim_{t\to\infty}e(t)}\]</div>
-
-          <p>
-            Example: if the target is 10 m and the drone settles at 9.9 m,
-            \(e_{ss}=10-9.9=0.1\text{ m}\).
-          </p>
-
-          <h3>How do we calculate it?</h3>
-
-          <p>
-            The same tracking error can be written in the Laplace domain. Here,
-            <strong>R(s)</strong> is the desired altitude and
-            <strong>Y(s)</strong> is the actual altitude:
-          </p>
-
-          <div class="math">\[\boxed{E(s)=R(s)-Y(s)}\]</div>
-
-          <p>
-            <strong>E(s) is not the steady-state error.</strong>
-            It is the tracking error in the Laplace domain.
-          </p>
-
-          <p>
-            For unity feedback, \(Y(s)=\frac{L(s)}{1+L(s)}R(s)\). Therefore:
-          </p>
-
-          <div class="math">
-            \[ E(s)=R(s)-\frac{L(s)}{1+L(s)}R(s) =\boxed{\frac{R(s)}{1+L(s)}} \]
-          </div>
-
-          <button class="btn derive-btn" id="openDerivation" type="button">
-            Why does it simplify to this?
-          </button>
-
-          <p>
-            Now use the <strong>Final Value Theorem</strong> to find the error
-            after settling:
-          </p>
-
-          <div class="math">\[\boxed{e_{ss}=\lim_{s\to0}sE(s)}\]</div>
-
-          <p>For the 10 m step, \(R(s)=10/s\):</p>
-
-          <div class="math">\[e_{ss}=\lim_{s\to0}\frac{10}{1+L(s)}\]</div>
-
-          <p>
-            <strong>Important:</strong> the Final Value Theorem is used only
-            when the relevant closed-loop error dynamics satisfy its stability
-            conditions.
-          </p>
-
-          <div class="actions">
-            <button class="btn" data-next="0" type="button">← Previous</button>
-            <button class="btn primary" data-next="2" type="button">
-              Next: identify system type →
-            </button>
-          </div>
-        </article>
-      </section>
-
-      <!-- System type -->
-      <section
-        class="lesson-panel"
-        id="panel2"
-        data-panel="2"
-        role="tabpanel"
-        aria-labelledby="tab2"
-        tabindex="0"
-        hidden
-      >
-        <article class="lesson-card">
-          <div class="step-tag">03 / 05 · THE RULE</div>
-          <h2>Count the integrators in the open loop</h2>
-
-          <p>
-            The system type is the number of uncancelled poles at the origin in
-            the open-loop transfer function \(L(s)\). It helps predict tracking
-            error for step, ramp and parabolic references.
-          </p>
-
-          <div class="concept-grid">
-            <div class="concept">
-              <strong>Type 0</strong>
-              <div>\[L(s)=\frac{K}{s+2}\]</div>
-              <p>No pole at the origin. A step can leave a nonzero error.</p>
-            </div>
-
-            <div class="concept">
-              <strong>Type 1</strong>
-              <div>\[L(s)=\frac{K}{s(s+2)}\]</div>
-              <p>
-                One pole at the origin. Stable closed loop → zero step error.
-              </p>
-            </div>
-
-            <div class="concept">
-              <strong>Type 2</strong>
-              <div>\[L(s)=\frac{K}{s^2(s+2)}\]</div>
-              <p>
-                Two poles at the origin. Stable closed loop → zero step and ramp
-                error.
-              </p>
-            </div>
-          </div>
-
-          <p class="muted">
-            For the drone comparison, the step-reference error and the
-            constant-disturbance response are two different tests. Do not use
-            the wind-on result as the wind-free step-error prediction.
-          </p>
-
-          <div class="actions">
-            <button class="btn" data-next="1" type="button">← Previous</button>
-            <button class="btn primary" data-next="3" type="button">
-              Next: compare controllers →
-            </button>
-          </div>
-        </article>
-      </section>
-
-      <!-- Controller comparison -->
-      <section
-        class="lesson-panel"
-        id="panel3"
-        data-panel="3"
-        role="tabpanel"
-        aria-labelledby="tab3"
-        tabindex="0"
-        hidden
-      >
-        <article class="lesson-card">
-          <div class="step-tag">04 / 05 · APPLY THE IDEA</div>
-          <h2>What should you see in Experiment 1?</h2>
-
-          <p>
-            The comparison plant has no integrator. Adding integral action in PI
-            or PID changes the open-loop type. Keep the plant and proportional
-            gain fixed when comparing controllers.
-          </p>
-
-          <div class="response-explainer">
-            <div class="response-title">What is transient response?</div>
-
-            <div class="response-row">
-              <div class="response-item">
-                <span class="response-label">Transient response</span>
-                <span class="response-text">
-                  <b>Before settling</b> — rise time, overshoot and settling
-                  time.
-                </span>
-              </div>
-
-              <div class="response-arrow" aria-hidden="true">→</div>
-
-              <div class="response-item">
-                <span class="response-label">Steady state</span>
-                <span class="response-text">
-                  <b>After settling</b> — the final output and remaining error.
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="table-scroll"
-            role="region"
-            aria-label="Controller comparison table"
-            tabindex="0"
-          >
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Controller</th>
-                  <th scope="col">Step-reference result (stable loop)</th>
-                  <th scope="col">What to observe</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                <tr>
-                  <td>P</td>
-                  <td>Nonzero \(e_{ss}\)</td>
-                  <td>Altitude settles below the 10 m reference.</td>
-                </tr>
-
-                <tr>
-                  <td>PD</td>
-                  <td>Nonzero \(e_{ss}\)</td>
-                  <td>
-                    Derivative action changes how the system behaves before
-                    settling (the transient response), but does not remove the
-                    steady-state error at the same \(K_P\).
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>PI</td>
-                  <td>Zero \(e_{ss}\)</td>
-                  <td>
-                    Integral action removes the persistent step-reference
-                    offset.
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>PID</td>
-                  <td>Zero \(e_{ss}\)</td>
-                  <td>
-                    Integral action removes the steady-state error; derivative
-                    action changes how the system behaves before settling.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="math">
-            \[ e_{ss,\,P}=e_{ss,\,PD}=\frac{10}{1+K_PG_p(0)} \qquad
-            e_{ss,\,PI}=e_{ss,\,PID}=0 \]
-          </div>
-
-          <p>
-            These predictions are for a wind-free step reference and stable
-            closed-loop operation. After recording all four controllers, try the
-            constant disturbance as a separate recovery exercise.
-          </p>
-
-          <div class="actions">
-            <button class="btn" data-next="2" type="button">← Previous</button>
-            <button class="btn primary" data-next="4" type="button">
-              Next: quick check →
-            </button>
-          </div>
-        </article>
-      </section>
-
-      <!-- Knowledge check -->
-      <section
-        class="lesson-panel"
-        id="panel4"
-        data-panel="4"
-        role="tabpanel"
-        aria-labelledby="tab4"
-        tabindex="0"
-        hidden
-      >
-        <article class="lesson-card">
-          <div class="step-tag">05 / 05 · KNOWLEDGE CHECK</div>
-          <h2>Check your understanding</h2>
-
-          <fieldset style="border: 0; padding: 0; margin: 0; min-width: 0">
-            <legend style="padding: 0; margin-bottom: 14px; color: #344e67">
-              For the same stable comparison plant and proportional gain, which
-              controllers eliminate the steady-state error to a constant 10 m
-              step reference?
-            </legend>
-
-            <label class="quiz-option">
-              <input type="radio" name="q" value="a" />
-              P and PD
-            </label>
-
-            <label class="quiz-option">
-              <input type="radio" name="q" value="b" />
-              PI and PID
-            </label>
-
-            <label class="quiz-option">
-              <input type="radio" name="q" value="c" />
-              All four controllers
-            </label>
-          </fieldset>
-
-          <button class="btn primary" id="checkAnswer" type="button">
-            Check answer
-          </button>
-
-          <p class="feedback" id="feedback" aria-live="polite"></p>
-
-          <div class="lesson-footer">
-            <button class="btn" data-next="3" type="button">← Previous</button>
-            <a class="btn primary" href="drone.html">Try Experiment 1 →</a>
-            <a class="btn" href="home.html">Return home</a>
-          </div>
-        </article>
-      </section>
-    </main>
-
-    <!-- Derivation popup -->
-    <div
-      class="derive-modal"
-      id="derivationModal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="deriveTitle"
-      hidden
-    >
-      <div class="derive-dialog">
-        <button
-          class="derive-close"
-          id="closeDerivation"
-          type="button"
-          aria-label="Close derivation"
-        >
-          ×
-        </button>
-
-        <h3 id="deriveTitle">Why is \(E(s)=R(s)-Y(s)\)?</h3>
-
-        <p class="derive-intro">
-          The error is simply the gap between what we want and what we actually
-          get.
-        </p>
-
-        <div class="derive-step">
-          <strong>1. Identify the two signals</strong>
-          <p>
-            \(R(s)\) = desired drone altitude. \(Y(s)\) = actual drone altitude.
-          </p>
-          <div>\[\boxed{E(s)=R(s)-Y(s)}\]</div>
-        </div>
-
-        <div class="derive-step">
-          <strong>2. Substitute the unity-feedback output</strong>
-          <div>\[Y(s)=\frac{L(s)}{1+L(s)}R(s)\]</div>
-          <div>\[E(s)=R(s)-\frac{L(s)}{1+L(s)}R(s)\]</div>
-        </div>
-
-        <div class="derive-step">
-          <strong>3. Simplify</strong>
-          <p>Factor out \(R(s)\), then combine the terms inside the bracket:</p>
-
-          <div>
-            \[ \begin{aligned} E(s) &=R(s)\left(1-\frac{L(s)}{1+L(s)}\right)\\
-            &=R(s)\left(\frac{1+L(s)-L(s)}{1+L(s)}\right)\\
-            &=\boxed{\frac{R(s)}{1+L(s)}} \end{aligned} \]
-          </div>
-
-          <p>
-            The \(+L(s)\) and \(-L(s)\) cancel. Here \(L(s)=C(s)G_p(s)\), which
-            represents the controller and plant together.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Original footer -->
-    <footer>
-      <div><b>EE3011</b> Interactive Learning Platform</div>
+"use strict";
+
+const $ = (id) => document.getElementById(id);
+const simulationTimeStep = 0.002;
+const WINDOW = 12;
+const SAMPLE_EVERY = 10;
+const ANALYSIS_END = 30;
+const numericIds = ["w", "z", "target", "fixed", "kp", "ki", "kd"];
+const CONTROLLERS = ["P", "PD", "PI", "PID"];
+
+const fmt = (value, places = 2) =>
+  Number.isFinite(value) ? value.toFixed(places) : "—";
+
+const initialState = () => ({
+  t: 0,
+  altitude: 0,
+  verticalVelocity: 0,
+  accumulatedError: 0,
+  controlInput: 0
+});
+
+const initialSample = () => ({ t: 0, y: 0, v: 0, u: 0 });
+
+function on(id, event, handler, options) {
+  $(id)?.addEventListener(event, handler, options);
+}
+
+function text(id, value) {
+  if ($(id)) $(id).textContent = value;
+}
+
+function hide(id, value = true) {
+  if ($(id)) $(id).hidden = value;
+}
+
+function typeset(elements) {
+  const nodes = elements.filter(Boolean);
+  if (nodes.length && window.MathJax?.typesetPromise) {
+    window.MathJax.typesetPromise(nodes).catch(() => {});
+  }
+}
+
+function equation(tex) {
+  return `<div class="solution-equation">\\[${tex}\\]</div>`;
+}
+
+function status(message) {
+  text("status", message);
+}
+
+let state = initialState();
+let samples = [initialSample()];
+let analysisSamples = [initialSample()];
+let currentConfig = null;
+
+let running = false;
+let frame = null;
+let previousFrame = null;
+let accumulator = 0;
+let steps = 0;
+let hasLaunched = false;
+let flightWasDisturbed = false;
+let analysisStart = 0;
+let lastLivePlot = 0;
+
+let droneApp = null;
+let droneSprite = null;
+
+let designChallenge = null;
+let designHasLaunched = false;
+let designAnswerCorrect = false;
+let solutionRevealed = false;
+
+const comparisonResults = {};
+const GUST_DIRECTION = -1;
+const GUST_DURATION = 0.2;
+const CONSTANT_WIND_TARGET_PD_OFFSET = 1;
+
+let constantWind = false;
+let wind = freshWind();
+
+function freshWind() {
+  return {
+    index: 0,
+    value: 0,
+    until: 0,
+    baseline: 0,
+    maxDeviation: 0,
+    lastDeviation: null
+  };
+}
+
+function hasIntegral(settings) {
+  return ["PI", "PID"].includes(settings.type) && settings.ki > 0;
+}
+
+function hasDerivative(settings) {
+  return ["PD", "PID"].includes(settings.type);
+}
+
+// Read the controls.
+function config() {
+  const settings = {
+    mode: $("mode").value,
+    type: $("type").value,
+    plant: $("experiment").value
+  };
+
+  for (const id of numericIds) {
+    const raw = $(id).value;
+    if (raw.trim() === "") {
+      throw Error("Enter a value for every required setting.");
+    }
+    settings[id] = Number(raw);
+  }
+
+  settings.naturalFrequency = settings.w;
+  settings.dampingRatio = settings.z;
+
+  if (
+    numericIds.some((id) => !Number.isFinite(settings[id])) ||
+    settings.w <= 0 ||
+    settings.z < 0 ||
+    settings.z > 1 ||
+    settings.target <= 0 ||
+    ["kp", "ki", "kd"].some((id) => settings[id] < 0)
+  ) {
+    throw Error(
+      "Use a positive ω₀ and target, ζ₀ between 0 and 1, and non-negative gains."
+    );
+  }
+
+  return settings;
+}
+
+// Stability conditions for the selected feedback system.
+function isStable(settings) {
+  if (!settings || settings.mode !== "closed") return false;
+
+  const integral = hasIntegral(settings);
+  const kd = hasDerivative(settings) ? settings.kd : 0;
+
+  if (settings.plant === "compare") {
+    if (!integral) return true;
+    return settings.ki < (2 + kd) * (1 + settings.kp);
+  }
+
+  const a = 2 * settings.z * settings.w + settings.w ** 2 * kd;
+
+  if (settings.kp <= 0 || a <= 0) return false;
+  if (!integral) return true;
+
+  return settings.ki < a * settings.kp;
+}
+
+function mathLaw(type) {
+  const p = String.raw`K_pe(t)`;
+  const i = String.raw`K_i\int_0^t e(\tau)\,d\tau`;
+  const d = String.raw`K_d\frac{de(t)}{dt}`;
+
+  if (type === "P") return String.raw`\[u(t)=${p}\]`;
+  if (type === "PI") {
+    return String.raw`\[\begin{aligned}u(t)&=${p}\\&+${i}\end{aligned}\]`;
+  }
+  if (type === "PD") {
+    return String.raw`\[\begin{aligned}u(t)&=${p}\\&+${d}\end{aligned}\]`;
+  }
+
+  return String.raw`\[\begin{aligned}u(t)&=${p}+${i}\\&+${d}\end{aligned}\]`;
+}
+
+// Theoretical error for a wind-free step reference.
+function theoreticalError(settings) {
+  if (!settings || !isStable(settings)) return null;
+
+  if (settings.plant === "compare") {
+    return hasIntegral(settings)
+      ? 0
+      : settings.target / (1 + settings.kp);
+  }
+
+  return 0;
+}
+
+function updateTheory() {
+  const settings = currentConfig;
+  const box = $("essDerivation");
+
+  if (!settings) {
+    text("theoreticalEss", "—");
+    return;
+  }
+
+  if (settings.mode !== "closed") {
+    text("theoreticalEss", "N/A");
+    return;
+  }
+
+  const result = theoreticalError(settings);
+  text(
+    "theoreticalEss",
+    result === null ? "No stable final value" : `${fmt(result, 3)} m`
+  );
+
+  if (!box || settings.plant !== "compare") return;
+
+  const type = settings.type;
+  const integral = hasIntegral(settings);
+  const derivative = hasDerivative(settings);
+  const damping = derivative ? "(2+K_D)" : "2";
+  const reference = fmt(settings.target, 2);
+
+  const laws = {
+    P: String.raw`K_P`,
+    PD: String.raw`K_P+K_Ds`,
+    PI: String.raw`K_P+\frac{K_I}{s}`,
+    PID: String.raw`K_P+\frac{K_I}{s}+K_Ds`
+  };
+
+  let working = equation(
+    String.raw`C_{\mathrm{${type}}}(s)=${laws[type]}`
+  );
+
+  if (integral) {
+    const characteristic =
+      String.raw`s^3+${damping}s^2+(1+K_P)s+K_I`;
+
+    working += equation(
+      String.raw`E(s)=\frac{${reference}}{s}\frac{s(s^2+2s+1)}{${characteristic}}`
+    );
+    working += equation(
+      String.raw`e_{ss}=\lim_{s\to0}\frac{${reference}s(s^2+2s+1)}{${characteristic}}=0`
+    );
+    working += `
       <p>
-        © 2026 Nanyang Technological University — School of Electrical &amp;
-        Electronic Engineering
+        ${type} includes integral action with
+        Kᵢ = ${fmt(settings.ki, 3)}.
+        For a stable closed loop, this removes the constant step-reference error.
       </p>
-    </footer>
+      <p class="note">
+        Stability requires
+        Kᵢ &lt; ${derivative ? "(2 + Kᴅ)" : "2"}(1 + Kₚ).
+      </p>`;
+  } else {
+    if (["PI", "PID"].includes(type)) {
+      working += `
+        <p>
+          Kᵢ is zero. This ${type} controller currently behaves as
+          ${derivative ? "PD" : "P"}.
+        </p>`;
+    }
 
-    <script>
-      // Header navigation
-      function closeMenus() {
-        document.querySelectorAll(".site-nav .dropdown").forEach((menu) => {
-          menu.classList.remove("show");
-        });
+    working += equation(
+      String.raw`E(s)=\frac{${reference}}{s}\frac{s^2+2s+1}{s^2+${damping}s+(1+K_P)}`
+    );
+    working += equation(
+      String.raw`e_{ss}=\frac{${reference}}{1+K_P}=\frac{${reference}}{1+${fmt(settings.kp, 3)}}=${fmt(settings.target / (1 + settings.kp), 3)}\,\mathrm{m}`
+    );
 
-        document.querySelectorAll(".site-nav .nav-button").forEach((button) => {
-          button.setAttribute("aria-expanded", "false");
-        });
+    working += derivative
+      ? `<p>
+          PD has the same theoretical step-reference error as P at the
+          same Kₚ. At steady state, the derivative term is zero.
+          It changes the transient response rather than removing this offset.
+        </p>`
+      : `<p>
+          P needs a nonzero error to produce the constant control input
+          that balances this plant’s restoring term.
+        </p>`;
+  }
+
+  const warning = isStable(settings)
+    ? ""
+    : `<p class="note">
+        These gains do not give a stable closed loop.
+        The Final Value Theorem cannot be used to claim a settled error.
+      </p>`;
+
+  box.innerHTML = `
+    <p><strong>Selected controller: ${type}</strong></p>
+    <p><strong>1 · Write the error transfer function</strong></p>
+    ${equation(
+      String.raw`E(s)=\frac{R(s)}{1+C(s)G_1(s)},\qquad R(s)=\frac{${reference}}{s}`
+    )}
+    <p><strong>2 · Substitute ${type} and apply the Final Value Theorem</strong></p>
+    ${working}
+    ${warning}
+    <p><strong>3 · Test ${type}</strong></p>
+    <p>
+      Launch a fresh flight with disturbance OFF.
+      Wait for the observed steady-state error, then record the result.
+    </p>`;
+
+  typeset([box]);
+}
+
+function observedSettled() {
+  if (
+    !hasLaunched ||
+    !currentConfig ||
+    !isStable(currentConfig) ||
+    state.t < 3 ||
+    wind.value !== 0 ||
+    wind.until > 0
+  ) {
+    return false;
+  }
+
+  const recent = samples.filter((point) => point.t >= state.t - 3);
+
+  if (
+    recent.length < 40 ||
+    state.t - recent[0].t < 2.9 ||
+    recent.some((point) => Math.abs(point.v) >= 0.015)
+  ) {
+    return false;
+  }
+
+  const values = recent.map((point) => point.y);
+  return Math.max(...values) - Math.min(...values) < 0.015;
+}
+
+function updateSteadyError() {
+  if (!hasLaunched) {
+    text("ess", "—");
+    return;
+  }
+
+  text(
+    "ess",
+    observedSettled()
+      ? `${fmt(currentConfig.target - state.altitude, 3)} m`
+      : "Not settled"
+  );
+}
+
+function updateForm() {
+  const type = $("type").value;
+
+  hide("pidFields", false);
+  hide("kiRow", !["PI", "PID"].includes(type));
+  hide("kdRow", !["PD", "PID"].includes(type));
+
+  if ($("controllerFormula")) {
+    $("controllerFormula").innerHTML = mathLaw(type);
+  }
+  if ($("inputFormula")) {
+    $("inputFormula").innerHTML = mathLaw(type);
+  }
+
+  typeset([$("controllerFormula"), $("inputFormula")]);
+
+  text("modeLabel", `With ${type}`);
+  text(
+    "tip",
+    $("experiment").value === "compare"
+      ? "Compare P, PD, PI and PID at the same proportional gain. Record each settled, wind-free result."
+      : "Calculate your PID gains, launch a fresh flight, then compare the full response with the design estimates."
+  );
+
+  for (const id of numericIds) {
+    text(`${id}O`, $(id).value);
+  }
+
+  try {
+    currentConfig = config();
+  } catch (error) {
+    currentConfig = null;
+    status(error.message);
+  }
+
+  analysisStart = 0;
+
+  if ($("analysisScroll")) $("analysisScroll").value = "0";
+  text("analysisRange", "0.0–1.0 s");
+
+  recomputeAnalysis();
+  analysisMetrics();
+  updateTheory();
+  updateControllerButtons();
+
+  const target = currentConfig?.target || 10;
+  show(state, target);
+  draw(target);
+  drawAnalysis(target);
+}
+
+// Drone graphics.
+function initDrone() {
+  if (!window.PIXI || droneApp || !$("droneStage") || !$("sky")) return;
+
+  droneApp = new PIXI.Application({
+    resizeTo: $("sky"),
+    backgroundAlpha: 0,
+    antialias: true
+  });
+
+  $("droneStage").appendChild(droneApp.view);
+
+  const drone = new PIXI.Container();
+  const arms = new PIXI.Graphics();
+  const body = new PIXI.Graphics();
+  const rotors = new PIXI.Graphics();
+
+  arms.beginFill(0x243b4e).drawRect(-60, -2, 120, 5).endFill();
+
+  body
+    .beginFill(0xedf6fc)
+    .lineStyle(2, 0x1a8bd0)
+    .drawRoundedRect(-24, -16, 48, 33, 9)
+    .endFill();
+
+  body
+    .beginFill(0x1a8bd0)
+    .drawPolygon([-5, -2, 0, 5, 5, -2, 0, -8])
+    .endFill();
+
+  rotors
+    .lineStyle(2, 0x233d51)
+    .drawEllipse(-43, -20, 32, 4)
+    .drawEllipse(43, -20, 32, 4);
+
+  drone.addChild(arms, rotors, body);
+  droneApp.stage.addChild(drone);
+  droneSprite = drone;
+}
+
+function moveDrone(altitude, target) {
+  if (!droneSprite) initDrone();
+  if (!droneSprite) return;
+
+  const sky = $("sky");
+  const maxAltitude = Math.max(target * 1.5, 1);
+  const fraction = Math.max(0, Math.min(1, altitude / maxAltitude));
+
+  droneSprite.x = sky.clientWidth / 2;
+  droneSprite.y =
+    sky.clientHeight - 28 - fraction * (sky.clientHeight - 56);
+}
+
+function show(point, target) {
+  const p = point === state
+    ? {
+        t: state.t,
+        y: state.altitude,
+        v: state.verticalVelocity,
+        u: state.controlInput
       }
+    : point;
 
-      function toggleMenu(id, button) {
-        const menu = document.getElementById(id);
-        const shouldOpen = !menu.classList.contains("show");
+  if (wind.until > 0) {
+    wind.maxDeviation = Math.max(
+      wind.maxDeviation,
+      Math.abs(p.y - wind.baseline)
+    );
+  }
 
-        closeMenus();
+  text(
+    "gustDeviation",
+    wind.until > 0
+      ? `Gust altitude change: ${fmt(p.y - wind.baseline, 3)} m · largest ${fmt(wind.maxDeviation, 3)} m`
+      : wind.lastDeviation !== null
+        ? `Last gust: largest ${fmt(wind.lastDeviation, 3)} m · finished`
+        : "No gust yet"
+  );
 
-        if (shouldOpen) {
-          menu.classList.add("show");
-          button.setAttribute("aria-expanded", "true");
-        }
+  const appliedWind =
+    wind.value +
+    (constantWind && currentConfig?.plant === "compare"
+      ? comparisonWindAcceleration(currentConfig)
+      : 0);
+
+  text(
+    "wind",
+    constantWind
+      ? `Constant downward · ${fmt(Math.abs(appliedWind), 1)} m/s²`
+      : wind.value === 0
+        ? "Calm"
+        : `${wind.value > 0 ? "Upward" : "Downward"} gust · ${fmt(Math.abs(wind.value), 0)} m/s²`
+  );
+
+  text("time", `${fmt(p.t)} s`);
+  text("altitude", `${fmt(p.y)} m`);
+  text("velocity", `${fmt(p.v)} m/s`);
+  text("command", fmt(p.u));
+  text("error", `${fmt(target - p.y)} m`);
+
+  moveDrone(p.y, target);
+
+  const sky = $("sky");
+  const maxAltitude = Math.max(target * 1.5, 1);
+
+  if (sky && $("targetLine")) {
+    const fraction = Math.max(0, Math.min(1, target / maxAltitude));
+    $("targetLine").style.top =
+      `${sky.clientHeight - 28 - fraction * (sky.clientHeight - 56)}px`;
+    $("targetLine").style.bottom = "auto";
+  }
+
+  text("targetLabel", `TARGET · ${fmt(target, 1)} m`);
+  text("topScale", `${fmt(maxAltitude, 1)} m`);
+}
+
+// Wind disturbance.
+function comparisonWindAcceleration(settings) {
+  return (
+    -(1 + Math.max(0, settings.kp)) *
+    CONSTANT_WIND_TARGET_PD_OFFSET *
+    Number($("gustStrength").value)
+  );
+}
+
+function syncWindButton() {
+  text(
+    "holdWind",
+    constantWind
+      ? "Stop constant disturbance"
+      : "Start constant disturbance"
+  );
+}
+
+function resetWind() {
+  wind = freshWind();
+  constantWind = false;
+  syncWindButton();
+}
+
+function updateWind(settings) {
+  if (
+    wind.until > 0 &&
+    (settings.mode !== "closed" || state.t >= wind.until)
+  ) {
+    wind.maxDeviation = Math.max(
+      wind.maxDeviation,
+      Math.abs(state.altitude - wind.baseline)
+    );
+
+    wind.lastDeviation = wind.maxDeviation;
+    wind.value = 0;
+    wind.until = 0;
+
+    status("Gust finished. Wind is calm; you can apply another gust.");
+  }
+}
+
+function applyWind() {
+  if (!running || !currentConfig || currentConfig.mode !== "closed") {
+    status("Launch the drone in feedback mode before applying wind.");
+    return;
+  }
+
+  if (wind.until > 0) {
+    status("A gust is already active. Wait for it to finish.");
+    return;
+  }
+
+  const stiffness =
+    (currentConfig.plant === "compare" ? 1 : currentConfig.w ** 2) *
+    Math.max(currentConfig.kp, 1);
+
+  wind.value =
+    GUST_DIRECTION *
+    Math.max(120, Math.min(9000, stiffness * 1.5)) *
+    Number($("gustStrength").value);
+
+  wind.baseline = state.altitude;
+  wind.maxDeviation = 0;
+  wind.lastDeviation = null;
+  wind.index++;
+  wind.until = state.t + GUST_DURATION;
+  flightWasDisturbed = true;
+
+  status(
+    "Downward gust applied for 0.2 simulated seconds. Watch the LIVE response and recovery."
+  );
+}
+
+// Response measurements.
+function clearMetrics() {
+  for (const id of ["rise", "peak", "os", "settle", "sse", "ess"]) {
+    text(id, "—");
+  }
+}
+
+function firstCrossing(points, level) {
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1];
+    const b = points[i];
+
+    if (a.y < level && b.y >= level) {
+      return a.t + ((level - a.y) / (b.y - a.y)) * (b.t - a.t);
+    }
+  }
+
+  return null;
+}
+
+function firstPeak(points) {
+  for (let i = 1; i < points.length - 1; i++) {
+    if (
+      points[i].y >= points[i - 1].y &&
+      points[i].y > points[i + 1].y
+    ) {
+      return points[i];
+    }
+  }
+
+  return null;
+}
+
+function settlingTime(points, finalValue, tolerance) {
+  if (points.length < 2) return null;
+
+  let lastOutside = -1;
+
+  for (let i = points.length - 1; i >= 0; i--) {
+    if (Math.abs(points[i].y - finalValue) > tolerance) {
+      lastOutside = i;
+      break;
+    }
+  }
+
+  if (lastOutside < 0) return 0;
+  if (lastOutside >= points.length - 1) return null;
+
+  const a = points[lastOutside];
+  const b = points[lastOutside + 1];
+  const boundary =
+    a.y > finalValue ? finalValue + tolerance : finalValue - tolerance;
+  const change = b.y - a.y;
+
+  if (Math.abs(change) < 1e-12) return b.t;
+
+  const fraction = Math.max(
+    0,
+    Math.min(1, (boundary - a.y) / change)
+  );
+
+  return a.t + fraction * (b.t - a.t);
+}
+
+function responseMetrics() {
+  if (!hasLaunched || !currentConfig || analysisSamples.length < 3) {
+    return null;
+  }
+
+  const target = currentConfig.target;
+  const tr = firstCrossing(analysisSamples, target);
+  const candidate = firstPeak(analysisSamples);
+
+  const finalAltitude = currentConfig.plant === "compare"
+    ? target - (theoreticalError(currentConfig) ?? 0)
+    : target;
+
+  const peak = candidate && candidate.y > finalAltitude * 1.001
+    ? candidate
+    : null;
+
+  const maximum = Math.max(...analysisSamples.map((point) => point.y));
+  const overshoot = Math.max(0, ((maximum - target) / target) * 100);
+  const tolerance = Math.max(0.02, Math.abs(target) * 0.02);
+  const measuredTs = settlingTime(analysisSamples, target, tolerance);
+  const ts =
+    measuredTs !== null &&
+    analysisSamples.at(-1).t - measuredTs >= 1
+      ? measuredTs
+      : null;
+
+  return { tr, peak, overshoot, ts, tolerance };
+}
+
+function analysisMetrics() {
+  const metrics = responseMetrics();
+
+  if (!metrics) {
+    clearMetrics();
+    updateDesignResult();
+    return;
+  }
+
+  text("rise", metrics.tr === null ? "—" : `${fmt(metrics.tr)} s`);
+  text(
+    "peak",
+    metrics.peak ? `${fmt(metrics.peak.t)} s` : "No overshoot peak"
+  );
+  text("os", `${fmt(metrics.overshoot, 1)} %`);
+  text("settle", metrics.ts === null ? "N/A" : `${fmt(metrics.ts)} s`);
+  text("sse", `${fmt(currentConfig.target - state.altitude)} m`);
+
+  updateSteadyError();
+  updateDesignResult();
+}
+
+// Live graph.
+function draw(target) {
+  if (!window.Plotly || !$("chart")) return;
+
+  const now = performance.now();
+
+  if (state.t > 0 && now - lastLivePlot < 100) return;
+  lastLivePlot = now;
+
+  const start = Math.max(0, state.t - WINDOW);
+  const visible = samples.filter((point) => point.t >= start);
+
+  Plotly.react(
+    "chart",
+    [
+      {
+        x: visible.map((point) => point.t),
+        y: visible.map((point) => point.y),
+        type: "scatter",
+        mode: "lines",
+        name: "Altitude",
+        line: { color: "#38bdf8", width: 3 }
+      },
+      {
+        x: [start, start + WINDOW],
+        y: [target, target],
+        type: "scatter",
+        mode: "lines",
+        name: "Target",
+        line: { color: "#ffb347", dash: "dash", width: 2 }
       }
+    ],
+    {
+      paper_bgcolor: "#071a2f",
+      plot_bgcolor: "#071a2f",
+      font: { color: "#d7edff" },
+      margin: { l: 65, r: 20, t: 20, b: 50 },
+      xaxis: {
+        title: { text: "Time (s)" },
+        range: [start, start + WINDOW],
+        gridcolor: "#244563"
+      },
+      yaxis: {
+        title: { text: "Altitude (m)" },
+        gridcolor: "#244563"
+      },
+      showlegend: true,
+      legend: { orientation: "h" }
+    },
+    { responsive: true, displaylogo: false, scrollZoom: true }
+  );
+}
 
-      document.addEventListener("click", (event) => {
-        if (!event.target.closest(".site-nav .nav-group")) closeMenus();
+// Full closed-loop model. Coefficients are in ascending powers of s.
+function closedLoopModel(settings) {
+  const b = settings.plant === "compare" ? 1 : settings.w ** 2;
+  const a = settings.plant === "compare"
+    ? 2
+    : 2 * settings.z * settings.w;
+  const restoring = settings.plant === "compare" ? 1 : 0;
+  const kd = hasDerivative(settings) ? settings.kd : 0;
+
+  if (hasIntegral(settings)) {
+    return {
+      den: [
+        b * settings.ki,
+        restoring + b * settings.kp,
+        a + b * kd
+      ],
+      num: [
+        b * settings.ki,
+        b * settings.kp,
+        b * kd
+      ]
+    };
+  }
+
+  return {
+    den: [restoring + b * settings.kp, a + b * kd],
+    num: [b * settings.kp, b * kd]
+  };
+}
+
+function simulateClosedLoopModel(settings) {
+  const model = closedLoopModel(settings);
+  const order = model.den.length;
+  let x = Array(order).fill(0);
+
+  const derivative = (q) => {
+    const result = Array(order).fill(0);
+
+    for (let i = 0; i < order - 1; i++) {
+      result[i] = q[i + 1];
+    }
+
+    let last = settings.target;
+
+    for (let i = 0; i < order; i++) {
+      last -= model.den[i] * q[i];
+    }
+
+    result[order - 1] = last;
+    return result;
+  };
+
+  const output = (q) =>
+    model.num.reduce((sum, coefficient, i) => sum + coefficient * q[i], 0);
+
+  const result = [initialSample()];
+  const totalSteps = Math.round(ANALYSIS_END / simulationTimeStep);
+
+  for (let n = 0; n < totalSteps; n++) {
+    const k1 = derivative(x);
+    const k2 = derivative(
+      x.map((value, i) => value + k1[i] * simulationTimeStep / 2)
+    );
+    const k3 = derivative(
+      x.map((value, i) => value + k2[i] * simulationTimeStep / 2)
+    );
+    const k4 = derivative(
+      x.map((value, i) => value + k3[i] * simulationTimeStep)
+    );
+
+    x = x.map(
+      (value, i) =>
+        value +
+        simulationTimeStep *
+        (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) / 6
+    );
+
+    const y = output(x);
+    const t = (n + 1) * simulationTimeStep;
+
+    if (!Number.isFinite(y) || Math.abs(y) > 1e7) return [];
+
+    if ((n + 1) % SAMPLE_EVERY === 0) {
+      result.push({ t, y, v: 0, u: 0 });
+    }
+  }
+
+  return result;
+}
+
+function recomputeAnalysis() {
+  analysisSamples = [initialSample()];
+
+  if (!currentConfig || !hasLaunched) return;
+
+  if (currentConfig.mode === "closed") {
+    analysisSamples = simulateClosedLoopModel(currentConfig);
+    return;
+  }
+
+  const settings = currentConfig;
+  let y = 0;
+  let v = 0;
+
+  for (
+    let n = 0;
+    n < Math.round(ANALYSIS_END / simulationTimeStep);
+    n++
+  ) {
+    const acceleration = settings.plant === "compare"
+      ? settings.fixed - 2 * v - y
+      : settings.w ** 2 * settings.fixed - 2 * settings.z * settings.w * v;
+
+    v += acceleration * simulationTimeStep;
+    y += v * simulationTimeStep;
+
+    if (!Number.isFinite(y) || Math.abs(y) > 1e7) {
+      analysisSamples = [];
+      return;
+    }
+
+    if ((n + 1) % SAMPLE_EVERY === 0) {
+      analysisSamples.push({
+        t: (n + 1) * simulationTimeStep,
+        y,
+        v,
+        u: settings.fixed
       });
+    }
+  }
+}
 
-      document.querySelectorAll(".site-nav .nav-group").forEach((group) => {
-        group.addEventListener("keydown", (event) => {
-          if (event.key !== "Escape") return;
-          closeMenus();
-          group.querySelector(".nav-button").focus();
-        });
-      });
+function drawAnalysis(target) {
+  if (!window.Plotly || !$("analysisChart")) return;
 
-      // Lesson navigation
-      const steps = [...document.querySelectorAll("[data-step]")];
-      const panels = [...document.querySelectorAll("[data-panel]")];
+  const start = analysisStart;
+  const end = start + 1;
+  const ready = hasLaunched && analysisSamples.length > 2;
+  const metrics = ready ? responseMetrics() : null;
+  const tolerance = metrics?.tolerance ?? Math.max(0.02, target * 0.02);
 
-      function go(number, focusPanel = false) {
-        steps.forEach((button) => {
-          const active = Number(button.dataset.step) === number;
+  if ($("analysisNote")) {
+    $("analysisNote").innerHTML = `
+      Browse the 30-second response using the slider.<br>
+      <b>t<sub>r</sub> — Rise time:</b> First reaches 100% of the target.<br>
+      <b>t<sub>p</sub> — Peak time:</b> Time of the first overshoot peak.<br>
+      <b>t<sub>s</sub> — Settling time:</b> Remains within ±2% of the target
+      for the rest of the analysed response.<br>
+      <b>M<sub>p</sub> — Percentage overshoot:</b> Maximum amount above
+      the target, expressed as a percentage of the target.
+    `;
+    $("analysisNote").style.lineHeight = "1.8";
+  }
 
-          button.classList.toggle("active", active);
-          button.setAttribute("aria-selected", String(active));
-          button.tabIndex = active ? 0 : -1;
-        });
+  const visible = ready
+    ? analysisSamples.filter(p => p.t >= start - 0.02 && p.t <= end + 0.02)
+    : [];
 
-        panels.forEach((panel) => {
-          panel.hidden = Number(panel.dataset.panel) !== number;
-        });
+  const shapes = [];
+  const annotations = [];
+  const traces = [];
 
-        document.getElementById("learningProgressLabel").textContent =
-          `SECTION ${number + 1} OF ${steps.length}`;
+  if (ready) {
+    shapes.push({
+      type: "rect",
+      xref: "x",
+      yref: "y",
+      x0: start,
+      x1: end,
+      y0: target - tolerance,
+      y1: target + tolerance,
+      fillcolor: "rgba(127,228,160,.14)",
+      line: { width: 0 },
+      layer: "below"
+    });
 
-        document.getElementById("learningProgressFill").style.width =
-          `${((number + 1) / steps.length) * 100}%`;
-
-        const panel = panels[number];
-
-        if (focusPanel) {
-          panel.focus({ preventScroll: true });
-
-          panel.scrollIntoView({
-            behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
-              .matches
-              ? "auto"
-              : "smooth",
-            block: "start",
-          });
-        }
-
-        if (window.MathJax?.typesetPromise) {
-          MathJax.typesetPromise([panel]).catch(() => {});
-        }
+    traces.push(
+      {
+        x: visible.map(p => p.t),
+        y: visible.map(p => p.y),
+        type: "scatter",
+        mode: "lines",
+        name: "Wind-free model response",
+        line: { color: "#38bdf8", width: 4 },
+        hovertemplate:
+          "Time: %{x:.3f} s<br>Altitude: %{y:.3f} m<extra></extra>"
+      },
+      {
+        x: [start, end],
+        y: [target, target],
+        type: "scatter",
+        mode: "lines",
+        name: "Target",
+        line: { color: "#ffb347", dash: "dash", width: 3 },
+        hoverinfo: "skip"
       }
+    );
 
-      steps.forEach((button, index) => {
-        button.addEventListener("click", () => go(index));
+    function mark(time, label, color, offset = 10) {
+      if (!Number.isFinite(time) || time < start || time > end) return;
 
-        button.addEventListener("keydown", (event) => {
-          let next = index;
-
-          if (event.key === "ArrowRight") {
-            next = (index + 1) % steps.length;
-          } else if (event.key === "ArrowLeft") {
-            next = (index - 1 + steps.length) % steps.length;
-          } else if (event.key === "Home") {
-            next = 0;
-          } else if (event.key === "End") {
-            next = steps.length - 1;
-          } else {
-            return;
-          }
-
-          event.preventDefault();
-          go(next);
-          steps[next].focus();
-        });
+      shapes.push({
+        type: "line",
+        xref: "x",
+        yref: "paper",
+        x0: time,
+        x1: time,
+        y0: 0,
+        y1: 1,
+        line: { color, dash: "dot", width: 2 }
       });
 
-      document.querySelectorAll("[data-next]").forEach((button) => {
-        button.addEventListener("click", () => {
-          go(Number(button.dataset.next), true);
-        });
+      annotations.push({
+        x: time,
+        y: 1,
+        xref: "x",
+        yref: "paper",
+        text: `<b>${label}</b>`,
+        font: { color, size: 15 },
+        showarrow: false,
+        yanchor: "bottom",
+        yshift: offset,
+        bgcolor: "rgba(7,26,47,.85)"
       });
+    }
 
-      // Interactive altitude illustration
-      const altitudeSlider = document.getElementById("trackingAltitude");
+    mark(metrics?.tr, "t<sub>r</sub>", "#38bdf8");
+    mark(metrics?.peak?.t, "t<sub>p</sub>", "#fb7185", 32);
+    mark(metrics?.ts, "t<sub>s</sub>", "#4ade80");
 
-      function updateTrackingDemo() {
-        const altitude = Number(altitudeSlider.value);
-        const error = 10 - altitude;
-        const position = 235 - (altitude / 12) * 200;
-        const signedError = `${error > 0 ? "+" : ""}${error.toFixed(2)}`;
+    const peak = metrics?.peak;
 
-        document.getElementById("trackingAltitudeOutput").textContent =
-          `${altitude.toFixed(2)} m`;
+    if (peak && peak.t >= start && peak.t <= end) {
+      const mp = Math.max(0, (peak.y - target) / target * 100);
 
-        document.getElementById("trackingCalculation").textContent =
-          `10.00 − ${altitude.toFixed(2)} = ${signedError} m`;
+      traces.push({
+        x: [peak.t],
+        y: [peak.y],
+        type: "scatter",
+        mode: "markers+text",
+        name: "First peak",
+        showlegend: false,
+        marker: { size: 11, color: "#fb7185" },
+        text: [`M<sub>p</sub> = ${fmt(mp, 2)}%`],
+        textposition:
+          peak.t > start + 0.7 ? "top left" : "top right",
+        textfont: { color: "#ffd7df", size: 14 },
+        cliponaxis: false,
+        hovertemplate:
+          `Peak time: ${fmt(peak.t, 3)} s<br>` +
+          `Peak altitude: ${fmt(peak.y, 3)} m<br>` +
+          `Mₚ: ${fmt(mp, 2)}%<extra></extra>`
+      });
+    }
+  } else {
+    annotations.push({
+      text: hasLaunched
+        ? "Response could not be analysed. Check the gains."
+        : "Launch the drone to analyse a fresh takeoff.",
+      xref: "paper",
+      yref: "paper",
+      x: 0.5,
+      y: 0.5,
+      showarrow: false
+    });
+  }
 
-        altitudeSlider.setAttribute(
-          "aria-valuetext",
-          `${altitude.toFixed(1)} metres`,
-        );
+  const values = visible.map(p => p.y).concat(
+    0, target - tolerance, target + tolerance
+  );
+  const minimum = Math.min(...values);
+  const maximum = Math.max(...values);
+  const padding = Math.max(0.5, (maximum - minimum) * 0.12);
 
-        document
-          .getElementById("trackingDrone")
-          .setAttribute("transform", `translate(220 ${position})`);
+  Plotly.react(
+    "analysisChart",
+    traces,
+    {
+      paper_bgcolor: "#071a2f",
+      plot_bgcolor: "#071a2f",
+      font: { color: "#e7f5ff", size: 15 },
+      margin: { l: 78, r: 35, t: 125, b: 75 },
 
-        const altitudeLabel = document.getElementById("trackingAltitudeLabel");
-        altitudeLabel.setAttribute("y", position + 39);
-        altitudeLabel.textContent = `ACTUAL · ${altitude.toFixed(2)} m`;
+      xaxis: {
+        title: { text: "Time (s)", standoff: 18 },
+        range: [start, end],
+        gridcolor: "#315a78",
+        gridwidth: 1.3,
+        fixedrange: true,
+        visible: ready
+      },
 
-        document
-          .getElementById("trackingErrorLine")
-          .setAttribute("y2", position);
+      yaxis: {
+        title: { text: "Altitude (m)", standoff: 15 },
+        range: [minimum - padding, maximum + padding],
+        gridcolor: "#315a78",
+        gridwidth: 1.3,
+        fixedrange: false,
+        visible: ready
+      },
 
-        const cap = document.getElementById("trackingErrorCap");
-        cap.setAttribute("y1", position);
-        cap.setAttribute("y2", position);
+      shapes,
+      annotations,
+      showlegend: ready,
+      legend: {
+        orientation: "h",
+        x: 0,
+        y: 1.25,
+        xanchor: "left",
+        yanchor: "bottom",
+        font: { size: 14 }
+      },
+      hovermode: "closest"
+    },
+    {
+      responsive: true,
+      displaylogo: false,
+      displayModeBar: "hover",
+      scrollZoom: false
+    }
+  );
+}
 
-        document.getElementById("trackingExplanation").textContent =
-          Math.abs(error) < 0.001
-            ? "At the target: the tracking error is zero."
-            : error > 0
-              ? "Below target: the tracking error is positive."
-              : "Above target: the tracking error is negative.";
+// Live controller and plant simulation.
+function controllerOutput(settings, error) {
+  const proportional = settings.kp * error;
+  const integral = ["PI", "PID"].includes(settings.type)
+    ? settings.ki * state.accumulatedError
+    : 0;
+  const derivative = hasDerivative(settings)
+    ? -settings.kd * state.verticalVelocity
+    : 0;
 
-        document.getElementById("trackingSceneDescription").textContent =
-          `Target 10 metres, actual altitude ${altitude.toFixed(2)} metres, ` +
-          `tracking error ${signedError} metres`;
+  return proportional + integral + derivative;
+}
+
+function advance(settings) {
+  const error = settings.target - state.altitude;
+  const input = settings.mode === "open"
+    ? settings.fixed
+    : controllerOutput(settings, error);
+
+  updateWind(settings);
+
+  const disturbance =
+    wind.value +
+    (constantWind && settings.plant === "compare"
+      ? comparisonWindAcceleration(settings)
+      : 0);
+
+  const acceleration =
+    (settings.plant === "compare"
+      ? input - 2 * state.verticalVelocity - state.altitude
+      : settings.w ** 2 * input -
+        2 * settings.z * settings.w * state.verticalVelocity) +
+    disturbance;
+
+  state.verticalVelocity += acceleration * simulationTimeStep;
+  state.altitude += state.verticalVelocity * simulationTimeStep;
+
+  if (
+    settings.mode === "closed" &&
+    ["PI", "PID"].includes(settings.type)
+  ) {
+    state.accumulatedError += error * simulationTimeStep;
+  }
+
+  state.controlInput = input;
+  state.t += simulationTimeStep;
+  steps++;
+
+  if (
+    !Number.isFinite(state.altitude) ||
+    !Number.isFinite(state.verticalVelocity) ||
+    Math.abs(state.altitude) > 1e7 ||
+    Math.abs(state.verticalVelocity) > 1e7
+  ) {
+    pause();
+    status(
+      "Simulation stopped: the selected gains produced an unstable or excessively large response."
+    );
+    return false;
+  }
+
+  if (steps % SAMPLE_EVERY === 0) {
+    samples.push({
+      t: state.t,
+      y: state.altitude,
+      v: state.verticalVelocity,
+      u: state.controlInput
+    });
+
+    if (samples.length > 10000) {
+      samples = samples.filter(
+        (point) => point.t >= state.t - Math.max(WINDOW + 5, 30)
+      );
+    }
+  }
+
+  return true;
+}
+
+function tick(now) {
+  if (!running) return;
+
+  if (previousFrame === null) previousFrame = now;
+
+  accumulator +=
+    Math.min(0.05, (now - previousFrame) / 1000) *
+    Number($("simSpeed").value);
+
+  previousFrame = now;
+
+  while (currentConfig && accumulator >= simulationTimeStep) {
+    if (!advance(currentConfig)) return;
+    accumulator -= simulationTimeStep;
+  }
+
+  const target = currentConfig?.target || 10;
+
+  show(state, target);
+  draw(target);
+  text("sse", `${fmt(target - state.altitude)} m`);
+  updateSteadyError();
+
+  frame = requestAnimationFrame(tick);
+}
+
+function pause() {
+  running = false;
+
+  if (frame !== null) cancelAnimationFrame(frame);
+
+  frame = null;
+  previousFrame = null;
+
+  if ($("run")) $("run").disabled = false;
+}
+
+function resumeFlight() {
+  if (running || !currentConfig) return;
+
+  running = true;
+  previousFrame = null;
+  accumulator = 0;
+
+  if ($("run")) $("run").disabled = true;
+
+  frame = requestAnimationFrame(tick);
+}
+
+function clearFlight() {
+  pause();
+  resetWind();
+
+  hasLaunched = false;
+  designHasLaunched = false;
+  flightWasDisturbed = false;
+  state = initialState();
+  samples = [initialSample()];
+  analysisSamples = [initialSample()];
+  steps = 0;
+  accumulator = 0;
+  lastLivePlot = 0;
+
+  clearMetrics();
+}
+
+function launch() {
+  try {
+    currentConfig = config();
+  } catch (error) {
+    status(error.message);
+    return false;
+  }
+
+  pause();
+  resetWind();
+
+  state = initialState();
+  samples = [initialSample()];
+  steps = 0;
+  accumulator = 0;
+  lastLivePlot = 0;
+
+  hasLaunched = true;
+  flightWasDisturbed = false;
+  designHasLaunched = currentConfig.plant === "design";
+
+  recomputeAnalysis();
+  analysisMetrics();
+  updateTheory();
+  drawAnalysis(currentConfig.target);
+  show(state, currentConfig.target);
+  draw(currentConfig.target);
+  updateChallengeButtons();
+  resumeFlight();
+
+  status(
+    "Drone launched. The live graph shows the flight; response analysis uses the complete wind-free model."
+  );
+
+  return true;
+}
+
+function reset() {
+  clearFlight();
+  updateForm();
+  updateChallengeButtons();
+  status("Reset to ground level. Click Launch to start a fresh flight.");
+}
+
+function settingsChanged() {
+  clearFlight();
+  designAnswerCorrect = false;
+
+  updateForm();
+  syncGuideGainsFromMain();
+  updateChallengeButtons();
+
+  if (designChallenge) {
+    text(
+      "designAnswerFeedback",
+      "Settings changed. Check your gains, or launch a trial flight."
+    );
+  }
+
+  status("Settings changed. Launch a new flight to measure this controller.");
+}
+
+// PID design challenge.
+function makeDesignChallenge() {
+  const z = Number((0.55 + Math.random() * 0.25).toFixed(2));
+  const tr = Number((0.35 + Math.random() * 0.2).toFixed(2));
+  const theta = Math.acos(z);
+  const wn = (Math.PI - theta) / (tr * Math.sqrt(1 - z * z));
+  const alpha = z * wn;
+  const p = 10 * alpha;
+
+  designChallenge = {
+    z,
+    tr,
+    theta,
+    wn,
+    alpha,
+    p,
+    kd: (2 * z * wn + p - 5) / 25,
+    kp: (wn * wn + 2 * z * wn * p) / 25,
+    ki: wn * wn * p / 25,
+    mp: Math.exp(-z * Math.PI / Math.sqrt(1 - z * z)) * 100,
+    tp: Math.PI / (wn * Math.sqrt(1 - z * z)),
+    ts: 4 / (z * wn)
+  };
+
+  text(
+    "designChallenge",
+    "Your mission: calculate Kₚ, Kᵢ and Kᴅ for the given damping ratio, rise time and zero steady-state error. Use p = 10ζωₙ and keep the plant at ω₀ = 5, ζ₀ = 0.5."
+  );
+
+  text("missionZ", fmt(z, 2));
+  text("missionTr", `${fmt(tr, 2)} s`);
+}
+
+function syncGuideGainsFromMain() {
+  for (const [guide, main] of [
+    ["guideKp", "kp"],
+    ["guideKi", "ki"],
+    ["guideKd", "kd"]
+  ]) {
+    if ($(guide) && $(main)) $(guide).value = $(main).value;
+  }
+}
+
+function readGuideGains() {
+  const result = {};
+
+  for (const [guide, main] of [
+    ["guideKp", "kp"],
+    ["guideKi", "ki"],
+    ["guideKd", "kd"]
+  ]) {
+    if (!$(guide) || $(guide).value.trim() === "") return null;
+
+    const value = Number($(guide).value);
+    if (!Number.isFinite(value) || value < 0) return null;
+
+    result[main] = value;
+  }
+
+  return result;
+}
+
+function syncMainGainsFromGuide() {
+  const gains = readGuideGains();
+  if (!gains) return false;
+
+  for (const id of ["kp", "ki", "kd"]) {
+    $(id).value = gains[id];
+  }
+
+  $("type").value = "PID";
+  return true;
+}
+
+function guideReady() {
+  return (
+    $("experiment").value === "design" &&
+    designChallenge !== null &&
+    readGuideGains() !== null
+  );
+}
+
+function updateChallengeButtons() {
+  if ($("guideLaunch")) {
+    $("guideLaunch").disabled = !guideReady();
+  }
+
+  if ($("anotherQuestion")) {
+    $("anotherQuestion").disabled = !(
+      solutionRevealed ||
+      (designAnswerCorrect && designHasLaunched)
+    );
+  }
+
+  if ($("guideSolution")) {
+    $("guideSolution").textContent = solutionRevealed
+      ? "View worked solution"
+      : "Reveal solution";
+  }
+}
+
+function goToChallengeStage(id) {
+  const step = $(id);
+  if (!step) return;
+
+  document.querySelectorAll("#designGuide .guide-step").forEach((item) => {
+    item.open = item.id === id;
+  });
+
+  document.querySelectorAll("#designGuide [data-stage]").forEach((button) => {
+    if (button.dataset.stage === id) {
+      button.setAttribute("aria-current", "step");
+    } else {
+      button.removeAttribute("aria-current");
+    }
+  });
+
+  requestAnimationFrame(() => {
+    step.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+}
+
+function openDesignAtRequirements() {
+  hide("experimentGuide", false);
+  goToChallengeStage("designRequirementsStep");
+}
+
+function resetForDesignQuestion(makeNew) {
+  clearFlight();
+
+  $("type").value = "PID";
+  $("mode").value = "closed";
+  $("w").value = "5";
+  $("z").value = "0.5";
+  $("target").value = "10";
+
+  if (makeNew || !designChallenge) makeDesignChallenge();
+
+  for (const id of ["kp", "ki", "kd"]) $(id).value = "0";
+
+  designAnswerCorrect = false;
+  solutionRevealed = false;
+
+  hide("manualSolution");
+  hide("predictionReveal");
+  hide("solutionLocked", false);
+
+  if ($("solutionBody")) $("solutionBody").innerHTML = "";
+  if ($("predictionValues")) $("predictionValues").innerHTML = "";
+
+  text(
+    "designAnswerFeedback",
+    "Enter your calculated gains. Check answer for feedback, or launch a trial flight."
+  );
+
+  updateForm();
+  syncGuideGainsFromMain();
+  updateChallengeButtons();
+
+  text("designResult", "Launch your design to see the response.");
+  status("New design question ready. Calculate Kₚ, Kᵢ and Kᴅ.");
+}
+
+function designGainTolerance(expected, gain) {
+  const absoluteTolerance = gain === "kd" ? 0.1 : 1;
+  return Math.max(absoluteTolerance, Math.abs(expected) * 0.01);
+}
+
+function designGainMatches(entered, expected, gain) {
+  return (
+    Number.isFinite(entered) &&
+    Math.abs(entered - expected) <= designGainTolerance(expected, gain) + 1e-10
+  );
+}
+
+function checkDesignAnswer() {
+  if (!designChallenge) return;
+
+  const entered = readGuideGains();
+
+  if (!entered) {
+    designAnswerCorrect = false;
+    text(
+      "designAnswerFeedback",
+      "Enter a valid non-negative number for all three gains."
+    );
+    updateChallengeButtons();
+    return;
+  }
+
+  syncMainGainsFromGuide();
+  clearFlight();
+  updateForm();
+
+  const matches = ["kp", "ki", "kd"].map(
+    (gain) => designGainMatches(entered[gain], designChallenge[gain], gain)
+  );
+
+  designAnswerCorrect = matches.every(Boolean);
+
+  const labels = { kp: "Kₚ", ki: "Kᵢ", kd: "Kᴅ" };
+  const details = ["kp", "ki", "kd"].map(
+    (gain, index) => `${labels[gain]} ${matches[index] ? "✓" : "needs checking"}`
+  );
+
+  text(
+    "designAnswerFeedback",
+    designAnswerCorrect
+      ? "Correct ✓ Your gains are within the accepted rounding range. Launch your design when ready."
+      : `${details.join(" · ")}. Review the coefficient matching and try again.`
+  );
+
+  updateChallengeButtons();
+}
+
+function useSolutionGains() {
+  if (!designChallenge) return;
+
+  clearFlight();
+
+  $("type").value = "PID";
+  $("mode").value = "closed";
+  $("w").value = "5";
+  $("z").value = "0.5";
+  $("target").value = "10";
+
+  for (const gain of ["kp", "ki", "kd"]) {
+    $(gain).value = Number(designChallenge[gain].toFixed(4));
+  }
+
+  designAnswerCorrect = true;
+
+  updateForm();
+  syncGuideGainsFromMain();
+  updateChallengeButtons();
+
+  text(
+    "designAnswerFeedback",
+    "Solution gains applied ✓ Click Launch my design. No additional answer check is needed."
+  );
+
+  text("designResult", "Solution gains are ready. Launch a fresh flight.");
+  status("Solution gains applied. You can launch directly.");
+  goToChallengeStage("enterDesignStep");
+}
+
+function revealSolution() {
+  if ($("experiment").value !== "design") return;
+  if (!designChallenge) makeDesignChallenge();
+
+  const d = designChallenge;
+
+  if ($("solutionBody")) {
+    $("solutionBody").innerHTML = `
+      <div class="solution-steps">
+        <p class="solution-intro">
+          Match the PID characteristic polynomial to the desired
+          second-order factor and a third pole.
+        </p>
+
+        <h3>Given · Mission requirements</h3>
+        ${equation(
+          String.raw`\zeta=${fmt(d.z, 2)},\quad t_r=${fmt(d.tr, 2)}\,\mathrm{s},\quad e_{ss}=0`
+        )}
+        ${equation(String.raw`G_2(s)=\frac{25}{s(s+5)}`)}
+
+        <h3>1 · Calculate the natural frequency</h3>
+        ${equation(
+          String.raw`\theta=\cos^{-1}(\zeta)=${fmt(d.theta, 4)}\,\mathrm{rad}`
+        )}
+        ${equation(
+          String.raw`t_r\approx\frac{\pi-\theta}{\omega_n\sqrt{1-\zeta^2}}`
+        )}
+        ${equation(
+          String.raw`\omega_n=\frac{\pi-\cos^{-1}(${fmt(d.z, 2)})}{${fmt(d.tr, 2)}\sqrt{1-${fmt(d.z, 2)}^2}}=${fmt(d.wn, 4)}\,\mathrm{rad/s}`
+        )}
+
+        <h3>2 · Place the third pole</h3>
+        ${equation(
+          String.raw`\alpha=\zeta\omega_n=${fmt(d.alpha, 4)}`
+        )}
+        ${equation(
+          String.raw`p=10\alpha=${fmt(d.p, 4)},\qquad s_3=-p`
+        )}
+        ${equation(
+          String.raw`P_d(s)=(s^2+2\zeta\omega_ns+\omega_n^2)(s+p)`
+        )}
+
+        <h3>3 · Match the coefficients</h3>
+        ${equation(
+          String.raw`P_{CL}(s)=s^3+(5+25K_D)s^2+25K_Ps+25K_I`
+        )}
+        ${equation(
+          String.raw`P_d(s)=s^3+(2\zeta\omega_n+p)s^2+(\omega_n^2+2\zeta\omega_np)s+\omega_n^2p`
+        )}
+
+        <h3>4 · Solve for the controller gains</h3>
+        ${equation(
+          String.raw`\boxed{K_D=\frac{2\zeta\omega_n+p-5}{25}=${fmt(d.kd, 4)}}`
+        )}
+        ${equation(
+          String.raw`\boxed{K_P=\frac{\omega_n^2+2\zeta\omega_np}{25}=${fmt(d.kp, 4)}}`
+        )}
+        ${equation(
+          String.raw`\boxed{K_I=\frac{\omega_n^2p}{25}=${fmt(d.ki, 4)}}`
+        )}
+
+        <h3>5 · Check the step-reference error</h3>
+        ${equation(
+          String.raw`e_{ss}=\lim_{s\to0}\frac{10}{1+C(s)G_2(s)}=0`
+        )}
+        <p>
+          The designed closed loop is stable and includes integral action.
+          Its wind-free step-reference error therefore approaches zero.
+        </p>
+
+        <div class="guide-check-actions">
+          <button
+            id="useSolution"
+            class="guide-action-button"
+            type="button"
+          >Use these design gains</button>
+        </div>
+
+        <p class="note">
+          Applying the solution enables launch immediately.
+          You can also try another question as soon as the solution is revealed.
+        </p>
+      </div>`;
+  }
+
+  // Keep the prediction in the manual, below the worked solution.
+  const manual = $("manualSolution");
+  const prediction = $("predictionReveal");
+
+  if (manual && prediction && !manual.contains(prediction)) {
+    manual.appendChild(prediction);
+  }
+
+  if ($("predictionValues")) {
+    $("predictionValues").innerHTML = `
+      <div>
+        <span>Overshoot · Mₚ</span>
+        <strong>${fmt(d.mp, 3)}%</strong>
+      </div>
+      <div>
+        <span>Peak time · tₚ</span>
+        <strong>${fmt(d.tp, 3)} s</strong>
+      </div>
+      <div>
+        <span>Settling time · ±2%</span>
+        <strong>${fmt(d.ts, 3)} s</strong>
+      </div>`;
+  }
+
+  text("predictionHeading", "Second-order design prediction");
+
+  solutionRevealed = true;
+
+  hide("experimentGuide", false);
+  hide("manualSolution", false);
+  hide("predictionReveal", false);
+  hide("solutionLocked");
+
+  updateChallengeButtons();
+  typeset([$("solutionBody")]);
+  goToChallengeStage("understandDesignStep");
+
+  on("useSolution", "click", useSolutionGains);
+}
+
+function updateDesignResult() {
+  const element = $("designResult");
+  if (!element) return;
+
+  if (
+    !currentConfig ||
+    currentConfig.plant !== "design" ||
+    currentConfig.type !== "PID"
+  ) {
+    element.textContent = "Select Experiment 2 to test a PID design.";
+    return;
+  }
+
+  if (!hasLaunched || !designHasLaunched) {
+    element.textContent = "Launch your design to see the response.";
+    return;
+  }
+
+  const metrics = responseMetrics();
+
+  if (!metrics) {
+    element.textContent =
+      "The response could not be analysed. Check the controller gains.";
+    return;
+  }
+
+  element.textContent =
+    `Full wind-free model response: ` +
+    `tᵣ = ${metrics.tr === null ? "not reached" : `${fmt(metrics.tr, 3)} s`}, ` +
+    `Mₚ = ${fmt(metrics.overshoot, 3)}%, ` +
+    `tₛ = ${metrics.ts === null ? "N/A within 30 s" : `${fmt(metrics.ts, 3)} s`}. ` +
+    "The live graph shows the drone flight. Reveal the solution to compare the second-order estimates.";
+}
+
+// Experiment 1 manual buttons and wording.
+function updateControllerButtons() {
+  document.querySelectorAll("[data-compare-controller]").forEach((button) => {
+    const selected = button.dataset.compareController === $("type").value;
+    button.setAttribute("aria-pressed", String(selected));
+    button.classList.toggle("selected", selected);
+  });
+}
+
+function selectComparisonController(type, launchNow = false) {
+  if (!CONTROLLERS.includes(type)) return;
+
+  if ($("experiment").value !== "compare") {
+    $("experiment").value = "compare";
+    updateExperiment();
+  }
+
+  $("type").value = type;
+  settingsChanged();
+
+  text(
+    "comparisonStatus",
+    `${type} selected. Launch with disturbance OFF, wait until settled, then record the result.`
+  );
+
+  if (launchNow) {
+    hide("experimentGuide");
+    launch();
+    $("chart")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
+function installComparisonManual() {
+  const guide = $("compareGuide");
+  if (!guide) return;
+
+  const heading = guide.querySelector("h3");
+  if (heading) {
+    heading.textContent =
+      "Experiment 1 · P, PD, PI and PID steady-state challenge";
+  }
+
+  const details = [...guide.querySelectorAll(".guide-step")];
+
+  if (details[1] && !$("compareControllerButtons")) {
+    const box = document.createElement("div");
+    box.id = "compareControllerButtons";
+    box.className = "guide-controller-buttons";
+    box.innerHTML = `
+      <p><strong>Choose the controller to investigate</strong></p>
+      <div class="guide-check-actions">
+        ${CONTROLLERS.map(
+          (type) => `
+            <button
+              type="button"
+              class="guide-action-button secondary"
+              data-compare-controller="${type}"
+              aria-pressed="false"
+            >${type}</button>`
+        ).join("")}
+      </div>
+      <p class="note">
+        These buttons update the simulator and the derivation below.
+        Keep the same Kₚ when comparing all four controllers.
+      </p>`;
+
+    const derivation = $("essDerivation");
+    if (derivation) derivation.before(box);
+    else details[1].appendChild(box);
+  }
+
+  if (details[2] && !$("manualLaunchComparison")) {
+    const actions = document.createElement("div");
+    actions.className = "guide-check-actions";
+    actions.innerHTML = `
+      <button
+        id="manualLaunchComparison"
+        class="guide-action-button"
+        type="button"
+      >Launch selected controller</button>`;
+
+    details[2].appendChild(actions);
+  }
+
+  if (details[4]) {
+    const summary = details[4].querySelector("summary");
+    if (summary) {
+      summary.textContent = "5 · Compare all four: P vs PD vs PI vs PID";
+    }
+
+    const tbody = details[4].querySelector("tbody");
+
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td><strong>P</strong></td>
+          <td>
+            With Kₚ &gt; 0, settles below the target with
+            eₛₛ = 10/(1 + Kₚ).
+          </td>
+          <td>
+            A nonzero error is needed to supply the plant’s steady input.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>PD</strong></td>
+          <td>
+            Has the same theoretical final error as P at the same Kₚ.
+            Its transient response can differ.
+          </td>
+          <td>
+            Derivative action changes the transient behaviour.
+            It is zero once the error stops changing.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>PI</strong></td>
+          <td>
+            With Kᵢ &gt; 0 and stable gains, the final altitude approaches
+            10 m and the error approaches zero.
+          </td>
+          <td>
+            Integral action removes the constant step-reference offset.
+            Settling can take longer for some gain choices.
+          </td>
+        </tr>
+        <tr>
+          <td><strong>PID</strong></td>
+          <td>
+            With Kᵢ &gt; 0 and stable gains, the final error also approaches
+            zero. Compare its transient response with PI.
+          </td>
+          <td>
+            Integral action removes the offset; derivative action changes
+            the transient response.
+          </td>
+        </tr>`;
+    }
+  }
+
+  guide.querySelectorAll("[data-compare-controller]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectComparisonController(button.dataset.compareController);
+    });
+  });
+
+  on("manualLaunchComparison", "click", () => {
+    selectComparisonController($("type").value, true);
+  });
+}
+
+function renderComparisonResults() {
+  if (!$("comparisonRows")) return;
+
+  $("comparisonRows").innerHTML = CONTROLLERS.map((type) => {
+    const result = comparisonResults[type];
+
+    if (!result) {
+      return `
+        <tr>
+          <td><strong>${type}</strong></td>
+          <td>—</td>
+          <td>Not recorded</td>
+          <td>—</td>
+        </tr>`;
+    }
+
+    return `
+      <tr>
+        <td>
+          <strong>${type}</strong>
+          <small style="display:block">
+            Kₚ=${fmt(result.kp, 2)},
+            Kᵢ=${fmt(result.ki, 2)},
+            Kᴅ=${fmt(result.kd, 2)}
+          </small>
+        </td>
+        <td>${fmt(result.theory, 3)} m</td>
+        <td>${fmt(result.error, 3)} m</td>
+        <td>${fmt(result.alt, 3)} m</td>
+      </tr>`;
+  }).join("");
+}
+
+function recordComparison() {
+  if (
+    $("experiment").value !== "compare" ||
+    !currentConfig ||
+    currentConfig.mode !== "closed" ||
+    !hasLaunched
+  ) {
+    text(
+      "comparisonStatus",
+      "Select Experiment 1 and launch a fresh flight before recording."
+    );
+    return;
+  }
+
+  if (flightWasDisturbed || constantWind || wind.value !== 0) {
+    text(
+      "comparisonStatus",
+      "Launch a fresh wind-free flight before recording the step-reference error."
+    );
+    return;
+  }
+
+  if (!observedSettled()) {
+    text(
+      "comparisonStatus",
+      "The response has not settled. Wait until Observed steady-state error shows a value."
+    );
+    return;
+  }
+
+  const settings = currentConfig;
+
+  comparisonResults[settings.type] = {
+    alt: state.altitude,
+    error: settings.target - state.altitude,
+    theory: theoreticalError(settings),
+    kp: settings.kp,
+    ki: ["PI", "PID"].includes(settings.type) ? settings.ki : 0,
+    kd: hasDerivative(settings) ? settings.kd : 0
+  };
+
+  renderComparisonResults();
+
+  const count = Object.keys(comparisonResults).length;
+
+  text(
+    "comparisonStatus",
+    count === 4
+      ? "All four controllers recorded. Compare P, PD, PI and PID, checking that the runs used the same Kₚ."
+      : `${settings.type} recorded · ${count}/4 complete. Choose another controller and launch a fresh flight.`
+  );
+}
+
+// Switch experiments.
+function updateExperiment() {
+  clearFlight();
+
+  const compare = $("experiment").value === "compare";
+
+  hide("designGuide", compare);
+  hide("compareGuide", !compare);
+  hide("experimentGuide");
+  hide("solutionModal");
+  hide("holdWind", !compare);
+  hide("applyWind", compare);
+  hide("readyDesign", compare);
+
+  // Review and prediction are accessed through the manual.
+  hide("completeDesign");
+  hide("designPlantSettings", compare);
+  hide("controllerTypeRow", !compare);
+  hide("pidLockedController", compare);
+
+  $("plantFormula").innerHTML = compare
+    ? String.raw`\(G_1(s)=\dfrac{1}{s^2+2s+1}\)`
+    : String.raw`\(G_2(s)=\dfrac{\omega_0^2}{s(s+2\zeta_0\omega_0)}\)`;
+
+  $("plantDynamics").innerHTML = compare
+    ? String.raw`\(\ddot y=u-2\dot y-y+d(t)\)`
+    : String.raw`\(\ddot y=\omega_0^2u-2\zeta_0\omega_0\dot y+d(t)\)`;
+
+  text(
+    "plantNote",
+    compare
+      ? "Experiment 1 uses a normalised plant with a restoring term to compare steady-state error."
+      : "Experiment 2 uses the integrator plant for the PID design challenge."
+  );
+
+  text(
+    "experimentIntro",
+    compare
+      ? "Compare P, PD, PI and PID for the same 10 m target. Predict, launch, observe and record."
+      : "Calculate PID gains, test your design and review the worked solution."
+  );
+
+  text(
+    "quickHelp",
+    compare
+      ? "Use the manual’s controller buttons. Launch without wind, wait until settled, then record each result."
+      : "Open Ready to design. You can check your answer or launch a trial flight."
+  );
+
+  $("mode").value = "closed";
+  $("target").value = "10";
+  $("w").value = "5";
+  $("z").value = "0.5";
+  $("type").value = compare ? "P" : "PID";
+
+  if (compare) {
+    $("kp").value = "100";
+    $("ki").value = "4";
+    $("kd").value = "5";
+
+    updateForm();
+    syncGuideGainsFromMain();
+  } else {
+    resetForDesignQuestion(!designChallenge);
+  }
+
+  updateChallengeButtons();
+  typeset([$("plantFormula"), $("plantDynamics")]);
+
+  status(
+    compare
+      ? "Experiment 1 ready. Open the manual or launch the selected controller."
+      : "Experiment 2 ready. Open Ready to design to begin the challenge."
+  );
+}
+
+// Small additions to the existing manual design.
+function installManualStyles() {
+  if ($("droneManualEnhancements")) return;
+
+  const style = document.createElement("style");
+  style.id = "droneManualEnhancements";
+
+  style.textContent = `
+    #experimentGuide [hidden] {
+      display: none !important;
+    }
+
+    #designGuide .guide-step,
+    #compareGuide .guide-step {
+      margin: 14px 0;
+      border: 1px solid rgba(125, 211, 252, .22);
+      border-radius: 15px;
+      overflow: hidden;
+      background: rgba(8, 30, 52, .55);
+    }
+
+    #designGuide .guide-step > summary,
+    #compareGuide .guide-step > summary {
+      padding: 17px 20px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    #designGuide .guide-step[open],
+    #compareGuide .guide-step[open] {
+      border-color: rgba(56, 189, 248, .65);
+    }
+
+    .guide-controller-buttons {
+      margin: 16px 0;
+      padding: 16px;
+      border: 1px solid rgba(125, 211, 252, .24);
+      border-radius: 12px;
+    }
+
+    .guide-check-actions,
+    .guide-end-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    #experimentGuide .guide-action-button {
+      padding: 11px 17px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    #experimentGuide button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    #experimentGuide [data-compare-controller].selected {
+      background: #38bdf8;
+      color: #06233b;
+      border-color: #7dd3fc;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, .2);
+    }
+
+    #predictionReveal {
+      margin-top: 25px;
+      padding: 20px;
+      border: 1px solid rgba(56, 189, 248, .35);
+      border-radius: 14px;
+      background: rgba(14, 65, 95, .3);
+    }
+
+    #predictionValues {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 12px;
+    }
+
+    #predictionValues > div {
+      padding: 15px;
+      border-radius: 10px;
+      background: rgba(5, 24, 43, .65);
+    }
+
+    #predictionValues span,
+    #predictionValues strong {
+      display: block;
+    }
+
+    #predictionValues span {
+      font-size: .85rem;
+      margin-bottom: 8px;
+    }
+
+    #predictionValues strong {
+      color: #7dd3fc;
+      font-size: 1.35rem;
+    }
+
+    #designAnswerFeedback {
+      padding: 14px 16px;
+      border-left: 3px solid #38bdf8;
+      border-radius: 8px;
+      background: rgba(56, 189, 248, .08);
+      line-height: 1.6;
+    }
+
+    #solutionBody .solution-equation {
+      overflow-x: auto;
+      padding: 8px 0;
+    }
+
+    #solutionBody h3 {
+      margin-top: 25px;
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
+function prepareManual() {
+  installManualStyles();
+  installComparisonManual();
+
+  // Generated challenge gains can exceed the old HTML max="100".
+  for (const id of [
+    "kp", "ki", "kd", "guideKp", "guideKi", "guideKd"
+  ]) {
+    if ($(id)) {
+      $(id).removeAttribute("max");
+      $(id).step = "any";
+    }
+  }
+
+  const manual = $("manualSolution");
+  const prediction = $("predictionReveal");
+
+  if (manual && prediction && !manual.contains(prediction)) {
+    manual.appendChild(prediction);
+  }
+
+  hide("manualSolution");
+  hide("predictionReveal");
+
+  const enterStep = $("enterDesignStep");
+
+  if (enterStep) {
+    const paragraph = enterStep.querySelector("p");
+    if (paragraph) {
+      paragraph.textContent =
+        "Enter your calculated gains. Check answer gives feedback; Launch my design lets you test a valid set of gains directly.";
+    }
+  }
+
+  const review = $("understandDesignStep");
+  if (review) {
+    const paragraph = review.querySelector("p");
+    if (paragraph) {
+      paragraph.textContent =
+        "Reveal the working when ready. The second-order prediction appears below the solution, and Try another question becomes available immediately.";
+    }
+  }
+
+  if ($("guideLaunch")) {
+    $("guideLaunch").textContent = "Launch my design";
+  }
+
+  text(
+    "analysisNote",
+    "Browse the 30 s wind-free model response. tᵣ is the first 0–100% target crossing, tₚ is the first peak, and tₛ uses the ±2% target band."
+  );
+}
+
+// Main simulator events.
+on("run", "click", launch);
+on("reset", "click", reset);
+on("applyWind", "click", applyWind);
+on("type", "change", settingsChanged);
+on("mode", "change", settingsChanged);
+on("experiment", "change", updateExperiment);
+on("recordComparison", "click", recordComparison);
+
+for (const id of numericIds) {
+  on(id, "input", settingsChanged);
+}
+
+on("z", "change", () => {
+  const value = Number($("z").value);
+  $("z").value = Number.isFinite(value)
+    ? Math.max(0, Math.min(1, value))
+    : 0.5;
+
+  settingsChanged();
+});
+
+on("gustStrength", "input", () => {
+  text("gustStrengthO", `${$("gustStrength").value}×`);
+});
+
+on("simSpeed", "input", () => {
+  text("simSpeedO", `${Number($("simSpeed").value).toFixed(2)}×`);
+});
+
+on("holdWind", "click", () => {
+  if (!running || !currentConfig || currentConfig.mode !== "closed") {
+    status(
+      "Launch the drone in feedback mode before starting the constant disturbance."
+    );
+    return;
+  }
+
+  constantWind = !constantWind;
+
+  if (constantWind) flightWasDisturbed = true;
+
+  wind.value = 0;
+  wind.until = 0;
+
+  syncWindButton();
+
+  status(
+    constantWind
+      ? `Constant disturbance ON. P and PD have an additional downward offset of approximately ${fmt(CONSTANT_WIND_TARGET_PD_OFFSET * Number($("gustStrength").value), 2)} m after settling. Stable PI/PID with integral action should reject the constant disturbance.`
+      : "Constant disturbance OFF. Watch the controller recover."
+  );
+
+  show(state, currentConfig.target);
+});
+
+// Challenge events.
+on("readyDesign", "click", () => {
+  if ($("experiment").value !== "design") return;
+  if (!designChallenge) resetForDesignQuestion(true);
+  openDesignAtRequirements();
+});
+
+on("anotherQuestion", "click", () => {
+  if (
+    !solutionRevealed &&
+    !(designAnswerCorrect && designHasLaunched)
+  ) {
+    return;
+  }
+
+  resetForDesignQuestion(true);
+  openDesignAtRequirements();
+});
+
+for (const id of ["guideKp", "guideKi", "guideKd"]) {
+  on(id, "input", () => {
+    clearFlight();
+    designAnswerCorrect = false;
+
+    const valid = syncMainGainsFromGuide();
+
+    if (valid) updateForm();
+
+    text(
+      "designAnswerFeedback",
+      valid
+        ? "Gains updated. Check answer for feedback, or launch a trial flight."
+        : "Enter a valid non-negative number for all three gains."
+    );
+
+    updateChallengeButtons();
+  });
+}
+
+on("checkDesignAnswer", "click", checkDesignAnswer);
+
+on("guideLaunch", "click", () => {
+  if (!syncMainGainsFromGuide()) {
+    text(
+      "designAnswerFeedback",
+      "Enter valid non-negative values for all three gains before launching."
+    );
+    return;
+  }
+
+  updateForm();
+
+  if (!launch()) return;
+
+  hide("experimentGuide");
+
+  requestAnimationFrame(() => {
+    $("chart")?.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  });
+});
+
+on("guideSolution", "click", revealSolution);
+on("completeDesign", "click", revealSolution);
+
+// Manual navigation.
+on("openExperimentGuide", "click", () => {
+  hide("experimentGuide", false);
+
+  if ($("experiment").value === "design" && !designChallenge) {
+    resetForDesignQuestion(true);
+  }
+
+  $("closeExperimentGuide")?.focus();
+});
+
+on("closeExperimentGuide", "click", () => {
+  hide("experimentGuide");
+  $("openExperimentGuide")?.focus();
+});
+
+on("experimentGuide", "click", (event) => {
+  if (event.target === $("experimentGuide")) {
+    hide("experimentGuide");
+    $("openExperimentGuide")?.focus();
+  }
+});
+
+on("closeSolution", "click", () => hide("solutionModal"));
+
+on("solutionModal", "click", (event) => {
+  if (event.target === $("solutionModal")) hide("solutionModal");
+});
+
+document.querySelectorAll("#designGuide [data-stage]").forEach((button) => {
+  button.addEventListener("click", () => {
+    goToChallengeStage(button.dataset.stage);
+  });
+});
+
+document.querySelectorAll("#designGuide .guide-step").forEach((step) => {
+  step.addEventListener("toggle", () => {
+    if (!step.open) return;
+
+    document.querySelectorAll("#designGuide [data-stage]").forEach((button) => {
+      if (button.dataset.stage === step.id) {
+        button.setAttribute("aria-current", "step");
+      } else {
+        button.removeAttribute("aria-current");
       }
+    });
+  });
+});
 
-      altitudeSlider.addEventListener("input", updateTrackingDemo);
-      updateTrackingDemo();
+on("experimentGuide", "keydown", (event) => {
+  if (event.key === "Escape") {
+    hide("experimentGuide");
+    $("openExperimentGuide")?.focus();
+    return;
+  }
 
-      // Derivation popup
-      const derivationModal = document.getElementById("derivationModal");
-      const openDerivation = document.getElementById("openDerivation");
-      const closeDerivation = document.getElementById("closeDerivation");
+  if (event.key !== "Tab") return;
 
-      let previousOverflow = "";
+  const items = [
+    ...$("experimentGuide").querySelectorAll(
+      'button:not(:disabled), input:not(:disabled), select:not(:disabled), summary, a[href]'
+    )
+  ].filter((element) => element.getClientRects().length);
 
-      function showDerivation() {
-        previousOverflow = document.body.style.overflow;
-        derivationModal.hidden = false;
-        document.body.style.overflow = "hidden";
-        closeDerivation.focus();
+  if (!items.length) return;
 
-        if (window.MathJax?.typesetPromise) {
-          MathJax.typesetPromise([derivationModal]).catch(() => {});
-        }
-      }
+  const first = items[0];
+  const last = items[items.length - 1];
 
-      function hideDerivation() {
-        if (derivationModal.hidden) return;
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
 
-        derivationModal.hidden = true;
-        document.body.style.overflow = previousOverflow;
-        openDerivation.focus();
-      }
+// Analysis graph navigation.
+function setAnalysisStart(value) {
+  analysisStart = Math.max(0, Math.min(ANALYSIS_END - 1, value));
 
-      openDerivation.addEventListener("click", showDerivation);
-      closeDerivation.addEventListener("click", hideDerivation);
+  if ($("analysisScroll")) {
+    $("analysisScroll").value = String(analysisStart);
+  }
 
-      derivationModal.addEventListener("click", (event) => {
-        if (event.target === derivationModal) hideDerivation();
-      });
+  text(
+    "analysisRange",
+    `${analysisStart.toFixed(1)}–${(analysisStart + 1).toFixed(1)} s`
+  );
 
-      derivationModal.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          hideDerivation();
-        }
+  drawAnalysis(currentConfig?.target || 10);
+}
 
-        if (event.key === "Tab") {
-          event.preventDefault();
-          closeDerivation.focus();
-        }
-      });
+on("analysisScroll", "input", () => {
+  setAnalysisStart(Number($("analysisScroll").value));
+});
 
-      // Knowledge check
-      document.getElementById("checkAnswer").addEventListener("click", () => {
-        const choice = document.querySelector('input[name="q"]:checked');
+on("analysisBack", "click", () => {
+  setAnalysisStart(analysisStart - 0.5);
+});
 
-        document.getElementById("feedback").textContent = !choice
-          ? "Select an answer first."
-          : choice.value === "b"
-            ? "Correct. Integral action in PI and PID removes the step-reference offset for a stable closed loop."
-            : "Not quite. Which controllers include integral action?";
-      });
-    </script>
-  </body>
-</html>
+on("analysisNext", "click", () => {
+  setAnalysisStart(analysisStart + 0.5);
+});
+
+on(
+  "analysisScroll",
+  "wheel",
+  (event) => {
+    event.preventDefault();
+    setAnalysisStart(analysisStart + (event.deltaY > 0 ? 0.2 : -0.2));
+  },
+  { passive: false }
+);
+
+// Initialise.
+prepareManual();
+renderComparisonResults();
+updateExperiment();
+
+function refreshVisuals() {
+  initDrone();
+
+  const target = currentConfig?.target || 10;
+  show(state, target);
+  draw(target);
+  drawAnalysis(target);
+}
+
+if (document.readyState === "complete") {
+  refreshVisuals();
+} else {
+  window.addEventListener("load", refreshVisuals);
+}
+
+window.addEventListener("resize", () => {
+  show(state, currentConfig?.target || 10);
+});
