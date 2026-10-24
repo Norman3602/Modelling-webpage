@@ -1,11 +1,11 @@
 <!doctype html>
-
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>EE3011 | Drone Altitude Lab</title>
     <link href="drone-style.css" rel="stylesheet" />
+
     <style>
       .site-header {
         height: 90px;
@@ -107,32 +107,257 @@
         background: #edf7ff;
         color: #168cc0;
       }
-      @media (max-width: 800px) {
-        .site-header {
-          height: auto;
-          min-height: 90px;
-          flex-wrap: wrap;
-          gap: 8px;
-          padding: 12px 4%;
-        }
-        .site-nav {
-          width: 100%;
-          flex-wrap: wrap;
-          gap: 15px;
-          font-size: 14px;
-        }
-        .site-nav .nav-button {
-          font-size: 14px;
-          padding: 12px 0;
-        }
-        .site-nav > a {
-          padding: 12px 0;
-        }
-        .site-nav .dropdown {
-          top: 38px;
-          left: 0;
-          transform: none;
-        }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      #experimentGuide {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+        background: #020b18c9;
+        backdrop-filter: blur(8px);
+      }
+      #experimentGuide .guide-modal-card {
+        box-sizing: border-box;
+        width: min(980px, 94vw);
+        max-height: 90dvh;
+        padding: 30px;
+        border: 1px solid #355675;
+        border-radius: 22px;
+        background: #0b1c30;
+        color: #e8f1fa;
+        overflow: auto;
+        box-shadow: 0 30px 100px #0009;
+      }
+      #experimentGuide h2 {
+        font:
+          700 28px Arial,
+          sans-serif;
+        margin: 0 150px 8px 0;
+      }
+      #experimentGuide h3 {
+        font:
+          700 23px Arial,
+          sans-serif;
+        color: #eff7ff;
+      }
+      #experimentGuide p {
+        line-height: 1.65;
+      }
+      #experimentGuide .guide-lead {
+        color: #9eb5cb;
+      }
+      #experimentGuide .modal-close {
+        position: sticky;
+        top: 0;
+        float: right;
+        z-index: 2;
+        padding: 10px 14px;
+        border: 1px solid #49657c;
+        border-radius: 9px;
+        background: #173b55;
+        color: white;
+        cursor: pointer;
+      }
+      .challenge-eyebrow {
+        color: #6cdad1;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+      }
+      .challenge-route {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin: 22px 0;
+      }
+      #designGuide .challenge-route button {
+        padding: 14px 8px;
+        background: #122b43;
+        color: #acc2d5;
+        border: 1px solid #2c4860;
+        border-radius: 12px;
+        font: 600 13px Arial;
+        cursor: pointer;
+      }
+      #designGuide .challenge-route button[aria-current="step"] {
+        background: #77e5d0;
+        color: #062c2d;
+        border-color: #77e5d0;
+      }
+      #experimentGuide .guide-step {
+        border: 1px solid #2b4861;
+        border-radius: 16px;
+        background: #10263c;
+        padding: 0 20px;
+        margin: 12px 0;
+      }
+      #experimentGuide .guide-step > summary {
+        padding: 20px 0;
+        cursor: pointer;
+        font-weight: 700;
+        color: #d9eaf9;
+      }
+      #experimentGuide .guide-step > :last-child {
+        margin-bottom: 22px;
+      }
+      #designGuide .design-challenge-card {
+        padding: 18px;
+        border: 0;
+        background: #0b1d30;
+        border-radius: 12px;
+      }
+      #designGuide .design-challenge-card small {
+        color: #6cdad1;
+        letter-spacing: 1.5px;
+      }
+      .challenge-targets,
+      .prediction-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 18px 0;
+      }
+      .challenge-targets > div,
+      .prediction-grid > div {
+        padding: 16px;
+        background: #15314a;
+        border: 1px solid #34536a;
+        border-radius: 12px;
+      }
+      .challenge-targets span,
+      .prediction-grid span {
+        display: block;
+        font-size: 12px;
+        color: #abc2d6;
+        margin-bottom: 8px;
+      }
+      .challenge-targets strong,
+      .prediction-grid strong {
+        font-size: 22px;
+        color: #fff;
+      }
+      #designGuide .guide-gain-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+      #designGuide .guide-gain-grid label {
+        font-weight: 700;
+        color: #b8d4e7;
+      }
+      #designGuide input {
+        box-sizing: border-box;
+        width: 100%;
+        margin-top: 8px;
+        padding: 14px;
+        background: #071829;
+        color: white;
+        border: 1px solid #49657c;
+        border-radius: 10px;
+        font-size: 20px;
+      }
+      #experimentGuide .guide-action-button,
+      #experimentGuide #useSolution,
+      #experimentGuide #recordComparison {
+        padding: 12px 18px;
+        border: 0;
+        border-radius: 10px;
+        font-weight: 700;
+        background: #77e5d0;
+        color: #062c2d;
+        cursor: pointer;
+      }
+      #experimentGuide button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      #experimentGuide .guide-check-actions,
+      #experimentGuide .guide-end-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 18px 0;
+      }
+      #experimentGuide .secondary {
+        background: #264660 !important;
+        color: #e6f2fb !important;
+      }
+      #experimentGuide .design-answer-feedback,
+      #experimentGuide .experiment-result {
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid #41607a;
+        background: #0a1b2d;
+        line-height: 1.7;
+      }
+      #experimentGuide .solution-steps h3 {
+        font-size: 17px;
+        margin: 25px 0 12px;
+      }
+      #experimentGuide .solution-equation {
+        overflow-x: auto;
+        padding: 8px 14px;
+        margin: 10px 0;
+        border: 1px solid #2e4b64;
+        border-radius: 10px;
+        background: #0b1c30;
+        font-size: 16px;
+      }
+      #experimentGuide .solution-equation mjx-container {
+        max-width: none;
+      }
+      #experimentGuide .note {
+        color: #acc2d5;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+      #predictionReveal {
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #3b5971;
+      }
+      #experimentGuide button:focus-visible,
+      #experimentGuide summary:focus-visible {
+        outline: 3px solid #fff;
+        outline-offset: 4px;
+      }
+      #compareGuide .math-card {
+        overflow-x: auto;
+        padding: 16px;
+        background: #0b1d30;
+        border: 1px solid #34536a;
+        border-radius: 12px;
+      }
+      #experimentGuide .comparison-table-wrap {
+        overflow-x: auto;
+      }
+      #experimentGuide .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      #experimentGuide .comparison-table th,
+      #experimentGuide .comparison-table td {
+        padding: 14px 12px;
+        border-bottom: 1px solid #34536a;
+        text-align: left;
+        line-height: 1.6;
+        vertical-align: top;
+      }
+      #experimentGuide .comparison-table th {
+        color: #7de3d5;
+      }
+      #experimentGuide .comparison-table small {
+        display: block;
+        color: #9eb5cb;
       }
       .lesson-callout {
         display: flex;
@@ -168,7 +393,52 @@
         text-decoration: none;
         font-weight: bold;
       }
+      .manual-launch-card {
+        padding: 18px;
+        margin: 18px 0;
+        background: #0b1d30;
+        border: 1px solid #34536a;
+        border-radius: 12px;
+      }
+      .manual-launch-card small {
+        display: block;
+        color: #78ddd0;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        margin-bottom: 8px;
+      }
+      #compareLaunchSummary {
+        margin: 0 0 16px;
+        color: #dbeefa;
+        font-weight: 600;
+      }
+
       @media (max-width: 800px) {
+        .site-header {
+          height: auto;
+          min-height: 90px;
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 12px 4%;
+        }
+        .site-nav {
+          width: 100%;
+          flex-wrap: wrap;
+          gap: 15px;
+          font-size: 14px;
+        }
+        .site-nav .nav-button {
+          font-size: 14px;
+          padding: 12px 0;
+        }
+        .site-nav > a {
+          padding: 12px 0;
+        }
+        .site-nav .dropdown {
+          top: 38px;
+          left: 0;
+          transform: none;
+        }
         .lesson-callout {
           display: block;
         }
@@ -177,47 +447,74 @@
           white-space: normal;
         }
       }
+      @media (max-width: 600px) {
+        #experimentGuide .guide-modal-card {
+          padding: 20px 14px;
+        }
+        #experimentGuide h2 {
+          font-size: 21px;
+          margin-right: 100px;
+        }
+        .challenge-route {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .challenge-targets,
+        .prediction-grid {
+          grid-template-columns: 1fr;
+        }
+        #experimentGuide .guide-step {
+          padding: 0 12px;
+        }
+        #designGuide .guide-gain-grid {
+          gap: 8px;
+        }
+      }
     </style>
   </head>
+
   <body>
     <header class="site-header">
-      <a class="brand" href="home.html"
-        ><span class="brand-icon">EE</span>
-        <div><b>EE3011</b><small>MODELLING &amp; CONTROL</small></div></a
-      >
+      <a class="brand" href="home.html">
+        <span class="brand-icon">EE</span>
+        <div><b>EE3011</b><small>MODELLING &amp; CONTROL</small></div>
+      </a>
+
       <nav class="site-nav">
         <a href="home.html">Home</a>
+
         <div class="nav-group">
           <button
             class="nav-button"
-            onclick="toggleMenu('part1', this)"
+            onclick="toggleMenu('part1')"
             type="button"
           >
             Control Fundamentals <span class="chevron"></span>
           </button>
           <div class="dropdown" id="part1">
-            <a href="root_locus.html">Root Locus</a
-            ><a href="drone.html">PID Control</a
-            ><a href="steady_state_learning.html">Steady-State Error</a
-            ><a href="pt1_quiz.html">PT1 Quiz</a>
+            <a href="root_locus.html">Root Locus</a>
+            <a href="drone.html">PID Control</a>
+            <a href="steady_state_learning.html">Steady-State Error</a>
+            <a href="pt1_quiz.html">PT1 Quiz</a>
           </div>
         </div>
+
         <div class="nav-group">
           <button
             class="nav-button"
-            onclick="toggleMenu('part2', this)"
+            onclick="toggleMenu('part2')"
             type="button"
           >
             Frequency Response <span class="chevron"></span>
           </button>
           <div class="dropdown" id="part2">
-            <a href="root_locus.html">Root Locus</a
-            ><a href="drone.html">PID Control</a
-            ><a href="pt2_quiz.html">PT2 Quiz</a>
+            <a href="root_locus.html">Root Locus</a>
+            <a href="drone.html">PID Control</a>
+            <a href="pt2_quiz.html">PT2 Quiz</a>
           </div>
         </div>
       </nav>
     </header>
+
     <section class="hero">
       <div>
         <small>INTERACTIVE CONTROL APPLICATION</small>
@@ -228,113 +525,167 @@
         </p>
       </div>
       <div class="speech">
-        <b>Hi! I'm ControlBot.</b
-        ><span
-          >Enter your designed gains, then watch the calculated altitude—not a
-          pre-made flight animation.</span
-        >
+        <b>Hi! I'm ControlBot.</b>
+        <span>
+          Choose an experiment, explore the controller equations, then launch
+          the drone to test your settings.
+        </span>
       </div>
       <img alt="ControlBot ready to simulate" src="bot-simulate.png" />
     </section>
+
     <section aria-label="Choose experiment" class="experiment-picker">
-      <label for="experiment">Choose an experiment</label
-      ><select id="experiment">
+      <label for="experiment">Choose an experiment</label>
+      <select id="experiment">
         <option value="compare">
           Experiment 1 · P / PD / PI / PID steady-state comparison
         </option>
         <option value="design">Experiment 2 · PID design</option>
       </select>
       <p id="experimentIntro">
-        Compare P, PD, PI and PID steady-state error for a 10 m step target
-        using the comparison plant.
+        Compare P, PD, PI and PID steady-state error for a 10 m step target.
       </p>
     </section>
+
     <button class="guide-open-button" id="openExperimentGuide" type="button">
-      📖 Experiment instructions
+      📖 Experiment manual
     </button>
+
     <div
-      aria-label="Experiment instructions"
+      aria-label="Experiment manual"
       aria-modal="true"
       class="experiment-guide cb-modal"
-      hidden=""
+      hidden
       id="experimentGuide"
       role="dialog"
     >
       <div class="cb-modal-card guide-modal-card">
         <button
-          aria-label="Minimise experiment instructions"
+          aria-label="Minimise experiment manual"
           class="modal-close"
           id="closeExperimentGuide"
           type="button"
         >
           − Minimise
         </button>
-        <h2>Experiments · follow the steps</h2>
+
+        <h2>Flight lab · experiment manual</h2>
         <p class="guide-lead">
-          Follow the experiment here. Open only the step you need.
+          Follow the activity, test your controller, and use the results to
+          explain what happened.
         </p>
-        <div class="guide-panel" id="designGuide">
-          <h3>Experiment 2 · Design and test a PID controller</h3>
-          <details class="guide-step" id="designRequirementsStep" open="">
-            <summary>1 · Design requirements</summary>
+
+        <div class="guide-panel" id="designGuide" hidden>
+          <div class="challenge-eyebrow">EXPERIMENT 02 / CONTROL DESIGN</div>
+          <h3>Mission: design the drone’s takeoff controller</h3>
+          <p>
+            Reach the 10 m target with a PID controller designed from the given
+            requirements. Calculate your gains, verify them, and investigate the
+            flight response.
+          </p>
+
+          <nav class="challenge-route" aria-label="Challenge stages">
+            <button
+              type="button"
+              data-stage="designRequirementsStep"
+              aria-current="step"
+            >
+              01 · Brief
+            </button>
+            <button type="button" data-stage="enterDesignStep">
+              02 · Calculate
+            </button>
+            <button type="button" data-stage="evaluateDesignStep">
+              03 · Flight test
+            </button>
+            <button type="button" data-stage="understandDesignStep">
+              04 · Review
+            </button>
+          </nav>
+
+          <details class="guide-step" id="designRequirementsStep" open>
+            <summary>01 · Your mission brief</summary>
+
             <div class="design-challenge-card">
               <small>YOUR PID DESIGN CHALLENGE</small>
               <p id="designChallenge">
-                Press Ready to Design to generate your design requirements.
+                Press Ready to Design to generate your requirements.
               </p>
+
+              <div class="challenge-targets" aria-label="Design requirements">
+                <div>
+                  <span>Damping ratio · ζ</span>
+                  <strong id="missionZ">—</strong>
+                </div>
+                <div>
+                  <span>Rise time · 0–100%</span>
+                  <strong id="missionTr">—</strong>
+                </div>
+                <div>
+                  <span>Steady-state error</span>
+                  <strong>0 m</strong>
+                </div>
+              </div>
+
               <div class="math-card compact-design-math">
-                <div>\(G_p(s)=\dfrac{25}{s(s+5)}\)</div>
+                <div>\(G_2(s)=\dfrac{25}{s(s+5)}\)</div>
                 <div>\(p=10\zeta\omega_n\)</div>
               </div>
+
               <p class="note">
-                Use the given damping ratio \(\zeta\) and rise time \(t_r\) to
-                find \(K_p, K_i, K_d\).
+                Use the given damping ratio and rise time to find \(K_P,\ K_I,\
+                K_D\). Place the third pole at \(s=-p\).
               </p>
             </div>
           </details>
 
           <details class="guide-step" id="enterDesignStep">
-            <summary>2 · Enter your PID design</summary>
+            <summary>02 · Submit your controller</summary>
             <p>
-              Enter the gains you calculated. These boxes are linked to the
-              simulator.
+              Enter your calculated gains and check your answer. If you use the
+              revealed solution gains, you can launch directly.
             </p>
+
             <div class="guide-gain-grid">
               <label
-                >Kₚ<input
+                >Kₚ
+                <input
                   id="guideKp"
                   min="0"
-                  max="100"
-                  step="0.05"
+                  step="0.0001"
                   type="number"
                   value="0"
-              /></label>
+                />
+              </label>
               <label
-                >Kᵢ<input
+                >Kᵢ
+                <input
                   id="guideKi"
                   min="0"
-                  max="100"
-                  step="0.05"
+                  step="0.0001"
                   type="number"
                   value="0"
-              /></label>
+                />
+              </label>
               <label
-                >Kᴅ<input
+                >Kᴅ
+                <input
                   id="guideKd"
                   min="0"
-                  max="100"
-                  step="0.05"
+                  step="0.0001"
                   type="number"
                   value="0"
-              /></label>
+                />
+              </label>
             </div>
+
             <div class="guide-check-actions">
               <button
                 class="guide-action-button"
                 id="checkDesignAnswer"
                 type="button"
               >
-                ✓ Check answer
+                Check answer
               </button>
               <button
                 class="guide-action-button"
@@ -345,6 +696,7 @@
                 ▶ Launch my design
               </button>
             </div>
+
             <div
               aria-live="polite"
               class="design-answer-feedback"
@@ -352,53 +704,68 @@
             >
               Check your gains before launching.
             </div>
+
+            <p class="note">
+              Small rounding differences are accepted. Each gain has a tolerance
+              of 2%, capped at ±1, with a minimum of ±0.05.
+            </p>
           </details>
 
           <details class="guide-step" id="evaluateDesignStep">
-            <summary>3 · Launch and evaluate</summary>
+            <summary>03 · Flight test</summary>
             <p>
-              Observe the altitude response and the measured performance values.
-              Try your own gains before checking the solution.
+              Launch your design and inspect the altitude response. Compare the
+              response measurements with your mission brief.
             </p>
             <div aria-live="polite" class="experiment-result" id="designResult">
               Launch your design to see the measured response.
             </div>
+            <p class="note">
+              Test without wind first. Apply a short gust afterwards to
+              investigate disturbance recovery separately.
+            </p>
           </details>
 
           <details class="guide-step" id="understandDesignStep">
-            <summary>4 · Understand your results</summary>
+            <summary>04 · Review and worked solution</summary>
             <p>
-              <strong>Why can the design values and live values differ?</strong>
+              Reveal the working when you are ready. Afterwards, you can apply
+              the solution gains or move straight to another question.
             </p>
-            <p>
-              The design equations use a dominant second-order approximation.
-              The live graph measures the complete PID closed-loop response,
-              which also contains the third pole and PID zeros. Because of this,
-              the measured rise time, peak time, overshoot and settling time do
-              not have to exactly match the design prediction.
-            </p>
-            <div class="value-summary">
-              <div>
-                <strong>Design values</strong
-                ><span>Second-order design prediction</span>
-              </div>
-              <div>
-                <strong>Live values</strong
-                ><span>Measured from the complete simulated response</span>
-              </div>
+
+            <div id="solutionLocked" class="experiment-result">
+              Solution not revealed yet. Your entered gains are kept when you
+              reveal it.
             </div>
-            <p class="note">
-              After the drone settles, you can also apply one short gust to
-              observe recovery. Gusts are not included in the wind-free design
-              measurements.
-            </p>
+
+            <section id="manualSolution" hidden aria-label="Worked solution">
+              <div id="solutionBody"></div>
+
+              <section
+                id="predictionReveal"
+                hidden
+                aria-labelledby="predictionHeading"
+              >
+                <div class="challenge-eyebrow">
+                  AFTER THE WORKING / RESPONSE ESTIMATE
+                </div>
+                <h3 id="predictionHeading">Second-order design prediction</h3>
+                <div class="prediction-grid" id="predictionValues"></div>
+                <p class="note">
+                  These estimates use the desired dominant second-order poles.
+                  The complete third-order model also includes the third pole
+                  and PID zeros, so its response can differ.
+                </p>
+              </section>
+            </section>
+
             <div class="guide-end-actions">
               <button
                 class="guide-action-button"
                 id="guideSolution"
                 type="button"
               >
-                ✓ Show working / solution
+                Reveal solution
               </button>
               <button
                 class="guide-action-button secondary"
@@ -411,85 +778,120 @@
             </div>
           </details>
         </div>
-        <div class="guide-panel" hidden="" id="compareGuide">
-          <h3>Experiment 1 · Compare P, PD, PI and PID steady-state error</h3>
+
+        <div class="guide-panel" id="compareGuide">
+          <div class="challenge-eyebrow">
+            EXPERIMENT 01 / STEADY-STATE ERROR
+          </div>
+          <h3>Compare P, PD, PI and PID controllers</h3>
+
           <div class="lesson-callout">
             <div>
-              <small>GUIDED LEARNING · BEFORE EXPERIMENT 1</small>
+              <small>BEFORE YOU START</small>
               <h4>Understand steady-state error first</h4>
               <p>
-                Work through the Final Value Theorem and system-type examples,
-                then return here to compare the four controllers.
+                Review the Final Value Theorem and system type, then return here
+                to compare all four controllers.
               </p>
             </div>
-            <a class="lesson-callout-link" href="steady_state_learning.html"
-              >Open learning activity →</a
-            >
+            <a class="lesson-callout-link" href="steady_state_learning.html">
+              Open learning activity →
+            </a>
           </div>
-          <details class="guide-step" open="">
-            <summary>1 · Use the comparison plant</summary>
+
+          <details class="guide-step" open>
+            <summary>1 · Identify the plant and target</summary>
             <p>
-              Experiment 1 automatically switches to a separate, illustrative
-              altitude plant with a restoring term. It follows the
-              <strong>same step-error derivation method</strong> as the VTOL
-              manual, but uses normalised teaching parameters rather than the
-              manual’s physical pitch-angle parameters.
+              This experiment uses a normalised teaching plant with damping and
+              a restoring term. The target is a 10 m step.
             </p>
+
             <div class="math-card">
-              \[G_1(s)=\frac{K_t}{Js^2+Bs+K}=\frac{1}{s^2+2s+1}\]
+              \[ G_1(s)=\frac{K_t}{Js^2+Bs+K} =\frac{1}{s^2+2s+1} \]
               <p>
-                Here, \(J=1,\ B=2,\ K=1,\ K_t=1\). The reference is a fixed
-                \(R_0=10\,\mathrm m\) step. Keep the same proportional gain when
-                comparing controllers.
+                Here, \(J=1,\ B=2,\ K=1,\ K_t=1\). Without disturbance, \(\ddot
+                y=u-2\dot y-y\).
               </p>
             </div>
-          </details>
-          <details class="guide-step">
-            <summary>2 · Calculate theoretical steady-state error</summary>
+
             <p>
-              Select PD, PI or PID. The steps below update for your chosen
-              controller and proportional gain.
+              Keep the same plant, target and Kₚ for the four tests. Use
+              positive Kᵢ for PI and PID, and positive Kᴅ for PD and PID, so
+              each controller includes its intended actions.
             </p>
-            <div aria-live="polite" class="math-card" id="essDerivation">
-              Select a controller to display the derivation.
-            </div>
+          </details>
+
+          <details class="guide-step">
+            <summary>2 · Predict the steady-state error</summary>
             <p>
-              The Final Value Theorem requires a stable closed loop. A numerical
-              result is not a valid steady-state prediction for an unstable
+              Select <strong>P, PD, PI or PID</strong> in the controller panel.
+              The derivation below changes to match your selection.
+            </p>
+
+            <div aria-live="polite" class="math-card" id="essDerivation">
+              Select a controller to display its derivation.
+            </div>
+
+            <p class="note">
+              The Final Value Theorem requires a stable closed loop. A
+              calculated limit is not a valid final error for an unstable
               response.
             </p>
           </details>
-          <details class="guide-step">
-            <summary>3 · Launch and observe</summary>
+
+          <details class="guide-step" id="compareFlightStep">
+            <summary>3 · Launch a wind-free test</summary>
             <p>
-              Press <strong>Launch</strong> with the disturbance OFF. The drone
-              responds to the same 10 m step target under the selected
-              controller. Watch <strong>Current error</strong> approach
-              <strong>Theoretical steady-state error</strong>. The observed
-              steady-state value appears when the simulated response has
-              settled.
+              Launch the selected controller with disturbance OFF. Watch
+              <strong>Current error</strong> as the drone moves towards its
+              final altitude. When it settles,
+              <strong>Observed steady-state error</strong> displays the measured
+              final offset.
             </p>
+            <p>
+              Compare the observed error with the theoretical value. Changing
+              the controller or gains requires a fresh launch.
+            </p>
+
+            <div class="manual-launch-card">
+              <small>READY TO TEST</small>
+              <p id="compareLaunchSummary">Selected controller: P</p>
+              <button
+                class="guide-action-button"
+                id="guideCompareLaunch"
+                type="button"
+              >
+                ▶ Launch wind-free test
+              </button>
+              <p class="note">
+                Starts a fresh flight from ground level with disturbance OFF.
+                The manual closes so you can watch the response.
+              </p>
+              <p class="note" id="compareLaunchFeedback" role="status"></p>
+            </div>
           </details>
+
           <details class="guide-step">
-            <summary>4 · Record and compare</summary>
+            <summary>4 · Record all four controllers</summary>
             <p>
-              Once the response has settled, press Record settled result. Repeat
-              from a fresh launch for P, PD, PI and PID, using the same plant
-              and proportional gain. The table has a separate row for each
-              controller, including P. Integral action can eliminate the
-              step-reference offset if the closed loop is stable.
+              Once the response has settled, press
+              <strong>Record settled result</strong>. Repeat for
+              <strong>P, PD, PI and PID</strong>, using a fresh launch for each.
+              Keep Kₚ unchanged.
             </p>
+
             <button id="recordComparison" type="button">
               Record settled result
             </button>
             <p class="note" id="comparisonStatus" role="status">
               No results recorded yet.
             </p>
+
             <div class="comparison-table-wrap">
               <table class="comparison-table">
                 <thead>
                   <tr>
-                    <th>Controller</th>
+                    <th>Controller and gains</th>
                     <th>Theoretical \(e_{ss}\)</th>
                     <th>Observed \(e_{ss}\)</th>
                     <th>Final altitude</th>
@@ -497,105 +899,136 @@
                 </thead>
                 <tbody id="comparisonRows">
                   <tr>
-                    <td colspan="4">Run a test and record a result.</td>
+                    <td>P</td>
+                    <td>—</td>
+                    <td>Not recorded</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td>PD</td>
+                    <td>—</td>
+                    <td>Not recorded</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td>PI</td>
+                    <td>—</td>
+                    <td>Not recorded</td>
+                    <td>—</td>
+                  </tr>
+                  <tr>
+                    <td>PID</td>
+                    <td>—</td>
+                    <td>Not recorded</td>
+                    <td>—</td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </details>
+
           <details class="guide-step">
-            <summary>5 · What to expect: PD vs PI vs PID</summary>
+            <summary>5 · Explain the differences: P vs PD vs PI vs PID</summary>
             <p>
-              <strong>Compare the wind-free step responses first.</strong> Use
-              the same 10 m target, plant and proportional gain for all three
-              runs. Watch the altitude curve, current error and recorded
-              steady-state error. The exact transient shape depends on your
-              gains.
+              Compare all four wind-free tests at the same Kₚ. Separate final
+              tracking error from transient behaviour.
             </p>
+
             <div class="comparison-table-wrap">
               <table class="comparison-table">
                 <thead>
                   <tr>
                     <th>Controller</th>
-                    <th>What you should observe</th>
-                    <th>What it means</th>
+                    <th>Expected steady-state behaviour</th>
+                    <th>What to compare</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td><strong>P</strong></td>
                     <td>
-                      Settles below 10 m with a nonzero step-reference error.
+                      A stable response settles below 10 m. For this plant,
+                      \(e_{ss}=10/(1+K_P)\).
                     </td>
                     <td>
-                      Proportional action alone does not eliminate the step
-                      error for this comparison plant.
+                      Use P as the baseline. A nonzero error produces the
+                      constant input balancing the plant’s restoring term.
                     </td>
                   </tr>
                   <tr>
                     <td><strong>PD</strong></td>
                     <td>
-                      The altitude may settle below 10 m. The current error
-                      approaches a nonzero value.
+                      At the same Kₚ, PD has the same theoretical final altitude
+                      and step-reference error as P.
                     </td>
                     <td>
-                      Derivative action affects the transient response but does
-                      not, by itself, eliminate the constant step-reference
-                      error for this comparison plant. Compare the observed
-                      error with the theoretical value.
+                      Derivative action changes the transient response. Compare
+                      oscillation, overshoot and damping with P. It does not
+                      remove this plant’s constant step offset.
                     </td>
                   </tr>
                   <tr>
                     <td><strong>PI</strong></td>
                     <td>
-                      With stable gains, the altitude approaches 10 m and the
-                      current error approaches zero. The rise and settling
-                      behaviour may differ from PD.
+                      With Kᵢ &gt; 0 and a stable closed loop, altitude
+                      approaches 10 m and error approaches zero.
                     </td>
                     <td>
-                      Integral action accumulates the error and can remove the
-                      constant step-reference offset. Look for any oscillation
-                      or overshoot rather than assuming PI is always faster.
+                      Integral action removes the constant step offset. Compare
+                      its transient behaviour with P and PD. PI is not
+                      automatically faster or less oscillatory.
                     </td>
                   </tr>
                   <tr>
                     <td><strong>PID</strong></td>
                     <td>
-                      With stable gains, the altitude also approaches 10 m and
-                      the current error approaches zero. Its overshoot and
-                      settling time may differ from PI.
+                      With Kᵢ &gt; 0 and a stable closed loop, altitude also
+                      approaches 10 m with zero final error.
                     </td>
                     <td>
-                      Integral action removes the step offset; derivative action
-                      changes the transient response. Compare the actual curves
-                      and measured values rather than assuming PID always gives
-                      the smallest overshoot.
+                      Compare PID with PI to investigate derivative action while
+                      retaining integral action. The gains determine whether
+                      overshoot and settling improve.
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
+
             <p>
-              <strong>After recording all three:</strong> Check whether each
-              observed steady-state error agrees with its theoretical value.
-              Then compare rise time, overshoot and settling time from the
-              graphs. If a response has not settled or is unstable, do not
-              record it as a valid steady-state result.
+              <strong>After recording all four:</strong>
+              Do P and PD have similar final errors at the same Kₚ? Do stable PI
+              and PID responses remove that error? Use the graphs to explain
+              their transient differences.
+            </p>
+            <p class="note">
+              With Kᵢ = 0, PI behaves as P and PID behaves as PD. With Kᴅ = 0,
+              PD behaves as P and PID behaves as PI.
             </p>
           </details>
+
           <details class="guide-step">
-            <summary>6 · Optional: disturbance test</summary>
+            <summary>6 · Optional: test disturbance rejection</summary>
             <p>
-              After the step-response comparison, use the constant-disturbance
-              button to explore disturbance rejection separately. The
-              theoretical error displayed above is for the
-              <strong>wind-free step-reference experiment</strong>, not for the
-              disturbance test.
+              Complete the four wind-free recordings first. Then apply the
+              constant downward disturbance after settling.
+            </p>
+            <p>
+              P and PD generally retain an additional altitude offset. PI and
+              PID can reject a constant disturbance when integral action is
+              active and the closed loop is stable.
+            </p>
+            <p class="note">
+              The displayed theoretical error is for the wind-free step test.
+              After applying a disturbance, launch a fresh wind-free flight
+              before recording another result.
             </p>
           </details>
         </div>
+
         <div class="optional-reference">
           <h2>Reference models and feedback diagram</h2>
+
           <details class="reference-panel">
             <summary>Reference models and response formulas</summary>
             <div class="reference-inner">
@@ -603,49 +1036,55 @@
               <div class="reference-equation">
                 \[\frac{Y(s)}{R(s)}=\frac{1}{\tau s+1}\]
               </div>
+
               <p>Standard second-order reference model</p>
               <div class="reference-equation">
-                \[\frac{Y(s)}{R(s)}=\frac{\omega_n^2}{s^2+2\zeta\omega_ns+\omega_n^2}\]
+                \[ \frac{Y(s)}{R(s)}
+                =\frac{\omega_n^2}{s^2+2\zeta\omega_ns+\omega_n^2} \]
               </div>
+
               <p>Third-order reference model</p>
               <div class="reference-equation">
-                \[\frac{Y(s)}{R(s)}=\frac{A}{(s^2+2\zeta\omega_ns+\omega_n^2)(s+p)}\]
+                \[ \frac{Y(s)}{R(s)}
+                =\frac{A}{(s^2+2\zeta\omega_ns+\omega_n^2)(s+p)} \]
               </div>
+
               <p>Standard underdamped second-order response</p>
               <div class="reference-equation">
-                \[\omega_d=\omega_n\sqrt{1-\zeta^2},\quad\theta=\cos^{-1}(\zeta)\]
-                \[t_r=\frac{\pi-\theta}{\omega_d},\quad
-                t_p=\frac{\pi}{\omega_d}\]
-                \[M_p=100e^{-\pi\zeta/\sqrt{1-\zeta^2}}\%,\quad
-                t_s\approx\frac{4}{\zeta\omega_n}\]
+                \[ \omega_d=\omega_n\sqrt{1-\zeta^2},
+                \qquad\theta=\cos^{-1}(\zeta) \] \[
+                t_r=\frac{\pi-\theta}{\omega_d}, \qquad t_p=\frac{\pi}{\omega_d}
+                \] \[ M_p=100e^{-\pi\zeta/\sqrt{1-\zeta^2}}\%, \qquad
+                t_s\approx\frac{4}{\zeta\omega_n} \]
               </div>
               <p>
-                These response-index formulas apply to the standard stable
-                underdamped second-order model. PD controller zeros and
-                third-order PI/PID dynamics can change the actual response; use
-                the simulator measurements for those cases.
+                These formulas apply to the standard stable underdamped
+                second-order model. Controller zeros and higher-order dynamics
+                can change the complete response.
               </p>
             </div>
           </details>
+
           <details class="reference-panel diagram-panel">
             <summary>Unity-feedback controller block diagram</summary>
             <svg
-              aria-label="Target R enters a summing junction, error E enters controller C, command U enters plant G, output Y feeds back negatively"
+              aria-label="Target minus output produces error; controller drives plant; output feeds back negatively"
               role="img"
-              viewbox="0 0 760 225"
+              viewBox="0 0 760 225"
             >
               <defs>
                 <marker
                   id="bdArrow"
-                  markerheight="8"
-                  markerwidth="8"
+                  markerHeight="8"
+                  markerWidth="8"
                   orient="auto"
-                  refx="7"
-                  refy="4"
+                  refX="7"
+                  refY="4"
                 >
                   <path d="M0 0 L8 4 L0 8 Z" fill="#bcecff"></path>
                 </marker>
               </defs>
+
               <g
                 fill="none"
                 marker-end="url(#bdArrow)"
@@ -658,6 +1097,7 @@
                 <path d="M590 72 H738"></path>
                 <path d="M688 72 V180 H124 V99"></path>
               </g>
+
               <circle
                 cx="124"
                 cy="72"
@@ -666,10 +1106,12 @@
                 stroke="#bcecff"
                 stroke-width="2"
               ></circle>
+
               <g fill="white" font-size="17">
                 <text x="116" y="65">+</text>
                 <text x="116" y="87">−</text>
               </g>
+
               <rect
                 fill="#145377"
                 height="69"
@@ -690,12 +1132,14 @@
                 x="426"
                 y="38"
               ></rect>
+
               <g fill="#f3faff" font-size="16" text-anchor="middle">
                 <text x="288" y="62">Controller</text>
                 <text x="288" y="86">C(s)</text>
                 <text x="508" y="62">Altitude plant</text>
                 <text x="508" y="86">Gₚ(s)</text>
               </g>
+
               <g fill="#d7efff" font-size="16">
                 <text x="12" y="55">R(s)</text>
                 <text x="159" y="55">E(s)</text>
@@ -705,38 +1149,38 @@
               </g>
             </svg>
             <p>
-              The target minus the measured altitude produces the tracking
-              error. The selected P, PD, PI or PID controller calculates the
-              command sent to the plant.
+              The target minus the measured altitude produces tracking error.
+              The selected controller calculates the plant input.
             </p>
           </details>
         </div>
       </div>
     </div>
+
     <main>
       <aside class="panel controls">
-        <details class="setup-fold independent-fold" open="">
+        <details class="setup-fold independent-fold" open>
           <summary>1. Flight setup</summary>
           <div class="setup-content">
-            <input id="mode" type="hidden" value="closed" /><input
-              id="fixed"
-              type="hidden"
-              value="1"
-            />
+            <input id="mode" type="hidden" value="closed" />
+            <input id="fixed" type="hidden" value="1" />
+
             <div class="formula big">
               <span class="formula-label">Plant transfer function</span>
               <div class="math-display" id="plantFormula">
-                \(G_2(s)=\dfrac{\omega_0^2}{s(s+2\zeta_0\omega_0)}\)
+                \(G_1(s)=\dfrac{1}{s^2+2s+1}\)
               </div>
             </div>
+
             <p class="note">
-              Teaching model: \(y(t)\) is altitude; \(u(t)\) is the control
+              Teaching model: \(y(t)\) is altitude and \(u(t)\) is control
               input.
             </p>
-            <div id="designPlantSettings">
+
+            <div id="designPlantSettings" hidden>
               <div class="gain">
-                <label for="w">Plant ω₀ <output id="wO">5</output></label
-                ><input
+                <label for="w">Plant ω₀ <output id="wO">5</output></label>
+                <input
                   id="w"
                   max="30"
                   min="0.1"
@@ -746,8 +1190,8 @@
                 />
               </div>
               <div class="gain">
-                <label for="z">Plant ζ₀ <output id="zO">0.5</output></label
-                ><input
+                <label for="z">Plant ζ₀ <output id="zO">0.5</output></label>
+                <input
                   id="z"
                   max="1"
                   min="0"
@@ -757,63 +1201,55 @@
                 />
               </div>
             </div>
-            <p class="note" id="plantNote">
-              Experiment 2: integrator plant for the PID design challenge.
-            </p>
+
+            <p class="note" id="plantNote">Experiment 1 comparison plant.</p>
             <input id="target" type="hidden" value="10" />
             <p class="note">Reference altitude: 10 m.</p>
           </div>
         </details>
-        <details class="setup-fold independent-fold" open="">
-          <summary>2. Designed controller</summary>
+
+        <details class="setup-fold independent-fold" open>
+          <summary>2. Controller settings</summary>
           <div class="setup-content">
             <div id="pidFields">
               <div id="controllerTypeRow">
                 <label for="type">Controller type</label>
                 <select id="type">
                   <option>P</option>
-                  <option>PI</option>
                   <option>PD</option>
-                  <option selected="">PID</option>
+                  <option>PI</option>
+                  <option selected>PID</option>
                 </select>
               </div>
-              <div class="pid-locked-controller" id="pidLockedController">
+
+              <div
+                class="pid-locked-controller"
+                id="pidLockedController"
+                hidden
+              >
                 <span>Controller</span>
                 <strong>PID</strong>
                 <small>Experiment 2 uses PID only.</small>
               </div>
+
               <div class="formula" id="controllerFormula">
                 \(u(t)=K_pe(t)+K_i\int_0^t e(\tau)\,d\tau+K_d\dfrac{de(t)}{dt}\)
               </div>
+
               <div class="gain">
-                <label for="kp">Kₚ <output id="kpO">6</output></label
-                ><input
-                  id="kp"
-                  max="100"
-                  min="0"
-                  step="0.05"
-                  type="number"
-                  value="6"
-                />
+                <label for="kp">Kₚ <output id="kpO">6</output></label>
+                <input id="kp" min="0" step="0.0001" type="number" value="6" />
               </div>
               <div class="gain" id="kiRow">
-                <label for="ki">Kᵢ <output id="kiO">1</output></label
-                ><input
-                  id="ki"
-                  max="100"
-                  min="0"
-                  step="0.05"
-                  type="number"
-                  value="1"
-                />
+                <label for="ki">Kᵢ <output id="kiO">1</output></label>
+                <input id="ki" min="0" step="0.0001" type="number" value="1" />
               </div>
               <div class="gain" id="kdRow">
-                <label for="kd">Kᴅ <output id="kdO">0.5</output></label
-                ><input
+                <label for="kd">Kᴅ <output id="kdO">0.5</output></label>
+                <input
                   id="kd"
-                  max="100"
                   min="0"
-                  step="0.05"
+                  step="0.0001"
                   type="number"
                   value="0.5"
                 />
@@ -821,13 +1257,15 @@
             </div>
           </div>
         </details>
+
         <details class="setup-fold independent-fold">
           <summary>3. Disturbance settings</summary>
           <div class="setup-content">
             <div class="gain">
-              <label for="gustStrength"
-                >Wind strength <output id="gustStrengthO">1×</output></label
-              ><input
+              <label for="gustStrength">
+                Wind strength <output id="gustStrengthO">1×</output>
+              </label>
+              <input
                 id="gustStrength"
                 max="3"
                 min="0.25"
@@ -839,28 +1277,34 @@
             </div>
           </div>
         </details>
+
         <p class="note" id="status" role="status">
           Ready. Drone starts at 0 m, at rest.
         </p>
       </aside>
+
       <section class="center">
         <div aria-label="Quick flight controls" class="panel quick-controls">
           <div class="quick-actions">
-            <button hidden="" id="readyDesign" type="button">
-              ✎ Ready to design</button
-            ><button hidden="" id="completeDesign" type="button">
-              ✓ Complete · show solution</button
-            ><button id="run" type="button">▶ Launch</button
-            ><button id="reset" type="button">↻ Reset</button
-            ><button id="applyWind" type="button">🌬 Apply wind gust</button
-            ><button hidden="" id="holdWind" type="button">
+            <button hidden id="readyDesign" type="button">
+              ✎ Ready to design
+            </button>
+            <button hidden id="completeDesign" type="button">
+              Review challenge
+            </button>
+            <button id="run" type="button">▶ Launch</button>
+            <button id="reset" type="button">↻ Reset</button>
+            <button id="applyWind" type="button">🌬 Apply wind gust</button>
+            <button hidden id="holdWind" type="button">
               ⬇ Start constant disturbance
             </button>
           </div>
+
           <div class="quick-speed">
-            <label for="simSpeed"
-              >Simulation speed <output id="simSpeedO">0.35×</output></label
-            ><input
+            <label for="simSpeed">
+              Simulation speed <output id="simSpeedO">0.35×</output>
+            </label>
+            <input
               id="simSpeed"
               max="2"
               min="0.1"
@@ -869,26 +1313,25 @@
               value="0.35"
             />
           </div>
+
           <p class="note">
-            <span id="quickHelp"
-              >PID design: test takeoff without wind; use the short gust
-              afterwards to explore recovery.</span
-            >
+            <span id="quickHelp">Launch without wind first.</span>
           </p>
         </div>
+
         <div class="panel">
           <h2>Altitude simulation</h2>
           <div class="sky altitude-sky" id="sky">
             <div class="telemetry altitude-telemetry">
-              Time: <b id="time">0.00 s</b><br />Altitude:
-              <b id="altitude">0.00 m</b><br />Velocity:
-              <b id="velocity">0.00 m/s</b><br />Input u:
-              <b id="command">0.00</b><br />Wind:
-              <b id="wind">Calm · press Apply wind gust</b><br /><span
-                id="gustDeviation"
-                >No gust yet</span
-              ><br />Error: <b id="error">10.00 m</b>
+              Time: <b id="time">0.00 s</b><br />
+              Altitude: <b id="altitude">0.00 m</b><br />
+              Velocity: <b id="velocity">0.00 m/s</b><br />
+              Input u: <b id="command">0.00</b><br />
+              Wind: <b id="wind">Calm</b><br />
+              <span id="gustDeviation">No gust yet</span><br />
+              Error: <b id="error">10.00 m</b>
             </div>
+
             <div class="target-line" id="targetLine">
               <span id="targetLabel">TARGET · 10 m</span>
             </div>
@@ -903,10 +1346,11 @@
             </div>
           </div>
           <p class="note">
-            Apply a gust after the drone settles. It is a short downward pulse;
-            the controller should reject it and return toward the target.
+            Complete the wind-free test first. Apply a disturbance afterwards to
+            investigate recovery.
           </p>
         </div>
+
         <div class="panel chart">
           <h2>Live altitude response · <span id="modeLabel">With PID</span></h2>
           <div
@@ -915,14 +1359,15 @@
             aria-label="Altitude versus time graph"
           ></div>
           <p class="note">
-            Live response: solid = simulated altitude, dashed = 10 m target.
+            Solid line = simulated altitude. Dashed line = 10 m target.
           </p>
         </div>
+
         <div class="panel chart annotated-panel">
           <h2>Step-response analysis · 1-second viewing window</h2>
           <div class="analysis-navigation">
-            <button id="analysisBack" type="button">← Earlier</button
-            ><input
+            <button id="analysisBack" type="button">← Earlier</button>
+            <input
               aria-label="Scroll through response time"
               id="analysisScroll"
               max="29"
@@ -930,36 +1375,37 @@
               step="0.1"
               type="range"
               value="0"
-            /><button id="analysisNext" type="button">Later →</button
-            ><output id="analysisRange">0.0–1.0 s</output>
+            />
+            <button id="analysisNext" type="button">Later →</button>
+            <output id="analysisRange">0.0–1.0 s</output>
           </div>
           <div class="graph-hover-wrap">
             <div
               id="analysisChart"
               class="plotly-analysis"
-              aria-label="Altitude step-response analysis graph"
+              aria-label="Wind-free step-response analysis"
             ></div>
           </div>
           <p class="note">
-            Measured values come from the full simulated response. Design values
-            come from the 2nd-order approximation.
+            Launch to analyse the complete wind-free model response for your
+            current settings.
           </p>
           <p class="note" id="analysisNote">
-            Browse the 30 s response with the slider. \(t_r\) is the 0→100%
-            first crossing; \(t_p\) is first peak; \(t_s\) uses the ±2% band.
+            Browse the 30 s response. \(t_r\) is the first 0–100% target
+            crossing; \(t_p\) is the first peak; \(t_s\) uses the ±2% target
+            band. A controller with a final offset may never reach that band.
           </p>
         </div>
       </section>
+
       <aside class="right">
         <section class="panel">
           <h2>4. Response measurements · current settings</h2>
+          <div class="metric">Rise time (0–100%) <b id="rise">—</b></div>
+          <div class="metric">First peak time <b id="peak">—</b></div>
+          <div class="metric">Overshoot above target <b id="os">—</b></div>
           <div class="metric">
-            Measured rise time (0–100%) <b id="rise">—</b>
-          </div>
-          <div class="metric">Measured first peak time <b id="peak">—</b></div>
-          <div class="metric">Overshoot <b id="os">—</b></div>
-          <div class="metric">
-            Measured settling time (±2%) <b id="settle">—</b>
+            Settling time (±2% target) <b id="settle">—</b>
           </div>
           <div class="metric">Current error <b id="sse">—</b></div>
           <div class="metric">
@@ -968,19 +1414,18 @@
           <div class="metric">
             Observed steady-state error <b id="ess">—</b>
           </div>
+
           <p class="note">
-            Current error is the target minus the live altitude. Theoretical
-            steady-state error is derived for the selected plant and controller,
-            assuming a stable closed loop. Observed steady-state error is shown
-            after the simulated response settles. Rise, peak, overshoot and
-            settling are calculated immediately from a fresh takeoff using the
-            CURRENT settings. Current error is measured from the live drone. If
-            the drone is already at the target, changing gains alone may produce
-            no visible movement until a new error or disturbance occurs.
+            Rise, peak, overshoot and settling are extracted from the complete
+            wind-free model response after launch. Current error and observed
+            steady-state error come from the live drone. Changing a controller
+            setting requires a fresh launch.
           </p>
         </section>
+
         <section class="panel flight-math">
           <h2>5. Mathematics behind the flight</h2>
+
           <div class="formula">
             <span class="formula-label">Altitude tracking error</span>
             <div class="math-display">\(e(t)=r(t)-y(t)\)</div>
@@ -992,26 +1437,28 @@
             </div>
           </div>
           <div class="formula">
-            <span class="formula-label">Simplified vertical plant</span>
+            <span class="formula-label">Vertical plant</span>
             <div class="math-display" id="plantDynamics">
-              \(\ddot y(t)=\omega_0^2u(t)-2\zeta_0\omega_0\dot y(t)+d(t)\)
+              \(\ddot y=u-2\dot y-y+d(t)\)
             </div>
           </div>
           <div class="formula">
-            <span class="formula-label">Numerical simulation</span>
+            <span class="formula-label">Live numerical simulation</span>
             <div class="math-display">
-              \(v_{k+1}=v_k+a_k\Delta t\)<br />\(y_{k+1}=y_k+v_{k+1}\Delta t\)
+              \(v_{k+1}=v_k+a_k\Delta t\)<br />
+              \(y_{k+1}=y_k+v_{k+1}\Delta t\)
             </div>
           </div>
+
           <p class="note">
-            Here, \(r\) is the target altitude (10 m), \(y\) is actual altitude,
-            and \(d(t)\) is the applied vertical disturbance. The
-            takeoff-analysis graph is calculated without wind. For Experiment 2
-            PID design, it uses the complete third-order closed-loop transfer
-            function from the lecture-note derivation. The live drone remains a
-            time-domain visualisation of the selected plant and controller.
+            \(r\) is the 10 m target, \(y\) is altitude and \(d(t)\) is the
+            disturbance. The analysis graph uses the complete wind-free
+            closed-loop transfer function. The live drone uses the time-domain
+            plant equations. Live derivative action uses altitude velocity to
+            avoid a reference-step derivative kick.
           </p>
         </section>
+
         <section class="panel bot">
           <div class="crop">
             <img alt="ControlBot tuning the controller" src="bot-tuning.png" />
@@ -1019,17 +1466,18 @@
           <div>
             <h3>ControlBot's tip</h3>
             <p id="tip">
-              Start without PID, then switch to PID and enter the gains you
-              designed for this plant.
+              Compare the controllers at the same proportional gain.
             </p>
           </div>
         </section>
       </aside>
     </main>
+
     <footer>
       © NTU Nanyang Technological University EEE
       <em>Learn • Visualise • Control</em>
     </footer>
+
     <script>
       window.MathJax = {
         tex: { inlineMath: [["\\(", "\\)"]] },
@@ -1046,51 +1494,32 @@
       };
     </script>
     <script
-      defer=""
+      defer
       src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
     ></script>
-    <div
-      aria-labelledby="solutionTitle"
-      aria-modal="true"
-      class="cb-modal"
-      hidden=""
-      id="solutionModal"
-      role="dialog"
-    >
-      <div class="cb-modal-card">
-        <button class="modal-close" id="closeSolution" type="button">
-          − Minimise
-        </button>
-        <h2 id="solutionTitle">PID design · worked solution</h2>
-        <div id="solutionBody"></div>
-        <p class="note">
-          You can minimise this solution and return to it without changing your
-          gains.
-        </p>
-      </div>
-    </div>
     <script
       src="https://cdn.plot.ly/plotly-4.1.1.min.js"
       charset="utf-8"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.3/dist/pixi.min.js"></script>
     <script src="drone-script.js"></script>
+
     <script>
       function toggleMenu(id) {
-        document
-          .querySelectorAll(".site-nav .dropdown")
-          .forEach((m) =>
-            m.classList.toggle(
-              "show",
-              m.id === id ? !m.classList.contains("show") : false,
-            ),
+        document.querySelectorAll(".site-nav .dropdown").forEach((menu) => {
+          menu.classList.toggle(
+            "show",
+            menu.id === id ? !menu.classList.contains("show") : false,
           );
+        });
       }
-      document.addEventListener("click", (e) => {
-        if (!e.target.closest(".site-nav .nav-group"))
-          document
-            .querySelectorAll(".site-nav .dropdown")
-            .forEach((m) => m.classList.remove("show"));
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".site-nav .nav-group")) {
+          document.querySelectorAll(".site-nav .dropdown").forEach((menu) => {
+            menu.classList.remove("show");
+          });
+        }
       });
     </script>
   </body>
