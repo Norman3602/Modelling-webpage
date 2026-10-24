@@ -1,6 +1,5 @@
 "use strict";
 
-// Simulation settings and helper functions
 const $ = (id) => document.getElementById(id);
 const simulationTimeStep = 0.002;
 const WINDOW = 12;
@@ -17,7 +16,7 @@ const initialState = () => ({
   altitude: 0,
   verticalVelocity: 0,
   accumulatedError: 0,
-  controlInput: 0,
+  controlInput: 0
 });
 
 const initialSample = () => ({ t: 0, y: 0, v: 0, u: 0 });
@@ -45,11 +44,10 @@ function equation(tex) {
   return `<div class="solution-equation">\\[${tex}\\]</div>`;
 }
 
-function showStatus(message) {
+function status(message) {
   text("status", message);
 }
 
-// Simulation state and controller variables
 let state = initialState();
 let samples = [initialSample()];
 let analysisSamples = [initialSample()];
@@ -81,7 +79,6 @@ const CONSTANT_WIND_TARGET_PD_OFFSET = 1;
 let constantWind = false;
 let wind = freshWind();
 
-// Wind disturbance state
 function freshWind() {
   return {
     index: 0,
@@ -89,11 +86,10 @@ function freshWind() {
     until: 0,
     baseline: 0,
     maxDeviation: 0,
-    lastDeviation: null,
+    lastDeviation: null
   };
 }
 
-// Check which controller terms are active
 function hasIntegral(settings) {
   return ["PI", "PID"].includes(settings.type) && settings.ki > 0;
 }
@@ -102,12 +98,12 @@ function hasDerivative(settings) {
   return ["PD", "PID"].includes(settings.type);
 }
 
-// Read and validate the controller settings
+// Read the controls.
 function config() {
   const settings = {
     mode: $("mode").value,
     type: $("type").value,
-    plant: $("experiment").value,
+    plant: $("experiment").value
   };
 
   for (const id of numericIds) {
@@ -130,14 +126,14 @@ function config() {
     ["kp", "ki", "kd"].some((id) => settings[id] < 0)
   ) {
     throw Error(
-      "Use a positive ω₀ and target, ζ₀ between 0 and 1, and non-negative gains.",
+      "Use a positive ω₀ and target, ζ₀ between 0 and 1, and non-negative gains."
     );
   }
 
   return settings;
 }
 
-// Check the closed-loop stability conditions
+// Stability conditions for the selected feedback system.
 function isStable(settings) {
   if (!settings || settings.mode !== "closed") return false;
 
@@ -157,7 +153,6 @@ function isStable(settings) {
   return settings.ki < a * settings.kp;
 }
 
-// Display the mathematical equation for each controller
 function mathLaw(type) {
   const p = String.raw`K_pe(t)`;
   const i = String.raw`K_i\int_0^t e(\tau)\,d\tau`;
@@ -174,18 +169,19 @@ function mathLaw(type) {
   return String.raw`\[\begin{aligned}u(t)&=${p}+${i}\\&+${d}\end{aligned}\]`;
 }
 
-// Calculate the theoretical steady-state error
+// Theoretical error for a wind-free step reference.
 function theoreticalError(settings) {
   if (!settings || !isStable(settings)) return null;
 
   if (settings.plant === "compare") {
-    return hasIntegral(settings) ? 0 : settings.target / (1 + settings.kp);
+    return hasIntegral(settings)
+      ? 0
+      : settings.target / (1 + settings.kp);
   }
 
   return 0;
 }
 
-// Show the steady-state error derivation for the selected controller
 function updateTheory() {
   const settings = currentConfig;
   const box = $("essDerivation");
@@ -203,7 +199,7 @@ function updateTheory() {
   const result = theoreticalError(settings);
   text(
     "theoreticalEss",
-    result === null ? "No stable final value" : `${fmt(result, 3)} m`,
+    result === null ? "No stable final value" : `${fmt(result, 3)} m`
   );
 
   if (!box || settings.plant !== "compare") return;
@@ -218,19 +214,22 @@ function updateTheory() {
     P: String.raw`K_P`,
     PD: String.raw`K_P+K_Ds`,
     PI: String.raw`K_P+\frac{K_I}{s}`,
-    PID: String.raw`K_P+\frac{K_I}{s}+K_Ds`,
+    PID: String.raw`K_P+\frac{K_I}{s}+K_Ds`
   };
 
-  let working = equation(String.raw`C_{\mathrm{${type}}}(s)=${laws[type]}`);
+  let working = equation(
+    String.raw`C_{\mathrm{${type}}}(s)=${laws[type]}`
+  );
 
   if (integral) {
-    const characteristic = String.raw`s^3+${damping}s^2+(1+K_P)s+K_I`;
+    const characteristic =
+      String.raw`s^3+${damping}s^2+(1+K_P)s+K_I`;
 
     working += equation(
-      String.raw`E(s)=\frac{${reference}}{s}\frac{s(s^2+2s+1)}{${characteristic}}`,
+      String.raw`E(s)=\frac{${reference}}{s}\frac{s(s^2+2s+1)}{${characteristic}}`
     );
     working += equation(
-      String.raw`e_{ss}=\lim_{s\to0}\frac{${reference}s(s^2+2s+1)}{${characteristic}}=0`,
+      String.raw`e_{ss}=\lim_{s\to0}\frac{${reference}s(s^2+2s+1)}{${characteristic}}=0`
     );
     working += `
       <p>
@@ -252,10 +251,10 @@ function updateTheory() {
     }
 
     working += equation(
-      String.raw`E(s)=\frac{${reference}}{s}\frac{s^2+2s+1}{s^2+${damping}s+(1+K_P)}`,
+      String.raw`E(s)=\frac{${reference}}{s}\frac{s^2+2s+1}{s^2+${damping}s+(1+K_P)}`
     );
     working += equation(
-      String.raw`e_{ss}=\frac{${reference}}{1+K_P}=\frac{${reference}}{1+${fmt(settings.kp, 3)}}=${fmt(settings.target / (1 + settings.kp), 3)}\,\mathrm{m}`,
+      String.raw`e_{ss}=\frac{${reference}}{1+K_P}=\frac{${reference}}{1+${fmt(settings.kp, 3)}}=${fmt(settings.target / (1 + settings.kp), 3)}\,\mathrm{m}`
     );
 
     working += derivative
@@ -281,7 +280,7 @@ function updateTheory() {
     <p><strong>Selected controller: ${type}</strong></p>
     <p><strong>1 · Write the error transfer function</strong></p>
     ${equation(
-      String.raw`E(s)=\frac{R(s)}{1+C(s)G_1(s)},\qquad R(s)=\frac{${reference}}{s}`,
+      String.raw`E(s)=\frac{R(s)}{1+C(s)G_1(s)},\qquad R(s)=\frac{${reference}}{s}`
     )}
     <p><strong>2 · Substitute ${type} and apply the Final Value Theorem</strong></p>
     ${working}
@@ -295,7 +294,6 @@ function updateTheory() {
   typeset([box]);
 }
 
-// Check whether the drone has reached steady state
 function observedSettled() {
   if (
     !hasLaunched ||
@@ -322,7 +320,6 @@ function observedSettled() {
   return Math.max(...values) - Math.min(...values) < 0.015;
 }
 
-// Display the measured steady-state error
 function updateSteadyError() {
   if (!hasLaunched) {
     text("ess", "—");
@@ -333,11 +330,10 @@ function updateSteadyError() {
     "ess",
     observedSettled()
       ? `${fmt(currentConfig.target - state.altitude, 3)} m`
-      : "Not settled",
+      : "Not settled"
   );
 }
 
-// Update controller fields and displayed equations
 function updateForm() {
   const type = $("type").value;
 
@@ -359,7 +355,7 @@ function updateForm() {
     "tip",
     $("experiment").value === "compare"
       ? "Compare P, PD, PI and PID at the same proportional gain. Record each settled, wind-free result."
-      : "Calculate your PID gains, launch a fresh flight, then compare the full response with the design estimates.",
+      : "Calculate your PID gains, launch a fresh flight, then compare the full response with the design estimates."
   );
 
   for (const id of numericIds) {
@@ -370,7 +366,7 @@ function updateForm() {
     currentConfig = config();
   } catch (error) {
     currentConfig = null;
-    showStatus(error.message);
+    status(error.message);
   }
 
   analysisStart = 0;
@@ -389,14 +385,14 @@ function updateForm() {
   drawAnalysis(target);
 }
 
-// Initialise the drone graphics using PIXI
+// Drone graphics.
 function initDrone() {
   if (!window.PIXI || droneApp || !$("droneStage") || !$("sky")) return;
 
   droneApp = new PIXI.Application({
     resizeTo: $("sky"),
     backgroundAlpha: 0,
-    antialias: true,
+    antialias: true
   });
 
   $("droneStage").appendChild(droneApp.view);
@@ -414,7 +410,10 @@ function initDrone() {
     .drawRoundedRect(-24, -16, 48, 33, 9)
     .endFill();
 
-  body.beginFill(0x1a8bd0).drawPolygon([-5, -2, 0, 5, 5, -2, 0, -8]).endFill();
+  body
+    .beginFill(0x1a8bd0)
+    .drawPolygon([-5, -2, 0, 5, 5, -2, 0, -8])
+    .endFill();
 
   rotors
     .lineStyle(2, 0x233d51)
@@ -426,7 +425,6 @@ function initDrone() {
   droneSprite = drone;
 }
 
-// Update the drone position based on its altitude
 function moveDrone(altitude, target) {
   if (!droneSprite) initDrone();
   if (!droneSprite) return;
@@ -436,25 +434,24 @@ function moveDrone(altitude, target) {
   const fraction = Math.max(0, Math.min(1, altitude / maxAltitude));
 
   droneSprite.x = sky.clientWidth / 2;
-  droneSprite.y = sky.clientHeight - 28 - fraction * (sky.clientHeight - 56);
+  droneSprite.y =
+    sky.clientHeight - 28 - fraction * (sky.clientHeight - 56);
 }
 
-// Update the live flight readings and drone display
 function show(point, target) {
-  const p =
-    point === state
-      ? {
-          t: state.t,
-          y: state.altitude,
-          v: state.verticalVelocity,
-          u: state.controlInput,
-        }
-      : point;
+  const p = point === state
+    ? {
+        t: state.t,
+        y: state.altitude,
+        v: state.verticalVelocity,
+        u: state.controlInput
+      }
+    : point;
 
   if (wind.until > 0) {
     wind.maxDeviation = Math.max(
       wind.maxDeviation,
-      Math.abs(p.y - wind.baseline),
+      Math.abs(p.y - wind.baseline)
     );
   }
 
@@ -464,7 +461,7 @@ function show(point, target) {
       ? `Gust altitude change: ${fmt(p.y - wind.baseline, 3)} m · largest ${fmt(wind.maxDeviation, 3)} m`
       : wind.lastDeviation !== null
         ? `Last gust: largest ${fmt(wind.lastDeviation, 3)} m · finished`
-        : "No gust yet",
+        : "No gust yet"
   );
 
   const appliedWind =
@@ -479,7 +476,7 @@ function show(point, target) {
       ? `Constant downward · ${fmt(Math.abs(appliedWind), 1)} m/s²`
       : wind.value === 0
         ? "Calm"
-        : `${wind.value > 0 ? "Upward" : "Downward"} gust · ${fmt(Math.abs(wind.value), 0)} m/s²`,
+        : `${wind.value > 0 ? "Upward" : "Downward"} gust · ${fmt(Math.abs(wind.value), 0)} m/s²`
   );
 
   text("time", `${fmt(p.t)} s`);
@@ -504,7 +501,7 @@ function show(point, target) {
   text("topScale", `${fmt(maxAltitude, 1)} m`);
 }
 
-// Calculate the constant wind disturbance for Experiment 1
+// Wind disturbance.
 function comparisonWindAcceleration(settings) {
   return (
     -(1 + Math.max(0, settings.kp)) *
@@ -513,46 +510,47 @@ function comparisonWindAcceleration(settings) {
   );
 }
 
-// Update the constant wind button label
 function syncWindButton() {
   text(
     "holdWind",
-    constantWind ? "Stop constant disturbance" : "Start constant disturbance",
+    constantWind
+      ? "Stop constant disturbance"
+      : "Start constant disturbance"
   );
 }
 
-// Reset all wind disturbance values
 function resetWind() {
   wind = freshWind();
   constantWind = false;
   syncWindButton();
 }
 
-// Stop the gust when its duration has ended
 function updateWind(settings) {
-  if (wind.until > 0 && (settings.mode !== "closed" || state.t >= wind.until)) {
+  if (
+    wind.until > 0 &&
+    (settings.mode !== "closed" || state.t >= wind.until)
+  ) {
     wind.maxDeviation = Math.max(
       wind.maxDeviation,
-      Math.abs(state.altitude - wind.baseline),
+      Math.abs(state.altitude - wind.baseline)
     );
 
     wind.lastDeviation = wind.maxDeviation;
     wind.value = 0;
     wind.until = 0;
 
-    showStatus("Gust finished. Wind is calm; you can apply another gust.");
+    status("Gust finished. Wind is calm; you can apply another gust.");
   }
 }
 
-// Apply a temporary downward wind gust during flight
 function applyWind() {
   if (!running || !currentConfig || currentConfig.mode !== "closed") {
-    showStatus("Launch the drone in feedback mode before applying wind.");
+    status("Launch the drone in feedback mode before applying wind.");
     return;
   }
 
   if (wind.until > 0) {
-    showStatus("A gust is already active. Wait for it to finish.");
+    status("A gust is already active. Wait for it to finish.");
     return;
   }
 
@@ -572,19 +570,18 @@ function applyWind() {
   wind.until = state.t + GUST_DURATION;
   flightWasDisturbed = true;
 
-  showStatus(
-    "Downward gust applied for 0.2 simulated seconds. Watch the LIVE response and recovery.",
+  status(
+    "Downward gust applied for 0.2 simulated seconds. Watch the LIVE response and recovery."
   );
 }
 
-// Reset the response measurements
+// Response measurements.
 function clearMetrics() {
   for (const id of ["rise", "peak", "os", "settle", "sse", "ess"]) {
     text(id, "—");
   }
 }
 
-// Find the first time the response reaches a given level
 function firstCrossing(points, level) {
   for (let i = 1; i < points.length; i++) {
     const a = points[i - 1];
@@ -598,10 +595,12 @@ function firstCrossing(points, level) {
   return null;
 }
 
-// Find the first peak in the response
 function firstPeak(points) {
   for (let i = 1; i < points.length - 1; i++) {
-    if (points[i].y >= points[i - 1].y && points[i].y > points[i + 1].y) {
+    if (
+      points[i].y >= points[i - 1].y &&
+      points[i].y > points[i + 1].y
+    ) {
       return points[i];
     }
   }
@@ -609,7 +608,6 @@ function firstPeak(points) {
   return null;
 }
 
-// Calculate settling time using the specified tolerance
 function settlingTime(points, finalValue, tolerance) {
   if (points.length < 2) return null;
 
@@ -633,12 +631,14 @@ function settlingTime(points, finalValue, tolerance) {
 
   if (Math.abs(change) < 1e-12) return b.t;
 
-  const fraction = Math.max(0, Math.min(1, (boundary - a.y) / change));
+  const fraction = Math.max(
+    0,
+    Math.min(1, (boundary - a.y) / change)
+  );
 
   return a.t + fraction * (b.t - a.t);
 }
 
-// Calculate rise time, peak time, overshoot and settling time
 function responseMetrics() {
   if (!hasLaunched || !currentConfig || analysisSamples.length < 3) {
     return null;
@@ -648,27 +648,27 @@ function responseMetrics() {
   const tr = firstCrossing(analysisSamples, target);
   const candidate = firstPeak(analysisSamples);
 
-  const finalAltitude =
-    currentConfig.plant === "compare"
-      ? target - (theoreticalError(currentConfig) ?? 0)
-      : target;
+  const finalAltitude = currentConfig.plant === "compare"
+    ? target - (theoreticalError(currentConfig) ?? 0)
+    : target;
 
-  const peak =
-    candidate && candidate.y > finalAltitude * 1.001 ? candidate : null;
+  const peak = candidate && candidate.y > finalAltitude * 1.001
+    ? candidate
+    : null;
 
   const maximum = Math.max(...analysisSamples.map((point) => point.y));
   const overshoot = Math.max(0, ((maximum - target) / target) * 100);
   const tolerance = Math.max(0.02, Math.abs(target) * 0.02);
   const measuredTs = settlingTime(analysisSamples, target, tolerance);
   const ts =
-    measuredTs !== null && analysisSamples.at(-1).t - measuredTs >= 1
+    measuredTs !== null &&
+    analysisSamples.at(-1).t - measuredTs >= 1
       ? measuredTs
       : null;
 
   return { tr, peak, overshoot, ts, tolerance };
 }
 
-// Display the calculated response measurements
 function analysisMetrics() {
   const metrics = responseMetrics();
 
@@ -679,7 +679,10 @@ function analysisMetrics() {
   }
 
   text("rise", metrics.tr === null ? "—" : `${fmt(metrics.tr)} s`);
-  text("peak", metrics.peak ? `${fmt(metrics.peak.t)} s` : "No overshoot peak");
+  text(
+    "peak",
+    metrics.peak ? `${fmt(metrics.peak.t)} s` : "No overshoot peak"
+  );
   text("os", `${fmt(metrics.overshoot, 1)} %`);
   text("settle", metrics.ts === null ? "N/A" : `${fmt(metrics.ts)} s`);
   text("sse", `${fmt(currentConfig.target - state.altitude)} m`);
@@ -688,7 +691,7 @@ function analysisMetrics() {
   updateDesignResult();
 }
 
-// Plot the live drone altitude response
+// Live graph.
 function draw(target) {
   if (!window.Plotly || !$("chart")) return;
 
@@ -709,7 +712,7 @@ function draw(target) {
         type: "scatter",
         mode: "lines",
         name: "Altitude",
-        line: { color: "#38bdf8", width: 3 },
+        line: { color: "#38bdf8", width: 3 }
       },
       {
         x: [start, start + WINDOW],
@@ -717,8 +720,8 @@ function draw(target) {
         type: "scatter",
         mode: "lines",
         name: "Target",
-        line: { color: "#ffb347", dash: "dash", width: 2 },
-      },
+        line: { color: "#ffb347", dash: "dash", width: 2 }
+      }
     ],
     {
       paper_bgcolor: "#071a2f",
@@ -728,41 +731,49 @@ function draw(target) {
       xaxis: {
         title: { text: "Time (s)" },
         range: [start, start + WINDOW],
-        gridcolor: "#244563",
+        gridcolor: "#244563"
       },
       yaxis: {
         title: { text: "Altitude (m)" },
-        gridcolor: "#244563",
+        gridcolor: "#244563"
       },
       showlegend: true,
-      legend: { orientation: "h" },
+      legend: { orientation: "h" }
     },
-    { responsive: true, displaylogo: false, scrollZoom: true },
+    { responsive: true, displaylogo: false, scrollZoom: true }
   );
 }
 
-// Construct the full closed-loop transfer function model
-// Polynomial coefficients are stored in ascending powers of s
+// Full closed-loop model. Coefficients are in ascending powers of s.
 function closedLoopModel(settings) {
   const b = settings.plant === "compare" ? 1 : settings.w ** 2;
-  const a = settings.plant === "compare" ? 2 : 2 * settings.z * settings.w;
+  const a = settings.plant === "compare"
+    ? 2
+    : 2 * settings.z * settings.w;
   const restoring = settings.plant === "compare" ? 1 : 0;
   const kd = hasDerivative(settings) ? settings.kd : 0;
 
   if (hasIntegral(settings)) {
     return {
-      den: [b * settings.ki, restoring + b * settings.kp, a + b * kd],
-      num: [b * settings.ki, b * settings.kp, b * kd],
+      den: [
+        b * settings.ki,
+        restoring + b * settings.kp,
+        a + b * kd
+      ],
+      num: [
+        b * settings.ki,
+        b * settings.kp,
+        b * kd
+      ]
     };
   }
 
   return {
     den: [restoring + b * settings.kp, a + b * kd],
-    num: [b * settings.kp, b * kd],
+    num: [b * settings.kp, b * kd]
   };
 }
 
-// Simulate the closed-loop response using the fourth-order Runge-Kutta method
 function simulateClosedLoopModel(settings) {
   const model = closedLoopModel(settings);
   const order = model.den.length;
@@ -794,19 +805,20 @@ function simulateClosedLoopModel(settings) {
   for (let n = 0; n < totalSteps; n++) {
     const k1 = derivative(x);
     const k2 = derivative(
-      x.map((value, i) => value + (k1[i] * simulationTimeStep) / 2),
+      x.map((value, i) => value + k1[i] * simulationTimeStep / 2)
     );
     const k3 = derivative(
-      x.map((value, i) => value + (k2[i] * simulationTimeStep) / 2),
+      x.map((value, i) => value + k2[i] * simulationTimeStep / 2)
     );
     const k4 = derivative(
-      x.map((value, i) => value + k3[i] * simulationTimeStep),
+      x.map((value, i) => value + k3[i] * simulationTimeStep)
     );
 
     x = x.map(
       (value, i) =>
         value +
-        (simulationTimeStep * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i])) / 6,
+        simulationTimeStep *
+        (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]) / 6
     );
 
     const y = output(x);
@@ -822,7 +834,6 @@ function simulateClosedLoopModel(settings) {
   return result;
 }
 
-// Generate the complete response for graph analysis
 function recomputeAnalysis() {
   analysisSamples = [initialSample()];
 
@@ -837,11 +848,14 @@ function recomputeAnalysis() {
   let y = 0;
   let v = 0;
 
-  for (let n = 0; n < Math.round(ANALYSIS_END / simulationTimeStep); n++) {
-    const acceleration =
-      settings.plant === "compare"
-        ? settings.fixed - 2 * v - y
-        : settings.w ** 2 * settings.fixed - 2 * settings.z * settings.w * v;
+  for (
+    let n = 0;
+    n < Math.round(ANALYSIS_END / simulationTimeStep);
+    n++
+  ) {
+    const acceleration = settings.plant === "compare"
+      ? settings.fixed - 2 * v - y
+      : settings.w ** 2 * settings.fixed - 2 * settings.z * settings.w * v;
 
     v += acceleration * simulationTimeStep;
     y += v * simulationTimeStep;
@@ -856,13 +870,12 @@ function recomputeAnalysis() {
         t: (n + 1) * simulationTimeStep,
         y,
         v,
-        u: settings.fixed,
+        u: settings.fixed
       });
     }
   }
 }
 
-// Plot the detailed response with performance measurements
 function drawAnalysis(target) {
   if (!window.Plotly || !$("analysisChart")) return;
 
@@ -886,7 +899,7 @@ function drawAnalysis(target) {
   }
 
   const visible = ready
-    ? analysisSamples.filter((p) => p.t >= start - 0.02 && p.t <= end + 0.02)
+    ? analysisSamples.filter(p => p.t >= start - 0.02 && p.t <= end + 0.02)
     : [];
 
   const shapes = [];
@@ -904,19 +917,19 @@ function drawAnalysis(target) {
       y1: target + tolerance,
       fillcolor: "rgba(127,228,160,.14)",
       line: { width: 0 },
-      layer: "below",
+      layer: "below"
     });
 
     traces.push(
       {
-        x: visible.map((p) => p.t),
-        y: visible.map((p) => p.y),
+        x: visible.map(p => p.t),
+        y: visible.map(p => p.y),
         type: "scatter",
         mode: "lines",
         name: "Wind-free model response",
         line: { color: "#38bdf8", width: 4 },
         hovertemplate:
-          "Time: %{x:.3f} s<br>Altitude: %{y:.3f} m<extra></extra>",
+          "Time: %{x:.3f} s<br>Altitude: %{y:.3f} m<extra></extra>"
       },
       {
         x: [start, end],
@@ -925,11 +938,10 @@ function drawAnalysis(target) {
         mode: "lines",
         name: "Target",
         line: { color: "#ffb347", dash: "dash", width: 3 },
-        hoverinfo: "skip",
-      },
+        hoverinfo: "skip"
+      }
     );
 
-    // Mark the response measurement times on the graph
     function mark(time, label, color, offset = 10) {
       if (!Number.isFinite(time) || time < start || time > end) return;
 
@@ -941,7 +953,7 @@ function drawAnalysis(target) {
         x1: time,
         y0: 0,
         y1: 1,
-        line: { color, dash: "dot", width: 2 },
+        line: { color, dash: "dot", width: 2 }
       });
 
       annotations.push({
@@ -954,7 +966,7 @@ function drawAnalysis(target) {
         showarrow: false,
         yanchor: "bottom",
         yshift: offset,
-        bgcolor: "rgba(7,26,47,.85)",
+        bgcolor: "rgba(7,26,47,.85)"
       });
     }
 
@@ -962,11 +974,10 @@ function drawAnalysis(target) {
     mark(metrics?.peak?.t, "t<sub>p</sub>", "#fb7185", 32);
     mark(metrics?.ts, "t<sub>s</sub>", "#4ade80");
 
-    // Highlight the first overshoot peak and its percentage
     const peak = metrics?.peak;
 
     if (peak && peak.t >= start && peak.t <= end) {
-      const mp = Math.max(0, ((peak.y - target) / target) * 100);
+      const mp = Math.max(0, (peak.y - target) / target * 100);
 
       traces.push({
         x: [peak.t],
@@ -977,13 +988,14 @@ function drawAnalysis(target) {
         showlegend: false,
         marker: { size: 11, color: "#fb7185" },
         text: [`M<sub>p</sub> = ${fmt(mp, 2)}%`],
-        textposition: peak.t > start + 0.7 ? "top left" : "top right",
+        textposition:
+          peak.t > start + 0.7 ? "top left" : "top right",
         textfont: { color: "#ffd7df", size: 14 },
         cliponaxis: false,
         hovertemplate:
           `Peak time: ${fmt(peak.t, 3)} s<br>` +
           `Peak altitude: ${fmt(peak.y, 3)} m<br>` +
-          `Mₚ: ${fmt(mp, 2)}%<extra></extra>`,
+          `Mₚ: ${fmt(mp, 2)}%<extra></extra>`
       });
     }
   } else {
@@ -995,18 +1007,17 @@ function drawAnalysis(target) {
       yref: "paper",
       x: 0.5,
       y: 0.5,
-      showarrow: false,
+      showarrow: false
     });
   }
 
-  const values = visible
-    .map((p) => p.y)
-    .concat(0, target - tolerance, target + tolerance);
+  const values = visible.map(p => p.y).concat(
+    0, target - tolerance, target + tolerance
+  );
   const minimum = Math.min(...values);
   const maximum = Math.max(...values);
   const padding = Math.max(0.5, (maximum - minimum) * 0.12);
 
-  // Render the analysis graph using Plotly
   Plotly.react(
     "analysisChart",
     traces,
@@ -1022,7 +1033,7 @@ function drawAnalysis(target) {
         gridcolor: "#315a78",
         gridwidth: 1.3,
         fixedrange: true,
-        visible: ready,
+        visible: ready
       },
 
       yaxis: {
@@ -1031,7 +1042,7 @@ function drawAnalysis(target) {
         gridcolor: "#315a78",
         gridwidth: 1.3,
         fixedrange: false,
-        visible: ready,
+        visible: ready
       },
 
       shapes,
@@ -1043,20 +1054,20 @@ function drawAnalysis(target) {
         y: 1.25,
         xanchor: "left",
         yanchor: "bottom",
-        font: { size: 14 },
+        font: { size: 14 }
       },
-      hovermode: "closest",
+      hovermode: "closest"
     },
     {
       responsive: true,
       displaylogo: false,
       displayModeBar: "hover",
-      scrollZoom: false,
-    },
+      scrollZoom: false
+    }
   );
 }
 
-// Calculate the controller output using the selected PID gains
+// Live controller and plant simulation.
 function controllerOutput(settings, error) {
   const proportional = settings.kp * error;
   const integral = ["PI", "PID"].includes(settings.type)
@@ -1069,13 +1080,11 @@ function controllerOutput(settings, error) {
   return proportional + integral + derivative;
 }
 
-// Update the drone motion using the plant equations
 function advance(settings) {
   const error = settings.target - state.altitude;
-  const input =
-    settings.mode === "open"
-      ? settings.fixed
-      : controllerOutput(settings, error);
+  const input = settings.mode === "open"
+    ? settings.fixed
+    : controllerOutput(settings, error);
 
   updateWind(settings);
 
@@ -1089,12 +1098,16 @@ function advance(settings) {
     (settings.plant === "compare"
       ? input - 2 * state.verticalVelocity - state.altitude
       : settings.w ** 2 * input -
-        2 * settings.z * settings.w * state.verticalVelocity) + disturbance;
+        2 * settings.z * settings.w * state.verticalVelocity) +
+    disturbance;
 
   state.verticalVelocity += acceleration * simulationTimeStep;
   state.altitude += state.verticalVelocity * simulationTimeStep;
 
-  if (settings.mode === "closed" && ["PI", "PID"].includes(settings.type)) {
+  if (
+    settings.mode === "closed" &&
+    ["PI", "PID"].includes(settings.type)
+  ) {
     state.accumulatedError += error * simulationTimeStep;
   }
 
@@ -1109,24 +1122,23 @@ function advance(settings) {
     Math.abs(state.verticalVelocity) > 1e7
   ) {
     pause();
-    showStatus(
-      "Simulation stopped: the selected gains produced an unstable or excessively large response.",
+    status(
+      "Simulation stopped: the selected gains produced an unstable or excessively large response."
     );
     return false;
   }
 
-  // Store flight samples for the live response graph
   if (steps % SAMPLE_EVERY === 0) {
     samples.push({
       t: state.t,
       y: state.altitude,
       v: state.verticalVelocity,
-      u: state.controlInput,
+      u: state.controlInput
     });
 
     if (samples.length > 10000) {
       samples = samples.filter(
-        (point) => point.t >= state.t - Math.max(WINDOW + 5, 30),
+        (point) => point.t >= state.t - Math.max(WINDOW + 5, 30)
       );
     }
   }
@@ -1134,14 +1146,14 @@ function advance(settings) {
   return true;
 }
 
-// Run the simulation according to the selected animation speed
 function tick(now) {
   if (!running) return;
 
   if (previousFrame === null) previousFrame = now;
 
   accumulator +=
-    Math.min(0.05, (now - previousFrame) / 1000) * Number($("simSpeed").value);
+    Math.min(0.05, (now - previousFrame) / 1000) *
+    Number($("simSpeed").value);
 
   previousFrame = now;
 
@@ -1160,7 +1172,6 @@ function tick(now) {
   frame = requestAnimationFrame(tick);
 }
 
-// Pause the current simulation
 function pause() {
   running = false;
 
@@ -1172,7 +1183,6 @@ function pause() {
   if ($("run")) $("run").disabled = false;
 }
 
-// Resume the simulation from its current state
 function resumeFlight() {
   if (running || !currentConfig) return;
 
@@ -1185,7 +1195,6 @@ function resumeFlight() {
   frame = requestAnimationFrame(tick);
 }
 
-// Clear the flight data and reset the simulation state
 function clearFlight() {
   pause();
   resetWind();
@@ -1203,12 +1212,11 @@ function clearFlight() {
   clearMetrics();
 }
 
-// Launch a new flight using the current controller settings
 function launch() {
   try {
     currentConfig = config();
   } catch (error) {
-    showStatus(error.message);
+    status(error.message);
     return false;
   }
 
@@ -1234,22 +1242,20 @@ function launch() {
   updateChallengeButtons();
   resumeFlight();
 
-  showStatus(
-    "Drone launched. The live graph shows the flight; response analysis uses the complete wind-free model.",
+  status(
+    "Drone launched. The live graph shows the flight; response analysis uses the complete wind-free model."
   );
 
   return true;
 }
 
-// Reset the drone to its initial position
 function reset() {
   clearFlight();
   updateForm();
   updateChallengeButtons();
-  showStatus("Reset to ground level. Click Launch to start a fresh flight.");
+  status("Reset to ground level. Click Launch to start a fresh flight.");
 }
 
-// Reset the simulation when controller settings are changed
 function settingsChanged() {
   clearFlight();
   designAnswerCorrect = false;
@@ -1261,14 +1267,14 @@ function settingsChanged() {
   if (designChallenge) {
     text(
       "designAnswerFeedback",
-      "Settings changed. Check your gains, or launch a trial flight.",
+      "Settings changed. Check your gains, or launch a trial flight."
     );
   }
 
-  showStatus("Settings changed. Launch a new flight to measure this controller.");
+  status("Settings changed. Launch a new flight to measure this controller.");
 }
 
-// Generate a new PID design challenge with random requirements
+// PID design challenge.
 function makeDesignChallenge() {
   const z = Number((0.55 + Math.random() * 0.25).toFixed(2));
   const tr = Number((0.35 + Math.random() * 0.2).toFixed(2));
@@ -1301,7 +1307,6 @@ function makeDesignChallenge() {
   text("missionTr", `${fmt(tr, 2)} s`);
 }
 
-// Copy the main controller gains into the guided challenge
 function syncGuideGainsFromMain() {
   for (const [guide, main] of [
     ["guideKp", "kp"],
@@ -1312,7 +1317,6 @@ function syncGuideGainsFromMain() {
   }
 }
 
-// Read and validate the gains entered in the challenge
 function readGuideGains() {
   const result = {};
 
@@ -1332,7 +1336,6 @@ function readGuideGains() {
   return result;
 }
 
-// Apply the guided challenge gains to the main simulator
 function syncMainGainsFromGuide() {
   const gains = readGuideGains();
   if (!gains) return false;
@@ -1345,7 +1348,6 @@ function syncMainGainsFromGuide() {
   return true;
 }
 
-// Check whether the challenge is ready for a trial flight
 function guideReady() {
   return (
     $("experiment").value === "design" &&
@@ -1354,7 +1356,6 @@ function guideReady() {
   );
 }
 
-// Enable or disable challenge buttons based on progress
 function updateChallengeButtons() {
   if ($("guideLaunch")) {
     $("guideLaunch").disabled = !guideReady();
@@ -1374,7 +1375,6 @@ function updateChallengeButtons() {
   }
 }
 
-// Navigate between the guided challenge stages
 function goToChallengeStage(id) {
   const step = $(id);
   if (!step) return;
@@ -1396,13 +1396,11 @@ function goToChallengeStage(id) {
   });
 }
 
-// Open the design challenge at the requirements stage
 function openDesignAtRequirements() {
   hide("experimentGuide", false);
   goToChallengeStage("designRequirementsStep");
 }
 
-// Reset the challenge and optionally generate a new question
 function resetForDesignQuestion(makeNew) {
   clearFlight();
 
@@ -1436,16 +1434,14 @@ function resetForDesignQuestion(makeNew) {
   updateChallengeButtons();
 
   text("designResult", "Launch your design to see the response.");
-  showStatus("New design question ready. Calculate Kₚ, Kᵢ and Kᴅ.");
+  status("New design question ready. Calculate Kₚ, Kᵢ and Kᴅ.");
 }
 
-// Set the accepted rounding tolerance for each controller gain
 function designGainTolerance(expected, gain) {
   const absoluteTolerance = gain === "kd" ? 0.1 : 1;
   return Math.max(absoluteTolerance, Math.abs(expected) * 0.01);
 }
 
-// Compare the entered gain against the expected solution
 function designGainMatches(entered, expected, gain) {
   return (
     Number.isFinite(entered) &&
@@ -1453,7 +1449,6 @@ function designGainMatches(entered, expected, gain) {
   );
 }
 
-// Check the student's calculated PID gains and provide feedback
 function checkDesignAnswer() {
   if (!designChallenge) return;
 
@@ -1494,7 +1489,6 @@ function checkDesignAnswer() {
   updateChallengeButtons();
 }
 
-// Apply the correct PID gains directly to the simulator
 function useSolutionGains() {
   if (!designChallenge) return;
 
@@ -1522,269 +1516,170 @@ function useSolutionGains() {
   );
 
   text("designResult", "Solution gains are ready. Launch a fresh flight.");
-  showStatus("Solution gains applied. You can launch directly.");
+  status("Solution gains applied. You can launch directly.");
   goToChallengeStage("enterDesignStep");
 }
 
-// Generate a new PID design challenge with random requirements
-function makeDesignChallenge() {
-  const z = Number((0.55 + Math.random() * 0.25).toFixed(2));
-  const tr = Number((0.35 + Math.random() * 0.2).toFixed(2));
-  const theta = Math.acos(z);
-  const wn = (Math.PI - theta) / (tr * Math.sqrt(1 - z * z));
-  const alpha = z * wn;
-  const p = 10 * alpha;
+function revealSolution() {
+  if ($("experiment").value !== "design") return;
+  if (!designChallenge) makeDesignChallenge();
 
-  designChallenge = {
-    z,
-    tr,
-    theta,
-    wn,
-    alpha,
-    p,
-    kd: (2 * z * wn + p - 5) / 25,
-    kp: (wn * wn + 2 * z * wn * p) / 25,
-    ki: wn * wn * p / 25,
-    mp: Math.exp(-z * Math.PI / Math.sqrt(1 - z * z)) * 100,
-    tp: Math.PI / (wn * Math.sqrt(1 - z * z)),
-    ts: 4 / (z * wn)
-  };
+  const d = designChallenge;
 
-  text(
-    "designChallenge",
-    "Your mission: calculate Kₚ, Kᵢ and Kᴅ for the given damping ratio, rise time and zero steady-state error. Use p = 10ζωₙ and keep the plant at ω₀ = 5, ζ₀ = 0.5."
-  );
+  if ($("solutionBody")) {
+    $("solutionBody").innerHTML = `
+      <div class="solution-steps">
+        <p class="solution-intro">
+          Match the PID characteristic polynomial to the desired
+          second-order factor and a third pole.
+        </p>
 
-  text("missionZ", fmt(z, 2));
-  text("missionTr", `${fmt(tr, 2)} s`);
-}
+        <h3>Given · Mission requirements</h3>
+        ${equation(
+          String.raw`\zeta=${fmt(d.z, 2)},\quad t_r=${fmt(d.tr, 2)}\,\mathrm{s},\quad e_{ss}=0`
+        )}
+        ${equation(String.raw`G_2(s)=\frac{25}{s(s+5)}`)}
 
-// Copy the main controller gains into the guided challenge
-function syncGuideGainsFromMain() {
-  for (const [guide, main] of [
-    ["guideKp", "kp"],
-    ["guideKi", "ki"],
-    ["guideKd", "kd"]
-  ]) {
-    if ($(guide) && $(main)) $(guide).value = $(main).value;
-  }
-}
+        <h3>1 · Calculate the natural frequency</h3>
+        ${equation(
+          String.raw`\theta=\cos^{-1}(\zeta)=${fmt(d.theta, 4)}\,\mathrm{rad}`
+        )}
+        ${equation(
+          String.raw`t_r\approx\frac{\pi-\theta}{\omega_n\sqrt{1-\zeta^2}}`
+        )}
+        ${equation(
+          String.raw`\omega_n=\frac{\pi-\cos^{-1}(${fmt(d.z, 2)})}{${fmt(d.tr, 2)}\sqrt{1-${fmt(d.z, 2)}^2}}=${fmt(d.wn, 4)}\,\mathrm{rad/s}`
+        )}
 
-// Read and validate the gains entered in the challenge
-function readGuideGains() {
-  const result = {};
+        <h3>2 · Place the third pole</h3>
+        ${equation(
+          String.raw`\alpha=\zeta\omega_n=${fmt(d.alpha, 4)}`
+        )}
+        ${equation(
+          String.raw`p=10\alpha=${fmt(d.p, 4)},\qquad s_3=-p`
+        )}
+        ${equation(
+          String.raw`P_d(s)=(s^2+2\zeta\omega_ns+\omega_n^2)(s+p)`
+        )}
 
-  for (const [guide, main] of [
-    ["guideKp", "kp"],
-    ["guideKi", "ki"],
-    ["guideKd", "kd"]
-  ]) {
-    if (!$(guide) || $(guide).value.trim() === "") return null;
+        <h3>3 · Match the coefficients</h3>
+        ${equation(
+          String.raw`P_{CL}(s)=s^3+(5+25K_D)s^2+25K_Ps+25K_I`
+        )}
+        ${equation(
+          String.raw`P_d(s)=s^3+(2\zeta\omega_n+p)s^2+(\omega_n^2+2\zeta\omega_np)s+\omega_n^2p`
+        )}
 
-    const value = Number($(guide).value);
-    if (!Number.isFinite(value) || value < 0) return null;
+        <h3>4 · Solve for the controller gains</h3>
+        ${equation(
+          String.raw`\boxed{K_D=\frac{2\zeta\omega_n+p-5}{25}=${fmt(d.kd, 4)}}`
+        )}
+        ${equation(
+          String.raw`\boxed{K_P=\frac{\omega_n^2+2\zeta\omega_np}{25}=${fmt(d.kp, 4)}}`
+        )}
+        ${equation(
+          String.raw`\boxed{K_I=\frac{\omega_n^2p}{25}=${fmt(d.ki, 4)}}`
+        )}
 
-    result[main] = value;
-  }
+        <h3>5 · Check the step-reference error</h3>
+        ${equation(
+          String.raw`e_{ss}=\lim_{s\to0}\frac{10}{1+C(s)G_2(s)}=0`
+        )}
+        <p>
+          The designed closed loop is stable and includes integral action.
+          Its wind-free step-reference error therefore approaches zero.
+        </p>
 
-  return result;
-}
+        <div class="guide-check-actions">
+          <button
+            id="useSolution"
+            class="guide-action-button"
+            type="button"
+          >Use these design gains</button>
+        </div>
 
-// Apply the guided challenge gains to the main simulator
-function syncMainGainsFromGuide() {
-  const gains = readGuideGains();
-  if (!gains) return false;
-
-  for (const id of ["kp", "ki", "kd"]) {
-    $(id).value = gains[id];
-  }
-
-  $("type").value = "PID";
-  return true;
-}
-
-// Check whether the challenge is ready for a trial flight
-function guideReady() {
-  return (
-    $("experiment").value === "design" &&
-    designChallenge !== null &&
-    readGuideGains() !== null
-  );
-}
-
-// Enable or disable challenge buttons based on progress
-function updateChallengeButtons() {
-  if ($("guideLaunch")) {
-    $("guideLaunch").disabled = !guideReady();
+        <p class="note">
+          Applying the solution enables launch immediately.
+          You can also try another question as soon as the solution is revealed.
+        </p>
+      </div>`;
   }
 
-  if ($("anotherQuestion")) {
-    $("anotherQuestion").disabled = !(
-      solutionRevealed ||
-      (designAnswerCorrect && designHasLaunched)
-    );
+  // Keep the prediction in the manual, below the worked solution.
+  const manual = $("manualSolution");
+  const prediction = $("predictionReveal");
+
+  if (manual && prediction && !manual.contains(prediction)) {
+    manual.appendChild(prediction);
   }
 
-  if ($("guideSolution")) {
-    $("guideSolution").textContent = solutionRevealed
-      ? "View worked solution"
-      : "Reveal solution";
+  if ($("predictionValues")) {
+    $("predictionValues").innerHTML = `
+      <div>
+        <span>Overshoot · Mₚ</span>
+        <strong>${fmt(d.mp, 3)}%</strong>
+      </div>
+      <div>
+        <span>Peak time · tₚ</span>
+        <strong>${fmt(d.tp, 3)} s</strong>
+      </div>
+      <div>
+        <span>Settling time · ±2%</span>
+        <strong>${fmt(d.ts, 3)} s</strong>
+      </div>`;
   }
-}
 
-// Navigate between the guided challenge stages
-function goToChallengeStage(id) {
-  const step = $(id);
-  if (!step) return;
+  text("predictionHeading", "Second-order design prediction");
 
-  document.querySelectorAll("#designGuide .guide-step").forEach((item) => {
-    item.open = item.id === id;
-  });
+  solutionRevealed = true;
 
-  document.querySelectorAll("#designGuide [data-stage]").forEach((button) => {
-    if (button.dataset.stage === id) {
-      button.setAttribute("aria-current", "step");
-    } else {
-      button.removeAttribute("aria-current");
-    }
-  });
-
-  requestAnimationFrame(() => {
-    step.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  });
-}
-
-// Open the design challenge at the requirements stage
-function openDesignAtRequirements() {
   hide("experimentGuide", false);
-  goToChallengeStage("designRequirementsStep");
-}
+  hide("manualSolution", false);
+  hide("predictionReveal", false);
+  hide("solutionLocked");
 
-// Reset the challenge and optionally generate a new question
-function resetForDesignQuestion(makeNew) {
-  clearFlight();
-
-  $("type").value = "PID";
-  $("mode").value = "closed";
-  $("w").value = "5";
-  $("z").value = "0.5";
-  $("target").value = "10";
-
-  if (makeNew || !designChallenge) makeDesignChallenge();
-
-  for (const id of ["kp", "ki", "kd"]) $(id).value = "0";
-
-  designAnswerCorrect = false;
-  solutionRevealed = false;
-
-  hide("manualSolution");
-  hide("predictionReveal");
-  hide("solutionLocked", false);
-
-  if ($("solutionBody")) $("solutionBody").innerHTML = "";
-  if ($("predictionValues")) $("predictionValues").innerHTML = "";
-
-  text(
-    "designAnswerFeedback",
-    "Enter your calculated gains. Check answer for feedback, or launch a trial flight."
-  );
-
-  updateForm();
-  syncGuideGainsFromMain();
   updateChallengeButtons();
+  typeset([$("solutionBody")]);
+  goToChallengeStage("understandDesignStep");
 
-  text("designResult", "Launch your design to see the response.");
-  showStatus("New design question ready. Calculate Kₚ, Kᵢ and Kᴅ.");
+  on("useSolution", "click", useSolutionGains);
 }
 
-// Set the accepted rounding tolerance for each controller gain
-function designGainTolerance(expected, gain) {
-  const absoluteTolerance = gain === "kd" ? 0.1 : 1;
-  return Math.max(absoluteTolerance, Math.abs(expected) * 0.01);
-}
+function updateDesignResult() {
+  const element = $("designResult");
+  if (!element) return;
 
-// Compare the entered gain against the expected solution
-function designGainMatches(entered, expected, gain) {
-  return (
-    Number.isFinite(entered) &&
-    Math.abs(entered - expected) <= designGainTolerance(expected, gain) + 1e-10
-  );
-}
-
-// Check the student's calculated PID gains and provide feedback
-function checkDesignAnswer() {
-  if (!designChallenge) return;
-
-  const entered = readGuideGains();
-
-  if (!entered) {
-    designAnswerCorrect = false;
-    text(
-      "designAnswerFeedback",
-      "Enter a valid non-negative number for all three gains."
-    );
-    updateChallengeButtons();
+  if (
+    !currentConfig ||
+    currentConfig.plant !== "design" ||
+    currentConfig.type !== "PID"
+  ) {
+    element.textContent = "Select Experiment 2 to test a PID design.";
     return;
   }
 
-  syncMainGainsFromGuide();
-  clearFlight();
-  updateForm();
-
-  const matches = ["kp", "ki", "kd"].map(
-    (gain) => designGainMatches(entered[gain], designChallenge[gain], gain)
-  );
-
-  designAnswerCorrect = matches.every(Boolean);
-
-  const labels = { kp: "Kₚ", ki: "Kᵢ", kd: "Kᴅ" };
-  const details = ["kp", "ki", "kd"].map(
-    (gain, index) => `${labels[gain]} ${matches[index] ? "✓" : "needs checking"}`
-  );
-
-  text(
-    "designAnswerFeedback",
-    designAnswerCorrect
-      ? "Correct ✓ Your gains are within the accepted rounding range. Launch your design when ready."
-      : `${details.join(" · ")}. Review the coefficient matching and try again.`
-  );
-
-  updateChallengeButtons();
-}
-
-// Apply the correct PID gains directly to the simulator
-function useSolutionGains() {
-  if (!designChallenge) return;
-
-  clearFlight();
-
-  $("type").value = "PID";
-  $("mode").value = "closed";
-  $("w").value = "5";
-  $("z").value = "0.5";
-  $("target").value = "10";
-
-  for (const gain of ["kp", "ki", "kd"]) {
-    $(gain).value = Number(designChallenge[gain].toFixed(4));
+  if (!hasLaunched || !designHasLaunched) {
+    element.textContent = "Launch your design to see the response.";
+    return;
   }
 
-  designAnswerCorrect = true;
+  const metrics = responseMetrics();
 
-  updateForm();
-  syncGuideGainsFromMain();
-  updateChallengeButtons();
+  if (!metrics) {
+    element.textContent =
+      "The response could not be analysed. Check the controller gains.";
+    return;
+  }
 
-  text(
-    "designAnswerFeedback",
-    "Solution gains applied ✓ Click Launch my design. No additional answer check is needed."
-  );
-
-  text("designResult", "Solution gains are ready. Launch a fresh flight.");
-  showStatus("Solution gains applied. You can launch directly.");
-  goToChallengeStage("enterDesignStep");
+  element.textContent =
+    `Full wind-free model response: ` +
+    `tᵣ = ${metrics.tr === null ? "not reached" : `${fmt(metrics.tr, 3)} s`}, ` +
+    `Mₚ = ${fmt(metrics.overshoot, 3)}%, ` +
+    `tₛ = ${metrics.ts === null ? "N/A within 30 s" : `${fmt(metrics.ts, 3)} s`}. ` +
+    "The live graph shows the drone flight. Reveal the solution to compare the second-order estimates.";
 }
 
-// Update the selected controller button in Experiment 1
+// Experiment 1 manual buttons and wording.
 function updateControllerButtons() {
   document.querySelectorAll("[data-compare-controller]").forEach((button) => {
     const selected = button.dataset.compareController === $("type").value;
@@ -1793,7 +1688,6 @@ function updateControllerButtons() {
   });
 }
 
-// Select a controller for the steady-state comparison
 function selectComparisonController(type, launchNow = false) {
   if (!CONTROLLERS.includes(type)) return;
 
@@ -1817,7 +1711,6 @@ function selectComparisonController(type, launchNow = false) {
   }
 }
 
-// Set up the Experiment 1 guided manual and controller buttons
 function installComparisonManual() {
   const guide = $("compareGuide");
   if (!guide) return;
@@ -1870,7 +1763,6 @@ function installComparisonManual() {
     details[2].appendChild(actions);
   }
 
-  // Display the expected behaviour of all four controllers
   if (details[4]) {
     const summary = details[4].querySelector("summary");
     if (summary) {
@@ -1938,7 +1830,6 @@ function installComparisonManual() {
   });
 }
 
-// Display the recorded results for P, PD, PI and PID
 function renderComparisonResults() {
   if (!$("comparisonRows")) return;
 
@@ -1972,7 +1863,6 @@ function renderComparisonResults() {
   }).join("");
 }
 
-// Record the steady-state error after a wind-free flight has settled
 function recordComparison() {
   if (
     $("experiment").value !== "compare" ||
@@ -2026,7 +1916,7 @@ function recordComparison() {
   );
 }
 
-// Switch between the steady-state comparison and PID design experiments
+// Switch experiments.
 function updateExperiment() {
   clearFlight();
 
@@ -2040,7 +1930,7 @@ function updateExperiment() {
   hide("applyWind", compare);
   hide("readyDesign", compare);
 
-  // Keep the review and prediction inside the experiment manual
+  // Review and prediction are accessed through the manual.
   hide("completeDesign");
   hide("designPlantSettings", compare);
   hide("controllerTypeRow", !compare);
@@ -2095,14 +1985,14 @@ function updateExperiment() {
   updateChallengeButtons();
   typeset([$("plantFormula"), $("plantDynamics")]);
 
-  showStatus(
+  status(
     compare
       ? "Experiment 1 ready. Open the manual or launch the selected controller."
       : "Experiment 2 ready. Open Ready to design to begin the challenge."
   );
 }
 
-// Add styling for the guided experiment manual
+// Small additions to the existing manual design.
 function installManualStyles() {
   if ($("droneManualEnhancements")) return;
 
@@ -2225,12 +2115,11 @@ function installManualStyles() {
   document.head.appendChild(style);
 }
 
-// Prepare the experiment manual and its guided learning controls
 function prepareManual() {
   installManualStyles();
   installComparisonManual();
 
-  // Allow calculated design gains to exceed the original input limits
+  // Generated challenge gains can exceed the old HTML max="100".
   for (const id of [
     "kp", "ki", "kd", "guideKp", "guideKi", "guideKd"
   ]) {
@@ -2279,7 +2168,7 @@ function prepareManual() {
   );
 }
 
-// Main simulator button and input events
+// Main simulator events.
 on("run", "click", launch);
 on("reset", "click", reset);
 on("applyWind", "click", applyWind);
@@ -2292,7 +2181,6 @@ for (const id of numericIds) {
   on(id, "input", settingsChanged);
 }
 
-// Keep the damping ratio within its allowed range
 on("z", "change", () => {
   const value = Number($("z").value);
   $("z").value = Number.isFinite(value)
@@ -2302,7 +2190,6 @@ on("z", "change", () => {
   settingsChanged();
 });
 
-// Update the disturbance strength and simulation speed displays
 on("gustStrength", "input", () => {
   text("gustStrengthO", `${$("gustStrength").value}×`);
 });
@@ -2311,10 +2198,9 @@ on("simSpeed", "input", () => {
   text("simSpeedO", `${Number($("simSpeed").value).toFixed(2)}×`);
 });
 
-// Toggle the constant wind disturbance during flight
 on("holdWind", "click", () => {
   if (!running || !currentConfig || currentConfig.mode !== "closed") {
-    showStatus(
+    status(
       "Launch the drone in feedback mode before starting the constant disturbance."
     );
     return;
@@ -2329,7 +2215,7 @@ on("holdWind", "click", () => {
 
   syncWindButton();
 
-  showStatus(
+  status(
     constantWind
       ? `Constant disturbance ON. P and PD have an additional downward offset of approximately ${fmt(CONSTANT_WIND_TARGET_PD_OFFSET * Number($("gustStrength").value), 2)} m after settling. Stable PI/PID with integral action should reject the constant disturbance.`
       : "Constant disturbance OFF. Watch the controller recover."
@@ -2338,14 +2224,13 @@ on("holdWind", "click", () => {
   show(state, currentConfig.target);
 });
 
-// Open the PID design challenge
+// Challenge events.
 on("readyDesign", "click", () => {
   if ($("experiment").value !== "design") return;
   if (!designChallenge) resetForDesignQuestion(true);
   openDesignAtRequirements();
 });
 
-// Generate another challenge after completing or revealing the solution
 on("anotherQuestion", "click", () => {
   if (
     !solutionRevealed &&
@@ -2358,7 +2243,6 @@ on("anotherQuestion", "click", () => {
   openDesignAtRequirements();
 });
 
-// Update the controller gains when the student enters new answers
 for (const id of ["guideKp", "guideKi", "guideKd"]) {
   on(id, "input", () => {
     clearFlight();
@@ -2379,10 +2263,8 @@ for (const id of ["guideKp", "guideKi", "guideKd"]) {
   });
 }
 
-// Check the calculated gains
 on("checkDesignAnswer", "click", checkDesignAnswer);
 
-// Launch the drone using the student's design gains
 on("guideLaunch", "click", () => {
   if (!syncMainGainsFromGuide()) {
     text(
@@ -2406,11 +2288,10 @@ on("guideLaunch", "click", () => {
   });
 });
 
-// Reveal the worked solution
 on("guideSolution", "click", revealSolution);
 on("completeDesign", "click", revealSolution);
 
-// Open and close the experiment manual
+// Manual navigation.
 on("openExperimentGuide", "click", () => {
   hide("experimentGuide", false);
 
@@ -2426,7 +2307,6 @@ on("closeExperimentGuide", "click", () => {
   $("openExperimentGuide")?.focus();
 });
 
-// Close the manual when clicking outside its content
 on("experimentGuide", "click", (event) => {
   if (event.target === $("experimentGuide")) {
     hide("experimentGuide");
@@ -2434,21 +2314,18 @@ on("experimentGuide", "click", (event) => {
   }
 });
 
-// Close the solution window
 on("closeSolution", "click", () => hide("solutionModal"));
 
 on("solutionModal", "click", (event) => {
   if (event.target === $("solutionModal")) hide("solutionModal");
 });
 
-// Navigate between the design challenge stages
 document.querySelectorAll("#designGuide [data-stage]").forEach((button) => {
   button.addEventListener("click", () => {
     goToChallengeStage(button.dataset.stage);
   });
 });
 
-// Update the active stage when a challenge section is opened
 document.querySelectorAll("#designGuide .guide-step").forEach((step) => {
   step.addEventListener("toggle", () => {
     if (!step.open) return;
@@ -2463,7 +2340,6 @@ document.querySelectorAll("#designGuide .guide-step").forEach((step) => {
   });
 });
 
-// Support keyboard navigation within the experiment manual
 on("experimentGuide", "keydown", (event) => {
   if (event.key === "Escape") {
     hide("experimentGuide");
@@ -2493,7 +2369,7 @@ on("experimentGuide", "keydown", (event) => {
   }
 });
 
-// Move between different sections of the analysis graph
+// Analysis graph navigation.
 function setAnalysisStart(value) {
   analysisStart = Math.max(0, Math.min(ANALYSIS_END - 1, value));
 
@@ -2509,7 +2385,6 @@ function setAnalysisStart(value) {
   drawAnalysis(currentConfig?.target || 10);
 }
 
-// Navigate the graph using the slider and buttons
 on("analysisScroll", "input", () => {
   setAnalysisStart(Number($("analysisScroll").value));
 });
@@ -2522,7 +2397,6 @@ on("analysisNext", "click", () => {
   setAnalysisStart(analysisStart + 0.5);
 });
 
-// Scroll through the analysis graph using the mouse wheel
 on(
   "analysisScroll",
   "wheel",
@@ -2533,12 +2407,11 @@ on(
   { passive: false }
 );
 
-// Initialise the simulator and experiment manual
+// Initialise.
 prepareManual();
 renderComparisonResults();
 updateExperiment();
 
-// Refresh the drone and graphs when the page finishes loading
 function refreshVisuals() {
   initDrone();
 
@@ -2554,7 +2427,6 @@ if (document.readyState === "complete") {
   window.addEventListener("load", refreshVisuals);
 }
 
-// Update the drone display when the browser window is resized
 window.addEventListener("resize", () => {
   show(state, currentConfig?.target || 10);
 });
