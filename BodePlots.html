@@ -1,0 +1,3695 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EE3011 · Bode plots</title>
+    <style>
+      :root {
+        --navy: #12203b;
+        --ink: #16233f;
+        --sky: #6ec6f0;
+        --steel: #4a86b8;
+        --bg: #f4f8fc;
+        --tint: #eef6fc;
+        --line: #cfe0ee;
+        --orange: #d9822b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          14px/1.5 system-ui,
+          Arial,
+          sans-serif;
+      }
+      h1,
+      h2,
+      h3,
+      .brand {
+        font-family: Georgia, "Times New Roman", serif;
+      }
+      .top {
+        background: var(--navy);
+        color: #fff;
+      }
+      .top div,
+      .hero > div {
+        max-width: 1100px;
+        margin: auto;
+        padding: 14px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .logo {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .logo i {
+        font: 600 11px system-ui;
+        font-style: normal;
+        border: 1.5px solid var(--sky);
+        border-radius: 6px;
+        width: 30px;
+        height: 30px;
+        display: grid;
+        place-items: center;
+      }
+      .brand {
+        font-weight: 700;
+        font-size: 17px;
+        line-height: 1;
+      }
+      .logo small {
+        display: block;
+        font: 10px system-ui;
+        letter-spacing: 0.12em;
+        color: var(--sky);
+      }
+      .top nav a {
+        color: #fff;
+        text-decoration: none;
+        font-size: 12.5px;
+        margin-left: 22px;
+      }
+      .hero {
+        background: var(--navy);
+        color: #fff;
+        padding-bottom: 26px;
+      }
+      .hero > div {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 40px;
+        align-items: center;
+        padding-top: 20px;
+      }
+      .eyebrow {
+        font-size: 10.5px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--sky);
+      }
+      h1 {
+        font-size: 40px;
+        line-height: 1.1;
+        margin: 10px 0 14px;
+      }
+      h1 span {
+        color: var(--sky);
+      }
+      .hero p {
+        color: #d5e0ee;
+        max-width: 460px;
+      }
+      .btn {
+        background: var(--steel);
+        color: #fff;
+        border: 0;
+        border-radius: 6px;
+        padding: 8px 14px;
+        font: 600 12px system-ui;
+        cursor: pointer;
+      }
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .keyq {
+        background: #1c3050;
+        border: 1px solid #34527c;
+        border-radius: 14px;
+        padding: 18px;
+      }
+      .keyq .f {
+        font:
+          italic 17px Georgia,
+          serif;
+        margin: 14px 0;
+      }
+      main {
+        max-width: 1000px;
+        margin: 24px auto;
+        padding: 0 16px;
+      }
+      .loop {
+        background: var(--tint);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px 18px;
+        margin-bottom: 16px;
+      }
+      .loop h3 {
+        margin: 0 0 4px;
+        font-size: 16px;
+      }
+      .mono,
+      #tf {
+        font:
+          13px ui-monospace,
+          Consolas,
+          monospace;
+      }
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .tab {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 6px 12px;
+        font: 600 12px system-ui;
+        color: var(--ink);
+        cursor: pointer;
+      }
+      .tab.on {
+        background: var(--steel);
+        border-color: var(--steel);
+        color: #fff;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px;
+      }
+      .card h2 {
+        margin: 4px 0 6px;
+        font-size: 24px;
+      }
+      .lab {
+        display: grid;
+        grid-template-columns: 290px 1fr;
+        gap: 20px;
+        margin-top: 14px;
+      }
+      @media (max-width: 820px) {
+        .hero > div,
+        .lab {
+          grid-template-columns: 1fr;
+        }
+        h1 {
+          font-size: 30px;
+        }
+        .top nav {
+          display: none;
+        }
+      }
+      .fac {
+        background: var(--tint);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 9px 11px;
+        margin-bottom: 8px;
+      }
+      .fac.off {
+        opacity: 0.55;
+      }
+      .sl {
+        display: grid;
+        grid-template-columns: 22px 1fr 74px;
+        gap: 6px;
+        align-items: center;
+        font-size: 12px;
+      }
+      .sl input {
+        accent-color: var(--steel);
+        width: 100%;
+      }
+      .seg {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .seg .tab.on {
+        background: var(--navy);
+        border-color: var(--navy);
+      }
+      canvas {
+        width: 100%;
+        height: auto;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        cursor: crosshair;
+      }
+      .legend {
+        font-size: 12px;
+        display: flex;
+        gap: 16px;
+        margin: 6px 2px;
+        flex-wrap: wrap;
+      }
+      .legend b {
+        display: inline-block;
+        width: 22px;
+        height: 0;
+        border-top: 3px solid var(--steel);
+        vertical-align: middle;
+        margin-right: 5px;
+      }
+      .legend b.d {
+        border-top: 3px dashed var(--orange);
+      }
+      .info {
+        background: var(--tint);
+        border-left: 3px solid var(--steel);
+        border-radius: 0 8px 8px 0;
+        padding: 10px 14px;
+        margin: 10px 0;
+        font-size: 13px;
+      }
+      .chip {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 3px 10px;
+        margin: 0 6px 6px 0;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .chip:hover {
+        border-color: var(--steel);
+      }
+      table {
+        border-collapse: collapse;
+        margin: 8px 0;
+      }
+      td {
+        border: 1px solid var(--line);
+        padding: 4px 12px;
+      }
+      .bot {
+        display: block;
+        height: auto;
+        flex: none;
+      }
+      .keyq .bot {
+        float: right;
+        width: 104px;
+        margin: -6px -4px 4px 10px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+      .row .bot {
+        width: 84px;
+      }
+      .intro .bot {
+        width: 120px;
+      }
+      .tunehead {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .tunehead .bot {
+        width: 64px;
+      }
+      .tunehead b {
+        font:
+          700 16px Georgia,
+          serif;
+      }
+      .coach {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .coach .bot {
+        width: 86px;
+      }
+      #p2 .bot.side {
+        float: right;
+        width: 120px;
+        margin: 0 0 6px 10px;
+      }
+      footer {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 0 16px;
+        font-size: 12.5px;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .keyq .bot,
+      .intro .bot,
+      .loop .bot {
+        animation: float 3s ease-in-out infinite;
+      }
+      .card,
+      .loop {
+        animation: rise 0.6s ease both;
+      }
+      .tab,
+      .btn,
+      .chip {
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+      }
+      .tab:hover,
+      .btn:hover,
+      .chip:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px #0003;
+      }
+      h1 span {
+        background: linear-gradient(90deg, #6ec6f0, #b58cff, #ff8fb1);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+      .stab {
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 8px;
+        border: 1px solid;
+      }
+      .stab.ok {
+        background: #e6f6ec;
+        color: #146c2e;
+        border-color: #9fd8b2;
+      }
+      .stab.warn {
+        background: #fff3df;
+        color: #8a5200;
+        border-color: #f0c887;
+      }
+      .stab.bad {
+        background: #fde8e8;
+        color: #a31515;
+        border-color: #f0a6a6;
+      }
+      .nt h2 {
+        margin: 0 0 2px;
+        color: var(--navy);
+      }
+      .nt h3 {
+        color: var(--navy);
+        margin: 18px 0 8px;
+      }
+      .nt-sub {
+        color: var(--steel);
+        margin: 0 0 12px;
+      }
+      .nt-acc details {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        margin-bottom: 8px;
+        background: var(--tint);
+        overflow: hidden;
+        transition: box-shadow 0.2s;
+      }
+      .nt-acc details[open] {
+        background: #fff;
+        box-shadow: 0 4px 14px rgba(74, 134, 184, 0.18);
+        border-color: var(--sky);
+      }
+      .nt-acc summary {
+        cursor: pointer;
+        padding: 10px 14px;
+        font-weight: 700;
+        color: var(--navy);
+      }
+      .nt-acc details > *:not(summary) {
+        margin: 0 14px 12px;
+        animation: ntIn 0.3s ease;
+      }
+      @keyframes ntIn {
+        from {
+          opacity: 0;
+          transform: translateY(-4px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .nt-tool {
+        background: var(--tint);
+        border: 1px dashed var(--sky);
+        border-radius: 10px;
+        padding: 10px 12px;
+      }
+      .nt input[type="number"] {
+        width: 72px;
+        padding: 4px 6px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font: 600 13px system-ui;
+        color: var(--ink);
+      }
+      .nt-sep {
+        display: inline-block;
+        width: 18px;
+      }
+      .nt-chips {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+      }
+      .nt-chips button {
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 999px;
+        padding: 5px 12px;
+        font: 600 12px system-ui;
+        cursor: pointer;
+        color: var(--ink);
+      }
+      .nt-chips button.on {
+        background: var(--steel);
+        border-color: var(--steel);
+        color: #fff;
+      }
+      .nt-two {
+        display: grid;
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+      }
+      .nt-two canvas {
+        width: 100%;
+        height: auto;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+      .nt-info {
+        font-size: 13px;
+      }
+      .nt-info code {
+        background: var(--tint);
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      .nt-res {
+        margin-top: 8px;
+        font-size: 14px;
+      }
+      .nt-badge {
+        padding: 2px 10px;
+        border-radius: 999px;
+        font: 700 12px system-ui;
+        color: #fff;
+      }
+      .nt-badge.ok {
+        background: #2e9e5b;
+      }
+      .nt-badge.bad {
+        background: #d64545;
+      }
+      .nt-q {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 14px;
+        margin-bottom: 8px;
+      }
+      .nt-q p {
+        margin: 0 0 6px;
+        font-weight: 600;
+      }
+      .nt-q button {
+        display: block;
+        width: 100%;
+        text-align: left;
+        margin: 4px 0;
+        padding: 7px 10px;
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 8px;
+        cursor: pointer;
+        font: 13px system-ui;
+        color: var(--ink);
+      }
+      .nt-q button:hover {
+        border-color: var(--sky);
+        background: var(--tint);
+      }
+      .nt-q button.right {
+        background: #e3f6ea;
+        border-color: #2e9e5b;
+      }
+      .nt-q button.wrong {
+        background: #fde8e8;
+        border-color: #d64545;
+        animation: ntShake 0.3s;
+      }
+      .nt-q .why {
+        font-size: 12.5px;
+        color: var(--steel);
+        margin-top: 4px;
+      }
+      @keyframes ntShake {
+        25% {
+          transform: translateX(-4px);
+        }
+        75% {
+          transform: translateX(4px);
+        }
+      }
+      .nt-score {
+        font-weight: 700;
+        color: var(--navy);
+        margin-top: 6px;
+      }
+      @media (max-width: 640px) {
+        .nt-two {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <style>
+      .num {
+        width: 100%;
+        padding: 4px 6px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font:
+          13px ui-monospace,
+          Consolas,
+          monospace;
+        background: #fff;
+        color: var(--ink);
+      }
+      .num:focus {
+        outline: 2px solid var(--steel);
+      }
+      .sl {
+        grid-template-columns: 34px 1fr 48px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <div>
+        <span class="logo"
+          ><i>EE</i
+          ><span
+            ><span class="brand">EE3011</span
+            ><small>MODELLING &amp; CONTROL</small></span
+          ></span
+        >
+        <nav>
+          <a href="BodePlots.html">Home</a
+          ><a href="BodePlots.html">Control Fundamentals</a
+          ><a href="BodePlots.html">Frequency Response</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div style="display: block; padding: 0">
+          <div class="eyebrow">Frequency response · Interactive lesson</div>
+          <h1>How do poles and zeros <span>shape the Bode plot?</span></h1>
+          <p>
+            Switch poles and zeros on and off, compare the asymptotic and actual
+            curves, and build the plot one step at a time.
+          </p>
+          <button
+            class="btn"
+            onclick="
+              document
+                .getElementById('lab')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+          >
+            Open Bode experiment →
+          </button>
+        </div>
+        <div class="keyq" style="display: block">
+          <img
+            class="bot"
+            src="images/bot-explaining.png"
+            alt="ControlBot explaining a Bode plot"
+            onerror="this.style.display = 'none'"
+          />
+          <div class="eyebrow">The key question</div>
+          <div class="f">H(jω) = K · Π(1 + jω/zᵢ) / Π(1 + jω/pᵢ)</div>
+          <div>
+            Which pole or zero is responsible for each change in slope and
+            phase?
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main id="lab">
+      <div class="loop row">
+        <div>
+          <h3>Keep this transfer function in mind</h3>
+          <div id="tf"></div>
+          <div style="font-size: 12px">
+            Multiplying factors means adding their dB magnitudes and their
+            phases.
+          </div>
+        </div>
+        <img
+          class="bot"
+          src="images/bot-simulate.png"
+          alt="ControlBot with simulation panels"
+          onerror="this.style.display = 'none'"
+        />
+      </div>
+
+      <div class="tabs">
+        <button class="tab on" data-p="p1">01 · Explore</button>
+        <button class="tab" data-p="p2">02 · Step-by-step construction</button>
+        <button class="tab" data-p="p3">03 · Real-life application</button>
+        <button class="tab" data-p="p4">04 · Quick notes</button>
+      </div>
+
+      <div class="card" id="p1">
+        <div class="row intro">
+          <div>
+            <div class="eyebrow">01 / 02 · The experiment</div>
+            <h2>Play with the system</h2>
+            <div>
+              Hi, I'm ControlBot! Toggle each pole or zero, drag the sliders,
+              and click the plot to identify important frequencies.
+            </div>
+          </div>
+          <img
+            class="bot"
+            src="images/bot-hello.png"
+            alt="ControlBot waving hello"
+            onerror="this.style.display = 'none'"
+          />
+        </div>
+        <div class="lab">
+          <div>
+            <div class="tunehead">
+              <img
+                class="bot"
+                src="images/bot-tuning.png"
+                alt="ControlBot holding a wrench"
+                onerror="this.style.display = 'none'"
+              /><b>Tune the system</b>
+            </div>
+            <div class="fac">
+              <b>Gain K</b>
+              <div class="sl">
+                <span>K</span>
+                <input
+                  class="num"
+                  type="number"
+                  id="K"
+                  min="-60"
+                  max="100"
+                  step="1"
+                  value="20"
+                />
+                <span>dB</span>
+              </div>
+            </div>
+            <div id="facs"></div>
+          </div>
+          <div>
+            <div class="seg">
+              <button class="tab" data-v="actual">Actual</button>
+              <button class="tab" data-v="asym">Asymptotic</button>
+              <button class="tab on" data-v="both">Both</button>
+              <label style="font-size: 12px"
+                ><input type="checkbox" id="sf" /> Show each factor</label
+              >
+            </div>
+            <div id="stab" class="stab"></div>
+            <canvas id="c1" width="720" height="560"></canvas>
+            <div class="legend">
+              <span><b></b>Actual</span><span><b class="d"></b>Asymptotic</span
+              ><span>● Key frequency (click it)</span>
+            </div>
+            <div id="chips"></div>
+            <div class="info coach">
+              <img
+                class="bot"
+                src="images/bot-help.png"
+                alt="ControlBot coach"
+                id="cimg"
+                onerror="this.style.display = 'none'"
+              />
+              <div id="info"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="p2" style="display: none">
+        <div class="eyebrow" id="sn"></div>
+        <h2 id="st"></h2>
+        <div class="lab" style="grid-template-columns: 1fr 1.3fr">
+          <div>
+            <img
+              class="bot side"
+              src="images/bot-learn.png"
+              alt="ControlBot"
+              id="simg"
+              onerror="this.style.display = 'none'"
+            />
+            <div id="sb"></div>
+            <button class="btn" id="back">← Back</button>
+            <button class="btn" id="next">Next →</button>
+          </div>
+          <div>
+            <canvas
+              id="c2"
+              width="720"
+              height="560"
+              style="cursor: default"
+            ></canvas>
+            <div class="legend">
+              <span><b></b>Actual</span><span><b class="d"></b>Asymptotic</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="p3" style="display: none">
+        <div class="seg">
+          <button class="tab on" data-a="app1">🚁 Drone altitude hold</button>
+          <button class="tab" data-a="app2">
+            🌀 Bouncy ride (spring &amp; damper)
+          </button>
+          <button class="tab" data-a="app3">🚗 Car cruise control</button>
+        </div>
+        <div id="app1">
+          <div class="row intro">
+            <div>
+              <div class="eyebrow">03 / 03 · Real-life application</div>
+              <h2>Drone altitude hold</h2>
+              <div>
+                Meet DroneBot, ControlBot's flying cousin: thrust changes its
+                climb rate, and feedback holds it at the target height. The loop
+                is
+                <span class="mono">L(s) = (Kp + Kd·s) / (s(s + 0.5))</span>. The
+                Kd term is a <b>zero</b>, so it adds phase lead. Set Kd to 0 and
+                watch the phase margin collapse.
+              </div>
+            </div>
+            <img
+              class="bot"
+              src="images/bot-simulate.png"
+              alt="ControlBot with simulation panels"
+              onerror="this.style.display = 'none'"
+            />
+          </div>
+          <div class="lab">
+            <div>
+              <div class="fac">
+                <b>Target altitude</b>
+                <div class="sl">
+                  <span></span>
+                  <input
+                    class="num"
+                    type="number"
+                    id="cr"
+                    min="1"
+                    max="12"
+                    step="1"
+                    value="10"
+                  />
+                  <span>m</span>
+                </div>
+              </div>
+              <div class="fac">
+                <b>Proportional gain Kp</b>
+                <div class="sl">
+                  <span></span>
+                  <input
+                    class="num"
+                    type="number"
+                    id="ckp"
+                    min="0.5"
+                    max="50"
+                    step="0.5"
+                    value="4"
+                  />
+                  <span></span>
+                </div>
+              </div>
+              <div class="fac">
+                <b>Derivative gain Kd</b>
+                <div class="sl">
+                  <span></span>
+                  <input
+                    class="num"
+                    type="number"
+                    id="ckd"
+                    min="0"
+                    max="20"
+                    step="0.5"
+                    value="1.5"
+                  />
+                  <span></span>
+                </div>
+              </div>
+              <button class="btn" id="go">▶ Start</button>
+              <button class="btn" id="rst">Reset</button>
+              <button class="btn" id="gust">💨 Gust</button>
+            </div>
+            <div>
+              <canvas
+                id="c3"
+                width="720"
+                height="470"
+                style="cursor: default"
+              ></canvas>
+              <canvas
+                id="c6"
+                width="720"
+                height="330"
+                style="cursor: default; margin-top: 10px"
+              ></canvas>
+              <div class="info coach">
+                <canvas
+                  id="cdb"
+                  width="140"
+                  height="104"
+                  style="
+                    width: 112px;
+                    height: auto;
+                    border: 0;
+                    background: none;
+                    cursor: default;
+                    flex: none;
+                  "
+                ></canvas>
+                <div id="cinfo"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="app2" style="display: none">
+          <div class="row intro">
+            <div>
+              <div class="eyebrow">03 / 03 · Real-life application</div>
+              <h2>Bouncy ride: spring and damper</h2>
+              <div>
+                A car seat, a camera gimbal and a pogo-stick all behave like a
+                mass on a spring and damper. The road moves, and the body
+                follows with
+                <span class="mono"
+                  >H(s) = (2ζωn·s + ωn²) / (s² + 2ζωn·s + ωn²)</span
+                >. That is your <b>complex pole pair</b> from the Explore tab: a
+                low ζ gives a tall resonance peak. Tap the bump, or shake the
+                road at the resonance frequency!
+              </div>
+            </div>
+            <img
+              class="bot"
+              src="images/bot-tuning.png"
+              alt="ControlBot with a wrench"
+              onerror="this.style.display = 'none'"
+            />
+          </div>
+          <div class="lab">
+            <div>
+              <div class="fac">
+                <b>Natural frequency ωn</b>
+                <div class="sl">
+                  <span></span
+                  ><input
+                    class="num"
+                    type="number"
+                    id="sw"
+                    min="1"
+                    max="40"
+                    step="0.5"
+                    value="8"
+                  /><span>rad/s</span>
+                </div>
+              </div>
+              <div class="fac">
+                <b>Damping ratio ζ</b>
+                <div class="sl">
+                  <span></span
+                  ><input
+                    class="num"
+                    type="number"
+                    id="sz"
+                    min="0.05"
+                    max="2"
+                    step="0.05"
+                    value="0.25"
+                  /><span></span>
+                </div>
+              </div>
+              <div class="fac">
+                <b>Road shaking frequency</b>
+                <div class="sl">
+                  <span></span
+                  ><input
+                    class="num"
+                    type="number"
+                    id="swf"
+                    min="0.5"
+                    max="80"
+                    step="0.5"
+                    value="8"
+                  /><span>rad/s</span>
+                </div>
+              </div>
+              <button class="btn" id="sbump">🚧 Bump</button>
+              <button class="btn" id="sshake">▶ Shake road</button>
+              <button class="btn" id="srst">Reset</button>
+            </div>
+            <div>
+              <canvas
+                id="s3"
+                width="720"
+                height="440"
+                style="cursor: default"
+              ></canvas>
+              <canvas
+                id="s6"
+                width="720"
+                height="250"
+                style="cursor: default; margin-top: 10px"
+              ></canvas>
+              <div class="info coach">
+                <img
+                  class="bot"
+                  src="images/bot-help.png"
+                  alt="ControlBot"
+                  id="sbot"
+                  onerror="this.style.display = 'none'"
+                />
+                <div id="sinfo"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="app3" style="display: none">
+          <div class="row intro">
+            <div>
+              <div class="eyebrow">03 / 03 · Real-life application</div>
+              <h2>Cruise control: ControlBot at the wheel</h2>
+              <div>
+                ControlBot is driving! A car's cruise control is a feedback
+                loop: it compares the target speed with the real speed and
+                adjusts the throttle. The loop transfer function is
+                <span class="mono">L(s) = Kp / ((0.5s + 1)(5s + 1))</span>, so
+                everything you learned about Bode plots applies. Change the
+                values, then press Start.
+              </div>
+            </div>
+            <img
+              class="bot"
+              src="images/bot-simulate.png"
+              alt="ControlBot with simulation panels"
+              onerror="this.style.display = 'none'"
+            />
+          </div>
+          <div class="lab">
+            <div>
+              <div class="fac">
+                <b>Target speed</b>
+                <div class="sl">
+                  <span></span>
+                  <input
+                    class="num"
+                    type="number"
+                    id="kcr"
+                    min="20"
+                    max="120"
+                    step="5"
+                    value="100"
+                  />
+                  <span>km/h</span>
+                </div>
+              </div>
+              <div class="fac">
+                <b>Controller gain Kp</b>
+                <div class="sl">
+                  <span></span>
+                  <input
+                    class="num"
+                    type="number"
+                    id="kckp"
+                    min="1"
+                    max="200"
+                    step="1"
+                    value="8"
+                  />
+                  <span></span>
+                </div>
+              </div>
+              <div class="fac">
+                <b>Uphill slope</b>
+                <div class="sl">
+                  <span></span>
+                  <input
+                    class="num"
+                    type="number"
+                    id="kchill"
+                    min="0"
+                    max="10"
+                    step="1"
+                    value="0"
+                  />
+                  <span>%</span>
+                </div>
+              </div>
+              <button class="btn" id="kgo">▶ Start</button>
+              <button class="btn" id="krst">Reset</button>
+            </div>
+            <div>
+              <canvas
+                id="kc3"
+                width="720"
+                height="420"
+                style="cursor: default"
+              ></canvas>
+              <canvas
+                id="kc6"
+                width="720"
+                height="330"
+                style="cursor: default; margin-top: 10px"
+              ></canvas>
+              <div class="info coach">
+                <img
+                  class="bot"
+                  src="images/bot-help.png"
+                  alt="ControlBot"
+                  id="kcbot"
+                  onerror="this.style.display = 'none'"
+                />
+                <div id="kcinfo"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card" id="p4" style="display: none">
+        <div class="nt">
+          <h2>Bode plot notes</h2>
+          <p class="nt-sub">Tap the cards and try the tools.</p>
+
+          <div class="nt-acc">
+            <details open>
+              <summary>1 · What is a Bode plot?</summary>
+              <p>
+                Two graphs of a transfer function <b>L(jω)</b> against frequency
+                on a <b>log axis</b>: the <b>magnitude</b> in dB and the
+                <b>phase</b> in degrees. Log axes turn multiplication into
+                addition, so you can draw each factor separately and just
+                <b>add them up</b>.
+              </p>
+            </details>
+            <details>
+              <summary>2 · Decibels (dB)</summary>
+              <p>
+                <b>dB = 20·log₁₀|G|</b>. Every ×10 in gain is +20 dB, every ×2
+                is about +6 dB, and gain 1 is 0 dB.
+              </p>
+              <div class="nt-tool">
+                Gain |G|
+                <input type="number" id="ntG" value="10" step="any" min="0" /> =
+                <b id="ntdB">20.0 dB</b>
+                <span class="nt-sep"></span>
+                or dB <input type="number" id="ntD" value="20" step="any" /> =
+                gain <b id="ntGo">10</b>
+              </div>
+            </details>
+            <details>
+              <summary>3 · Building blocks (pick one)</summary>
+              <div class="nt-chips" id="ntChips"></div>
+              <div class="nt-two">
+                <canvas id="ntC" width="520" height="250"></canvas>
+                <div id="ntInfo" class="nt-info"></div>
+              </div>
+            </details>
+            <details>
+              <summary>4 · Slope calculator</summary>
+              <p>
+                High-frequency behaviour only depends on how many poles and
+                zeros you have.
+              </p>
+              <div class="nt-tool">
+                Poles
+                <input
+                  type="number"
+                  id="ntP"
+                  value="2"
+                  min="0"
+                  max="8"
+                  step="1"
+                />
+                Zeros
+                <input
+                  type="number"
+                  id="ntZ"
+                  value="1"
+                  min="0"
+                  max="8"
+                  step="1"
+                />
+                <div id="ntSl" class="nt-res"></div>
+              </div>
+            </details>
+            <details>
+              <summary>5 · Reading stability</summary>
+              <p>
+                <b>Gain crossover</b> ωgc: where magnitude crosses 0 dB.
+                <b>Phase margin</b> PM = 180° + phase at ωgc.
+                <b>Phase crossover</b> ωpc: where phase = −180°.
+                <b>Gain margin</b> GM = −(magnitude in dB at ωpc).
+              </p>
+              <p>
+                Closed loop is stable when <b>PM &gt; 0</b> and
+                <b>GM &gt; 0 dB</b>. Roughly 45–60° of PM gives a well-damped
+                response.
+              </p>
+              <div class="nt-tool">
+                Phase at ωgc
+                <input type="number" id="ntPh" value="-130" step="1" />° → PM =
+                <b id="ntPM">50°</b>
+                <span id="ntPMs" class="nt-badge ok">stable</span>
+              </div>
+            </details>
+            <details>
+              <summary>6 · Drawing recipe</summary>
+              <ol>
+                <li>
+                  Write L(s) in standard form and list corner frequencies.
+                </li>
+                <li>
+                  Start with the low-frequency slope (−20 dB/dec per integrator)
+                  and DC gain.
+                </li>
+                <li>
+                  At each pole, slope drops by 20 dB/dec. At each zero, it rises
+                  by 20.
+                </li>
+                <li>
+                  Phase moves 45° at the corner, spreading over about one decade
+                  each side.
+                </li>
+                <li>Sum the factors, then read ωgc, PM and GM.</li>
+              </ol>
+            </details>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>EE3011 Interactive Learning Platform</footer>
+
+    <script>
+      const $ = (id) => document.getElementById(id),
+        LG = Math.log10,
+        R = 180 / Math.PI,
+        cl = (x) => Math.max(0, Math.min(1, x));
+      const LO = -1,
+        HI = 4,
+        N = 400,
+        X0 = 64,
+        W = 632,
+        H = 210,
+        Y0 = [18, 300];
+      const F = [
+        { name: "Integrators 1/sⁿ", type: "int", sym: "s", n: 1, on: false },
+        { name: "Zero z₁", type: "zero", sym: "z₁", w: 2, on: true },
+        { name: "Pole p₁", type: "pole", sym: "p₁", w: 10, on: true },
+        { name: "Pole p₂", type: "pole", sym: "p₂", w: 100, on: true },
+        {
+          name: "Complex pole pair",
+          type: "cpole",
+          sym: "ωn",
+          w: 30,
+          z: 0.2,
+          on: false,
+        },
+      ];
+      const COL = ["#8a63d2", "#2a9d8f", "#e76f51", "#c77dba", "#6c8ead"];
+      let hv = null,
+        hvT = null;
+      let K = 10;
+      let prog = 1;
+      ((view = "both"), (sel = null), (step = 0), (D = {}), (KEYS = []));
+      const bot = (id, n) => {
+        const e = $(id);
+        e.style.display = "";
+        e.src = "images/bot-" + n + ".png";
+      };
+      const fmt = (w) =>
+        w < 10 ? w.toFixed(2) : w < 100 ? w.toFixed(1) : w.toFixed(0);
+
+      // ---- math: one factor's [dB, degrees] ----
+      function actual(f, w) {
+        if (f.type === "int") return [-20 * f.n * LG(w), -90 * f.n];
+        const u = w / f.w;
+        if (f.type === "pole") return [-10 * LG(1 + u * u), -Math.atan(u) * R];
+        if (f.type === "zero") return [10 * LG(1 + u * u), Math.atan(u) * R];
+        const re = 1 - u * u,
+          im = 2 * f.z * u;
+        return [-10 * LG(re * re + im * im), -Math.atan2(im, re) * R];
+      }
+      function asym(f, w) {
+        if (f.type === "int") return [-20 * f.n * LG(w), -90 * f.n];
+        const l = LG(w / f.w),
+          m = Math.max(l, 0);
+        if (f.type === "pole") return [-20 * m, -90 * cl((l + 1) / 2)];
+        if (f.type === "zero") return [20 * m, 90 * cl((l + 1) / 2)];
+        return [-40 * m, -180 * cl((l + f.z) / (2 * f.z))];
+      }
+      function totalAt(w) {
+        let A = 20 * LG(K),
+          a = A,
+          P = 0,
+          p = 0;
+        for (const f of F)
+          if (f.on) {
+            const x = actual(f, w),
+              y = asym(f, w);
+            A += x[0];
+            P += x[1];
+            a += y[0];
+            p += y[1];
+          }
+        return { A, P, a, p };
+      }
+      function compute() {
+        D = { ws: [], A: [], P: [], a: [], p: [], FM: F.map(() => []) };
+        for (let i = 0; i <= N; i++) {
+          const w = 10 ** (LO + ((HI - LO) * i) / N),
+            t = totalAt(w);
+          D.ws.push(w);
+          D.A.push(t.A);
+          D.P.push(t.P);
+          D.a.push(t.a);
+          D.p.push(t.p);
+          F.forEach((f, j) => D.FM[j].push(f.on ? actual(f, w) : null));
+        }
+      }
+      function keys() {
+        const k = F.filter((f) => f.on && f.type !== "int").map((f) => ({
+          w: f.w,
+          label: f.sym + " = " + fmt(f.w),
+          kind: f.type,
+          f,
+        }));
+        const cross = (arr, v, kind, label) => {
+          for (let i = 0; i < N; i++)
+            if ((arr[i] - v) * (arr[i + 1] - v) < 0) {
+              const t = (v - arr[i]) / (arr[i + 1] - arr[i]);
+              const w = 10 ** (LO + ((HI - LO) * (i + t)) / N);
+              k.push({ w, label: label + " = " + fmt(w), kind });
+              return;
+            }
+        };
+        cross(D.A, 0, "gc", "Gain crossover");
+        cross(D.P, -180, "pc", "Phase crossover");
+        return k;
+      }
+      function tfStr() {
+        const n = [],
+          d = [];
+        F.filter((f) => f.on).forEach((f) => {
+          const t =
+            f.type === "cpole"
+              ? `(1 + ${((2 * f.z) / f.w).toFixed(3)}s + ${(1 / (f.w * f.w)).toPrecision(2)}s²)`
+              : `(1 + s/${fmt(f.w || 1)})`;
+          if (f.type === "int") d.push(f.n > 1 ? "s^" + f.n : "s");
+          else if (f.type === "zero") n.push(t);
+          else d.push(t);
+        });
+        return (
+          "H(s) = " +
+          [K.toFixed(2), ...n].join(" · ") +
+          (d.length ? "  /  [ " + d.join(" · ") + " ]" : "")
+        );
+      }
+
+      // ---- drawing ----
+      function draw(cv, o) {
+        const c = cv.getContext("2d"),
+          ws = D.ws;
+        c.clearRect(0, 0, 720, 560);
+        const X = (w) => X0 + ((LG(w) - LO) / (HI - LO)) * W;
+        const corners = KEYS.filter((k) => k.f),
+          c0 = corners.length ? Math.min(...corners.map((k) => k.w)) : Infinity;
+        [
+          [D.A, D.a, 0, 10, "Magnitude (dB)"],
+          [D.P, D.p, 1, 45, "Phase (°)"],
+        ].forEach(([act, asy, k, pad, lab]) => {
+          let mn = Math.min(...act, ...asy),
+            mx = Math.max(...act, ...asy);
+          if (k == 0) {
+            mn = Math.min(mn, -10);
+            mx = Math.max(mx, 10);
+          }
+          mn = Math.floor(mn / pad) * pad;
+          mx = Math.ceil(mx / pad) * pad;
+          if (mx === mn) mx += pad;
+          const y0 = Y0[k],
+            Y = (v) => y0 + H - ((v - mn) / (mx - mn)) * H;
+          c.font = "12px system-ui";
+          c.lineWidth = 1;
+          for (let e = LO; e <= HI; e++) {
+            // log grid
+            if (e < HI)
+              for (let m = 2; m < 10; m++) {
+                c.strokeStyle = "#eef1f5";
+                c.beginPath();
+                c.moveTo(X(m * 10 ** e), y0);
+                c.lineTo(X(m * 10 ** e), y0 + H);
+                c.stroke();
+              }
+            c.strokeStyle = "#d3dbe4";
+            c.beginPath();
+            c.moveTo(X(10 ** e), y0);
+            c.lineTo(X(10 ** e), y0 + H);
+            c.stroke();
+            c.fillStyle = "#444";
+            c.textAlign = "center";
+            c.fillText(String(10 ** e), X(10 ** e), y0 + H + 15);
+          }
+          const st = pad * Math.ceil((mx - mn) / pad / 6);
+          for (let v = mn; v <= mx + 1e-9; v += st) {
+            c.strokeStyle = "#d3dbe4";
+            c.beginPath();
+            c.moveTo(X0, Y(v));
+            c.lineTo(X0 + W, Y(v));
+            c.stroke();
+            c.fillStyle = "#444";
+            c.textAlign = "right";
+            c.fillText(v.toFixed(0), X0 - 6, Y(v) + 4);
+          }
+          const ref = k ? -180 : 0;
+          if (ref >= mn && ref <= mx) {
+            c.strokeStyle = "#7a8797";
+            c.setLineDash([2, 3]);
+            c.beginPath();
+            c.moveTo(X0, Y(ref));
+            c.lineTo(X0 + W, Y(ref));
+            c.stroke();
+            c.setLineDash([]);
+          }
+          c.strokeStyle = "#16233f";
+          c.strokeRect(X0, y0, W, H);
+          const line = (ys, col, lw, dash, lim) => {
+            c.strokeStyle = col;
+            c.lineWidth = lw;
+            c.setLineDash(dash || []);
+            c.beginPath();
+            let s = 0;
+            ys.forEach((v, i) => {
+              if (v == null || ws[i] > lim || i > prog * N) return;
+              s ? c.lineTo(X(ws[i]), Y(v)) : c.moveTo(X(ws[i]), Y(v));
+              s = 1;
+            });
+            c.stroke();
+            c.setLineDash([]);
+          };
+          if (o.corners)
+            corners.forEach((kk) => {
+              c.strokeStyle = "#8fa3ba";
+              c.lineWidth = 1;
+              c.setLineDash([5, 4]);
+              c.beginPath();
+              c.moveTo(X(kk.w), y0);
+              c.lineTo(X(kk.w), y0 + H);
+              c.stroke();
+              c.setLineDash([]);
+              if (k == 0) {
+                c.fillStyle = "#16233f";
+                c.textAlign = "left";
+                c.fillText(kk.f.sym, X(kk.w) + 3, y0 + 12);
+              }
+            });
+          if (o.factors)
+            F.forEach(
+              (f, j) =>
+                f.on &&
+                line(
+                  D.FM[j].map((v) => v && v[k]),
+                  COL[j],
+                  1.2,
+                  [],
+                  Infinity,
+                ),
+            );
+          if (k == 0 ? o.aM : o.aP)
+            line(
+              asy,
+              "#d9822b",
+              2.5,
+              [7, 5],
+              k == 0 && o.aM === "low" ? c0 : Infinity,
+            );
+          const g = c.createLinearGradient(X0, 0, X0 + W, 0);
+          g.addColorStop(0, "#2f6fa8");
+          g.addColorStop(0.5, "#8a63d2");
+          g.addColorStop(1, "#e76f51");
+          if (o.act) line(act, g, 3.5, [], Infinity);
+          const dot = (w, col, r) => {
+            const t = totalAt(w);
+            c.fillStyle = col;
+            c.beginPath();
+            c.arc(X(w), Y(k ? t.P : t.A), r, 0, 7);
+            c.fill();
+            c.strokeStyle = "#fff";
+            c.lineWidth = 1.5;
+            c.stroke();
+          };
+          if (o.marks) KEYS.forEach((kk) => dot(kk.w, "#12203b", 4));
+          if (o.sel) {
+            c.strokeStyle = "#c01c28";
+            c.lineWidth = 1;
+            c.setLineDash([4, 4]);
+            c.beginPath();
+            c.moveTo(X(o.sel.w), y0);
+            c.lineTo(X(o.sel.w), y0 + H);
+            c.stroke();
+            c.setLineDash([]);
+            dot(o.sel.w, "#c01c28", 5);
+          }
+          if (o.hov != null) {
+            const w = 10 ** o.hov;
+            c.strokeStyle = "#6b7a90";
+            c.lineWidth = 1;
+            c.setLineDash([3, 3]);
+            c.beginPath();
+            c.moveTo(X(w), y0);
+            c.lineTo(X(w), y0 + H);
+            c.stroke();
+            c.setLineDash([]);
+            dot(w, "#e8590c", 5);
+          }
+          if (o.hov != null && k == 0) {
+            const w = 10 ** o.hov,
+              t = totalAt(w),
+              tx = X(w) > X0 + W - 150 ? X(w) - 146 : X(w) + 10,
+              txt = [
+                "ω = " + fmt(w) + " rad/s",
+                t.A.toFixed(1) + " dB",
+                t.P.toFixed(1) + "°",
+              ];
+            c.fillStyle = "rgba(18,32,59,.92)";
+            c.beginPath();
+            c.roundRect(tx, y0 + 8, 136, 62, 8);
+            c.fill();
+            c.fillStyle = "#fff";
+            c.textAlign = "left";
+            txt.forEach((s, i) => c.fillText(s, tx + 10, y0 + 26 + i * 16));
+          }
+          c.fillStyle = "#16233f";
+          c.textAlign = "center";
+          c.save();
+          c.translate(X0 - 44, y0 + H / 2);
+          c.rotate(-Math.PI / 2);
+          c.fillText(lab, 0, 0);
+          c.restore();
+          if (k) c.fillText("Frequency (rad/s)", X0 + W / 2, y0 + H + 34);
+        });
+      }
+
+      // ---- explore tab ----
+      function why(s, t) {
+        const f = s.f;
+        if (s.kind === "pole")
+          return "Pole corner: the slope drops by 20 dB/dec. The real curve is 3 dB below the asymptote here, and this pole contributes −45°.";
+        if (s.kind === "zero")
+          return "Zero corner: the slope rises by 20 dB/dec. The real curve is 3 dB above the asymptote here, and this zero contributes +45°.";
+        if (s.kind === "cpole")
+          return (
+            `Resonant corner: the slope drops by 40 dB/dec and this pair contributes −90°. With ζ = ${f.z.toFixed(2)}, ` +
+            (f.z < 0.707
+              ? `the peak is about ${(-20 * LG(2 * f.z * Math.sqrt(1 - f.z * f.z))).toFixed(1)} dB above the asymptote.`
+              : "there is no resonant peak.")
+          );
+        if (s.kind === "gc")
+          return `Gain crossover (0 dB). Phase margin = 180° + phase = ${(180 + t.P).toFixed(1)}°.`;
+        if (s.kind === "pc")
+          return `Phase crossover (−180°). Gain margin = ${(-t.A).toFixed(1)} dB.`;
+        return `Actual minus asymptotic here: ${(t.A - t.a).toFixed(1)} dB. It is largest at the corner frequencies.`;
+      }
+      function info() {
+        if (!sel) {
+          $("info").textContent =
+            "Click the plot, or one of the frequencies above, to see what happens there.";
+          bot("cimg", "help");
+          return;
+        }
+        const t = totalAt(sel.w);
+        bot(
+          "cimg",
+          sel.kind === "pt"
+            ? "working"
+            : sel.kind === "gc"
+              ? 180 + t.P < 30
+                ? "thinking"
+                : "great"
+              : sel.kind === "pc"
+                ? t.A > 0
+                  ? "thinking"
+                  : "great"
+                : "explaining",
+        );
+        $("info").innerHTML =
+          `<b>${sel.label}</b> · ω = ${fmt(sel.w)} rad/s (${(sel.w / 6.2832).toFixed(2)} Hz)<br>
+      Actual: ${t.A.toFixed(1)} dB, ${t.P.toFixed(1)}° &nbsp;|&nbsp; Asymptotic: ${t.a.toFixed(1)} dB, ${t.p.toFixed(1)}°<br>${why(sel, t)}`;
+      }
+      const o1 = () => ({
+        aM: view !== "actual",
+        aP: view !== "actual",
+        act: view !== "asym",
+        factors: $("sf").checked,
+        marks: 1,
+        sel,
+        hov: hv,
+      });
+      let raf = 0;
+      function glide() {
+        hv += (hvT - hv) * 0.25;
+        if (Math.abs(hvT - hv) < 0.001) hv = hvT;
+        draw($("c1"), o1());
+        raf = hv === hvT ? 0 : requestAnimationFrame(glide);
+      }
+      $("c1").onpointermove = (e) => {
+        const r = e.target.getBoundingClientRect(),
+          x = ((e.clientX - r.left) * 720) / r.width;
+        if (x < X0 || x > X0 + W) {
+          $("c1").onpointerleave();
+          return;
+        }
+        hvT = LO + ((x - X0) / W) * (HI - LO);
+        if (hv === null) hv = hvT;
+        if (!raf) raf = requestAnimationFrame(glide);
+      };
+      $("c1").onpointerleave = () => {
+        hv = hvT = null;
+        cancelAnimationFrame(raf);
+        raf = 0;
+        draw($("c1"), o1());
+      };
+      $("c1").onclick = (e) => {
+        const r = e.target.getBoundingClientRect(),
+          x = ((e.clientX - r.left) * 720) / r.width;
+        if (x < X0 || x > X0 + W) return;
+        let best = null,
+          bd = 14;
+        KEYS.forEach((k) => {
+          const d = Math.abs(X0 + ((LG(k.w) - LO) / (HI - LO)) * W - x);
+          if (d < bd) {
+            bd = d;
+            best = k;
+          }
+        });
+        sel = best || {
+          w: 10 ** (LO + ((x - X0) / W) * (HI - LO)),
+          label: "Selected point",
+          kind: "pt",
+        };
+        refresh();
+      };
+      $("chips").onclick = (e) => {
+        const b = e.target.closest("button");
+        if (b) {
+          sel = KEYS[b.dataset.i];
+          refresh();
+        }
+      };
+
+      // ---- step-by-step tab ----
+      const ST = [
+        "Write it in standard form",
+        "Mark the corner frequencies",
+        "Start at low frequency",
+        "Change slope at each corner",
+        "Add up the phase",
+        "Correct to the actual curve",
+      ];
+      const LAY = [
+        {},
+        { corners: 1 },
+        { corners: 1, aM: "low" },
+        { corners: 1, aM: 1 },
+        { corners: 1, aM: 1, aP: 1 },
+        { aM: 1, aP: 1, act: 1 },
+      ];
+      function stepText(i) {
+        const c = KEYS.filter((k) => k.f).sort((a, b) => a.w - b.w),
+          nInt = F[0].on ? F[0].n : 0,
+          dB = (20 * LG(K)).toFixed(1);
+        if (i == 0)
+          return `<div class="info mono">${tfStr()}</div><p>Each factor is written as (1 + s/ω) so its corner frequency is visible. The gain K = ${K.toFixed(2)} is ${dB} dB. Because multiplying transfer functions adds dB and phase, we can treat one factor at a time.</p>`;
+        if (i == 1)
+          return c.length
+            ? `<p>Each pole or zero has a corner frequency where the asymptote bends:</p><ul>${c.map((k) => `<li>${k.f.sym} = ${fmt(k.w)} rad/s (${k.kind === "zero" ? "zero" : k.kind === "pole" ? "pole" : "complex pole pair"})</li>`).join("")}</ul>`
+            : "<p>No poles or zeros are switched on. Enable some in the Explore tab.</p>";
+        if (i == 2)
+          return `<p>Below the first corner only the gain${nInt ? " and the integrator" : ""} matter. The line passes through ${dB} dB at 1 rad/s with slope ${-20 * nInt} dB/dec${c[0] ? `, and is drawn up to ${fmt(c[0].w)} rad/s` : ""}.</p>`;
+        if (i == 3) {
+          let s = -20 * nInt;
+          const rows = [[c.length ? `ω < ${fmt(c[0].w)}` : "all ω", s]];
+          c.forEach((k, j) => {
+            s += k.kind === "zero" ? 20 : k.kind === "pole" ? -20 : -40;
+            rows.push([
+              `ω > ${fmt(k.w)}` +
+                (c[j + 1] ? ` (up to ${fmt(c[j + 1].w)})` : ""),
+              s,
+            ]);
+          });
+          return `<p>Every pole steepens the slope by −20 dB/dec (−40 for a complex pair). Every zero adds +20 dB/dec.</p><table>${rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]} dB/dec</td></tr>`).join("")}</table>`;
+        }
+        if (i == 4)
+          return (
+            `<p>Each first-order factor moves the phase by 90° over the two decades from ω/10 to 10ω. Add the ramps:</p><ul>` +
+            F.filter((f) => f.on)
+              .map((f) =>
+                f.type === "int"
+                  ? `<li>Integrators: constant −${90 * f.n}°</li>`
+                  : `<li>${f.sym}: ${f.type === "zero" ? "+90°" : f.type === "pole" ? "−90°" : "−180°"} between ${fmt(f.type === "cpole" ? f.w / 10 ** f.z : f.w / 10)} and ${fmt(f.type === "cpole" ? f.w * 10 ** f.z : f.w * 10)} rad/s</li>`,
+              )
+              .join("") +
+            "</ul>"
+          );
+        return `<p>The asymptotes are straight-line approximations. At each corner, a real pole's true curve is 3 dB below (a zero's is 3 dB above), and about 1 dB off at half and double the corner. The phase ramp is off by up to about 5.7°.${F[4].on ? " The complex pair adds a resonant peak set by ζ." : ""}</p><p>Go back to Explore and toggle a pole or zero to see how the plot changes.</p>`;
+      }
+      function steps() {
+        $("sn").textContent = `0${step + 1} / 0${ST.length} · Step by step`;
+        $("st").textContent = ST[step];
+        $("sb").innerHTML = stepText(step);
+        bot(
+          "simg",
+          ["learn", "working", "working", "thinking", "working", "great"][step],
+        );
+        $("back").disabled = step == 0;
+        $("next").textContent =
+          step == ST.length - 1 ? "Start again" : "Next →";
+        draw($("c2"), LAY[step]);
+      }
+      $("back").onclick = () => {
+        step--;
+        steps();
+      };
+      $("next").onclick = () => {
+        step = (step + 1) % ST.length;
+        steps();
+      };
+
+      // ---- controls & refresh ----
+      F.forEach((f) => {
+        const d = document.createElement("div");
+        d.className = "fac";
+        f.el = d;
+        const box = (v, min, max, step) =>
+          `<input class="num" type="number" min="${min}" max="${max}" step="${step}" value="${v}">`;
+        d.innerHTML =
+          `<label><input type="checkbox" ${f.on ? "checked" : ""}> <b>${f.name}</b></label>` +
+          (f.type === "int"
+            ? `<div class="sl"><span>n</span>${box(f.n, 1, 4, 1)}<span>1/sⁿ</span></div>`
+            : `<div class="sl"><span>${f.type === "cpole" ? "ωn" : "ω"}</span>${box(f.w, 0.01, 100000, "any")}<span>rad/s</span></div>`) +
+          (f.type === "cpole"
+            ? `<div class="sl"><span>ζ</span>${box(f.z, 0.05, 1.5, 0.05)}<span></span></div>`
+            : "");
+        $("facs").appendChild(d);
+        const r = d.querySelectorAll("input[type=number]");
+        d.querySelector("input").oninput = (e) => {
+          f.on = e.target.checked;
+          refresh();
+        };
+        if (r[0])
+          r[0].oninput = () => {
+            const v = +r[0].value;
+            if (f.type === "int")
+              f.n = Math.min(4, Math.max(1, Math.round(v) || 1));
+            else if (v > 0) f.w = Math.min(100000, Math.max(0.01, v));
+            refresh();
+          };
+        if (r[1])
+          r[1].oninput = () => {
+            const v = +r[1].value;
+            if (v > 0) f.z = Math.min(1.5, Math.max(0.05, v));
+            refresh();
+          };
+      });
+      $("K").oninput = refresh;
+      $("sf").oninput = refresh;
+      document.querySelectorAll("[data-v]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            view = b.dataset.v;
+            document
+              .querySelectorAll("[data-v]")
+              .forEach((x) => x.classList.toggle("on", x === b));
+            refresh();
+          }),
+      );
+      document.querySelectorAll("[data-p]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            document.querySelectorAll("[data-p]").forEach((x) => {
+              x.classList.toggle("on", x === b);
+              $(x.dataset.p).style.display = x === b ? "" : "none";
+            });
+            refresh();
+          }),
+      );
+      // --- stability check ---
+      function stability() {
+        const gc = KEYS.find((k) => k.kind === "gc"),
+          pc = KEYS.find((k) => k.kind === "pc");
+        if (!gc && D.A[0] >= 0) {
+          $("stab").className = "stab warn";
+          $("stab").textContent =
+            "⚠ Gain stays above 0 dB over the plotted range, so stability cannot be judged here";
+          return;
+        }
+        const pm = gc ? 180 + totalAt(gc.w).P : null,
+          gm = pc ? -totalAt(pc.w).A : null;
+        const stable = (pm === null || pm > 0) && (gm === null || gm > 0);
+        const weak =
+          stable && ((pm !== null && pm < 30) || (gm !== null && gm < 6));
+        $("stab").className =
+          "stab " + (!stable ? "bad" : weak ? "warn" : "ok");
+        $("stab").innerHTML =
+          (!stable
+            ? "✖ Unstable"
+            : weak
+              ? "⚠ Stable, but low margin"
+              : "✔ Stable") +
+          " in closed loop &nbsp;·&nbsp; phase margin: " +
+          (pm === null ? "n/a" : pm.toFixed(1) + "°") +
+          " &nbsp;·&nbsp; gain margin: " +
+          (gm === null ? "∞" : gm.toFixed(1) + " dB");
+      }
+      function refresh() {
+        K = 10 ** ($("K").value / 20);
+        F.forEach((f) => {
+          f.el.classList.toggle("off", !f.on);
+          const o = f.el.querySelectorAll("output");
+          if (o[0])
+            o[0].textContent =
+              f.type === "int" ? "1/s^" + f.n : fmt(f.w) + " rad/s";
+          if (o[1]) o[1].textContent = f.z.toFixed(2);
+        });
+        compute();
+        KEYS = keys();
+        if (sel && sel.kind !== "pt")
+          sel = KEYS.find((k) => k.f === sel.f && k.kind === sel.kind) || null;
+        $("tf").textContent = tfStr();
+        $("chips").innerHTML = KEYS.map(
+          (k, i) => `<button class="chip" data-i="${i}">${k.label}</button>`,
+        ).join("");
+        draw($("c1"), o1());
+        info();
+        steps();
+        stability();
+      }
+      function animate() {
+        prog = 0;
+        (function f() {
+          prog += 0.02;
+          refresh();
+          if (prog < 1) requestAnimationFrame(f);
+          else {
+            prog = 1;
+            refresh();
+          }
+        })();
+      }
+      // ===== Drone altitude-hold application =====
+      (() => {
+        const c = $("c3").getContext("2d"),
+          b = $("c6").getContext("2d"),
+          C0 = 0.5,
+          TMAX = 20,
+          YMAX = 15;
+        let t = 0,
+          y = 0,
+          v = 0,
+          hist = [],
+          run = false,
+          spin = 0,
+          gustT = -99,
+          rot = 0,
+          thr = 0,
+          thrD = 0,
+          phase = 0,
+          lastInfo = "";
+        const IMG = {};
+        let em = "hello";
+        ["help", "working", "thinking", "great", "tuning", "hello"].forEach(
+          (n) => {
+            const i = new Image();
+            i.onload = () => {
+              try {
+                paint();
+              } catch (e) {}
+            };
+            i.src = "images/bot-" + n + ".png";
+            IMG[n] = i;
+          },
+        );
+        const num = (id, lo, hi) => {
+          const x = +$(id).value;
+          return Math.min(hi, Math.max(lo, isFinite(x) ? x : lo));
+        };
+        const params = () => ({
+          r: num("cr", 1, 12),
+          kp: num("ckp", 0.5, 50),
+          kd: num("ckd", 0, 20),
+        });
+        const reset = () => {
+          t = 0;
+          y = 0;
+          v = 0;
+          hist = [];
+          spin = 0;
+          gustT = -99;
+        };
+        // loop L(jw) = (Kp + Kd jw) / (jw (jw + 0.5))
+        const Lmag = (kp, kd, w) =>
+          20 * Math.log10(Math.hypot(kp, kd * w) / (w * Math.hypot(w, C0)));
+        const Lph = (kp, kd, w) =>
+          (Math.atan2(kd * w, kp) - Math.PI / 2 - Math.atan(w / C0)) * R;
+        function margins(kp, kd) {
+          let prev = null;
+          for (let i = 0; i <= 400; i++) {
+            const w = 10 ** (-3 + (6 * i) / 400),
+              m = Lmag(kp, kd, w);
+            if (prev && prev.m > 0 && m <= 0) {
+              let lo = prev.w,
+                hi = w;
+              for (let k = 0; k < 50; k++) {
+                const mid = Math.sqrt(lo * hi);
+                Lmag(kp, kd, mid) > 0 ? (lo = mid) : (hi = mid);
+              }
+              const wc = Math.sqrt(lo * hi);
+              return { wc, pm: 180 + Lph(kp, kd, wc) };
+            }
+            prev = { w, m };
+          }
+          return { wc: null, pm: null };
+        }
+        function sim() {
+          const { r, kp, kd } = params(),
+            dt = 0.01;
+          for (let i = 0; i < 4; i++) {
+            const u = Math.max(-30, Math.min(30, kp * (r - y) - kd * v));
+            thr = Math.max(0, Math.min(1, 0.5 + u / 60));
+            v += (u - C0 * v) * dt;
+            y += v * dt;
+            if (y < 0) {
+              y = 0;
+              if (v < 0) v = 0;
+            }
+            t += dt;
+          }
+          hist.push([t, y]);
+          spin += 1;
+        }
+        // ---- DroneBot: a drone drawn in the same style as ControlBot ----
+        function drawDrone(c, cx, groundY, s, tilt, mood, thr, rot, ph) {
+          const air = groundY < 200;
+          c.save();
+          c.translate(
+            cx,
+            groundY - 62 * s + (air ? Math.sin(ph * 0.07) * 2.5 : 0),
+          );
+          c.rotate(tilt + (air ? Math.sin(ph * 0.05) * 0.02 : 0));
+          c.scale(s, s);
+          const lg = (x0, y0, x1, y1, st) => {
+            const g = c.createLinearGradient(x0, y0, x1, y1);
+            st.forEach((q) => g.addColorStop(q[0], q[1]));
+            return g;
+          };
+          const rr = (x, y, w, h, r) => {
+            c.beginPath();
+            c.moveTo(x + r, y);
+            c.arcTo(x + w, y, x + w, y + h, r);
+            c.arcTo(x + w, y + h, x, y + h, r);
+            c.arcTo(x, y + h, x, y, r);
+            c.arcTo(x, y, x + w, y, r);
+            c.closePath();
+          };
+          c.lineCap = "round";
+          c.lineJoin = "round";
+          // thruster glow
+          if (thr > 0.08) {
+            const fl = 10 + 28 * thr + Math.sin(ph * 0.9) * 3;
+            c.fillStyle = lg(0, 46, 0, 46 + fl, [
+              [0, "rgba(110,198,240,.9)"],
+              [1, "rgba(110,198,240,0)"],
+            ]);
+            c.beginPath();
+            c.ellipse(0, 46 + fl / 2, 10, fl / 2, 0, 0, 7);
+            c.fill();
+          }
+          const rotor = (x, y, k, a) => {
+            c.save();
+            c.translate(x, y);
+            c.scale(k, k);
+            c.globalAlpha = a;
+            c.fillStyle = "rgba(110,198,240,.3)";
+            c.beginPath();
+            c.ellipse(0, -3, 34, 5.5, 0, 0, 7);
+            c.fill();
+            c.fillStyle = "#1a2233";
+            c.beginPath();
+            c.arc(0, 0, 5, 0, 7);
+            c.fill();
+            c.fillStyle = "rgba(26,34,51,.9)";
+            c.beginPath();
+            c.ellipse(
+              0,
+              -3,
+              6 + 28 * Math.abs(Math.cos(rot + x)),
+              3.2,
+              0,
+              0,
+              7,
+            );
+            c.fill();
+            c.restore();
+          };
+          // rear rotors (depth), arms, front rotors
+          [-1, 1].forEach((sg) => {
+            c.save();
+            c.globalAlpha = 0.55;
+            c.strokeStyle = "#1a2233";
+            c.lineWidth = 5;
+            c.beginPath();
+            c.moveTo(sg * 34, -30);
+            c.lineTo(sg * 58, -42);
+            c.stroke();
+            c.restore();
+            rotor(sg * 58, -46, 0.7, 0.55);
+          });
+          [-1, 1].forEach((sg) => {
+            c.strokeStyle = "#1a2233";
+            c.lineWidth = 7;
+            c.beginPath();
+            c.moveTo(sg * 48, -8);
+            c.lineTo(sg * 84, -26);
+            c.stroke();
+            rotor(sg * 84, -30, 1, 1);
+          });
+          // legs and white shoes with black soles
+          [-1, 1].forEach((sg) => {
+            c.strokeStyle = "#141b2b";
+            c.lineWidth = 6;
+            c.beginPath();
+            c.moveTo(sg * 12, 50);
+            c.lineTo(sg * 16, 55);
+            c.stroke();
+            c.fillStyle = "#141b2b";
+            c.beginPath();
+            c.ellipse(sg * 17, 58, 14, 4.6, 0, 0, 7);
+            c.fill();
+            c.fillStyle = lg(0, 50, 0, 60, [
+              [0, "#ffffff"],
+              [1, "#dfe8f5"],
+            ]);
+            c.beginPath();
+            c.ellipse(sg * 17, 55, 12.5, 5.6, 0, 0, 7);
+            c.fill();
+          });
+          // torso with the pulse badge
+          c.fillStyle = lg(0, 24, 0, 54, [
+            [0, "#ffffff"],
+            [1, "#dbe5f3"],
+          ]);
+          rr(-22, 22, 44, 32, 13);
+          c.fill();
+          c.strokeStyle = "#b7c6da";
+          c.lineWidth = 1.3;
+          c.stroke();
+          c.fillStyle = "#141b2b";
+          [-1, 1].forEach((sg) => {
+            c.beginPath();
+            c.arc(sg * 22, 34, 5, 0, 7);
+            c.fill();
+          });
+          c.fillStyle = "#0a0e17";
+          c.beginPath();
+          c.arc(0, 38, 9.5, 0, 7);
+          c.fill();
+          c.strokeStyle = "#38b6ff";
+          c.lineWidth = 2.2;
+          c.stroke();
+          c.strokeStyle = "#52e5ff";
+          c.lineWidth = 1.7;
+          c.beginPath();
+          c.moveTo(-6, 38);
+          c.lineTo(-3, 38);
+          c.lineTo(-1, 32);
+          c.lineTo(2, 43);
+          c.lineTo(4, 37);
+          c.lineTo(6, 38);
+          c.stroke();
+          // neck
+          c.fillStyle = "#141b2b";
+          c.beginPath();
+          c.ellipse(0, 25, 10, 4, 0, 0, 7);
+          c.fill();
+          // headphone pods
+          [-1, 1].forEach((sg) => {
+            c.save();
+            c.translate(sg * 47, -6);
+            c.fillStyle = lg(-9, 0, 9, 0, [
+              [0, "#1f6bff"],
+              [1, "#7fd8ff"],
+            ]);
+            c.beginPath();
+            c.ellipse(0, 0, 9, 17, 0, 0, 7);
+            c.fill();
+            c.strokeStyle = "#0a3fa8";
+            c.lineWidth = 1.4;
+            c.stroke();
+            c.fillStyle = "#37e0ff";
+            c.beginPath();
+            c.ellipse(-sg * 1.5, 0, 4.5, 10, 0, 0, 7);
+            c.fill();
+            c.restore();
+          });
+          // head and face screen
+          c.fillStyle = lg(0, -34, 0, 26, [
+            [0, "#ffffff"],
+            [1, "#dbe5f3"],
+          ]);
+          rr(-46, -34, 92, 60, 26);
+          c.fill();
+          c.strokeStyle = "#b7c6da";
+          c.lineWidth = 1.5;
+          c.stroke();
+          c.fillStyle = "#0a0e17";
+          rr(-36, -28, 72, 42, 16);
+          c.fill();
+          c.fillStyle = "rgba(255,255,255,.16)";
+          c.beginPath();
+          c.ellipse(-14, -21, 14, 4, -0.15, 0, 7);
+          c.fill();
+          // face
+          c.save();
+          c.shadowColor = "#52e5ff";
+          c.shadowBlur = 10;
+          c.strokeStyle = "#6ff0ff";
+          c.fillStyle = "#6ff0ff";
+          c.lineWidth = 5;
+          const arcs = () =>
+            [-15, 15].forEach((x) => {
+              c.beginPath();
+              c.arc(x, -2, 8.5, Math.PI * 1.04, Math.PI * 1.96);
+              c.stroke();
+            });
+          if (mood === "think") {
+            c.beginPath();
+            c.arc(-15, -6, 8, 0, 7);
+            c.fill();
+            c.beginPath();
+            c.arc(15, -2, 8.5, Math.PI * 1.04, Math.PI * 1.96);
+            c.stroke();
+          } else if (mood === "brace") {
+            c.lineWidth = 4.5;
+            c.beginPath();
+            c.moveTo(-22, -13);
+            c.lineTo(-11, -7);
+            c.lineTo(-22, -1);
+            c.stroke();
+            c.beginPath();
+            c.moveTo(22, -13);
+            c.lineTo(11, -7);
+            c.lineTo(22, -1);
+            c.stroke();
+          } else arcs();
+          c.restore();
+          if (mood === "think") {
+            c.strokeStyle = "#8fa9c4";
+            c.lineWidth = 2;
+            c.beginPath();
+            c.arc(0, 14, 5, Math.PI * 1.15, Math.PI * 1.85);
+            c.stroke();
+          } else if (mood === "brace") {
+            c.strokeStyle = "#ff8a8a";
+            c.lineWidth = 2;
+            c.beginPath();
+            c.ellipse(0, 7, 4, 5, 0, 0, 7);
+            c.stroke();
+          } else {
+            const big = mood === "cheer" ? 1.25 : 1;
+            c.fillStyle = "#ff8a8a";
+            c.beginPath();
+            c.ellipse(0, 5, 9 * big, 6.5 * big, 0, 0, Math.PI);
+            c.closePath();
+            c.fill();
+            c.strokeStyle = "#0a0e17";
+            c.lineWidth = 1.2;
+            c.stroke();
+          }
+          // antenna with a glowing blue orb
+          c.fillStyle = "#141b2b";
+          c.beginPath();
+          c.moveTo(-10, -33);
+          c.lineTo(-3.5, -47);
+          c.lineTo(3.5, -47);
+          c.lineTo(10, -33);
+          c.closePath();
+          c.fill();
+          c.beginPath();
+          c.ellipse(0, -33, 13, 5, 0, 0, 7);
+          c.fill();
+          const pr = 8 + Math.sin(ph * 0.12) * 1.2;
+          c.save();
+          c.shadowColor = "#52e5ff";
+          c.shadowBlur = 14;
+          const og = c.createRadialGradient(-2, -55, 1, 0, -52, pr + 2);
+          og.addColorStop(0, "#fff");
+          og.addColorStop(0.35, "#8fe6ff");
+          og.addColorStop(1, "#2d8cff");
+          c.fillStyle = og;
+          c.beginPath();
+          c.arc(0, -52, pr, 0, 7);
+          c.fill();
+          c.restore();
+          // yellow action ticks (cheer / hello) and a question mark (think)
+          if (mood === "cheer" || mood === "hello") {
+            c.save();
+            c.strokeStyle = "#ffc633";
+            c.lineWidth = 5;
+            c.globalAlpha = 0.65 + 0.35 * Math.sin(ph * 0.15);
+            [
+              [-1, 0],
+              [0, 1],
+              [1, 2],
+            ].forEach(([a, i]) => {
+              const an = -0.9 + i * 0.5,
+                r0 = 56 + (i === 1 ? 4 : 0);
+              c.beginPath();
+              c.moveTo(Math.cos(an) * r0 + 14, Math.sin(an) * r0 - 22);
+              c.lineTo(
+                Math.cos(an) * (r0 + 11) + 14,
+                Math.sin(an) * (r0 + 11) - 22,
+              );
+              c.stroke();
+            });
+            c.restore();
+          }
+          if (mood === "think") {
+            c.fillStyle = "#2d8cff";
+            c.font = "700 34px Georgia";
+            c.textAlign = "center";
+            c.fillText("?", 64, -42 + Math.sin(ph * 0.1) * 3);
+          }
+          c.restore();
+        }
+        const MOOD = {
+          hello: "hello",
+          working: "happy",
+          thinking: "think",
+          tuning: "brace",
+          great: "cheer",
+        };
+        const mini = $("cdb").getContext("2d");
+        function paintScene(p, yss) {
+          const { r } = p;
+          c.setTransform(1, 0, 0, 1, 0, 0);
+          c.clearRect(0, 0, 720, 470);
+          const g = c.createLinearGradient(0, 0, 0, 230);
+          g.addColorStop(0, "#9fd3fb");
+          g.addColorStop(1, "#eef7ff");
+          c.fillStyle = g;
+          c.fillRect(0, 0, 720, 230);
+          c.fillStyle = "#9bd18f";
+          c.fillRect(0, 205, 720, 25);
+          const gy = (a) => 205 - (a / YMAX) * 88;
+          // target flag
+          c.strokeStyle = "#d9822b";
+          c.lineWidth = 2;
+          c.setLineDash([7, 5]);
+          c.beginPath();
+          c.moveTo(0, gy(r));
+          c.lineTo(720, gy(r));
+          c.stroke();
+          c.setLineDash([]);
+          c.fillStyle = "#d9822b";
+          c.font = "12px system-ui";
+          c.textAlign = "right";
+          c.fillText("Target " + r + " m", 705, gy(r) - 6);
+          // gust streaks
+          if (t - gustT < 1.2 && t - gustT >= 0) {
+            c.strokeStyle = "rgba(74,134,184,.6)";
+            c.lineWidth = 3;
+            c.lineCap = "round";
+            for (let i = 0; i < 4; i++) {
+              const yy = gy(y) - 60 + i * 24,
+                x0 = 520 - (t - gustT) * 160 + i * 30;
+              c.beginPath();
+              c.moveTo(x0, yy);
+              c.lineTo(x0 + 60, yy + 14);
+              c.stroke();
+            }
+            c.lineCap = "butt";
+          }
+          // DroneBot: same style as ControlBot, with spinning rotors
+          const by = gy(y),
+            tilt = Math.max(-0.14, Math.min(0.14, -v * 0.02)),
+            sh = Math.max(0.35, 1 - y / 20);
+          c.fillStyle = "rgba(0,0,0,.15)";
+          c.beginPath();
+          c.ellipse(360, 217, 40 * sh, 6 * sh, 0, 0, 7);
+          c.fill();
+          drawDrone(c, 360, by, 0.95, tilt, MOOD[em], thrD, rot, phase);
+          c.fillStyle = "#12203b";
+          c.textAlign = "left";
+          c.font = "700 26px Georgia";
+          c.fillText(y.toFixed(1) + " m", 20, 40);
+          c.font = "12px system-ui";
+          c.fillText("Altitude", 20, 56);
+          // graph
+          const X0 = 70,
+            Y0 = 250,
+            W = 620,
+            H = 175,
+            xs = (q) => X0 + (q / TMAX) * W,
+            ys = (q) => Y0 + H - (q / YMAX) * H;
+          c.lineWidth = 1;
+          c.textAlign = "right";
+          for (let s = 0; s <= YMAX; s += 5) {
+            c.strokeStyle = "#d3dbe4";
+            c.beginPath();
+            c.moveTo(X0, ys(s));
+            c.lineTo(X0 + W, ys(s));
+            c.stroke();
+            c.fillStyle = "#444";
+            c.fillText(s, X0 - 6, ys(s) + 4);
+          }
+          c.textAlign = "center";
+          for (let s = 0; s <= TMAX; s += 5) {
+            c.fillStyle = "#444";
+            c.fillText(s, xs(s), Y0 + H + 16);
+          }
+          c.fillText("Time (s)", X0 + W / 2, Y0 + H + 34);
+          c.save();
+          c.translate(X0 - 44, Y0 + H / 2);
+          c.rotate(-Math.PI / 2);
+          c.fillText("Altitude (m)", 0, 0);
+          c.restore();
+          c.strokeStyle = "#16233f";
+          c.strokeRect(X0, Y0, W, H);
+          c.lineWidth = 2;
+          c.setLineDash([7, 5]);
+          c.strokeStyle = "#d9822b";
+          c.beginPath();
+          c.moveTo(X0, ys(r));
+          c.lineTo(X0 + W, ys(r));
+          c.stroke();
+          c.setLineDash([]);
+          c.save();
+          c.beginPath();
+          c.rect(X0, Y0, W, H);
+          c.clip();
+          c.strokeStyle = "#2f6fa8";
+          c.lineWidth = 3;
+          c.beginPath();
+          hist.forEach((q, i) =>
+            i ? c.lineTo(xs(q[0]), ys(q[1])) : c.moveTo(xs(q[0]), ys(q[1])),
+          );
+          c.stroke();
+          c.restore();
+          c.textAlign = "left";
+          c.font = "12px system-ui";
+          [
+            ["#2f6fa8", "Altitude"],
+            ["#d9822b", "Target"],
+          ].forEach((l, i) => {
+            c.fillStyle = l[0];
+            c.fillText("● " + l[1], X0 + 10 + i * 80, Y0 + 16);
+          });
+        }
+        function paintBode(p, m) {
+          const { kp, kd } = p,
+            X0 = 70,
+            W = 620,
+            Hh = 110,
+            Ys = [18, 190],
+            lo = -2,
+            hi = 2;
+          b.setTransform(1, 0, 0, 1, 0, 0);
+          b.clearRect(0, 0, 720, 330);
+          const X = (w) => X0 + ((Math.log10(w) - lo) / (hi - lo)) * W;
+          b.font = "12px system-ui";
+          [
+            [0, -60, 80, 20, (w) => Lmag(kp, kd, w), "Magnitude of L (dB)"],
+            [1, -180, 0, 45, (w) => Lph(kp, kd, w), "Phase of L (°)"],
+          ].forEach(([k, mn, mx, st, f, lab]) => {
+            const y0 = Ys[k],
+              Y = (vv) =>
+                y0 +
+                Hh -
+                ((Math.max(mn, Math.min(mx, vv)) - mn) / (mx - mn)) * Hh;
+            for (let e = lo; e <= hi; e++) {
+              b.strokeStyle = "#d3dbe4";
+              b.lineWidth = 1;
+              b.beginPath();
+              b.moveTo(X(10 ** e), y0);
+              b.lineTo(X(10 ** e), y0 + Hh);
+              b.stroke();
+              if (k) {
+                b.fillStyle = "#444";
+                b.textAlign = "center";
+                b.fillText(String(10 ** e), X(10 ** e), y0 + Hh + 15);
+              }
+            }
+            for (let vv = mn; vv <= mx; vv += st) {
+              b.strokeStyle = "#d3dbe4";
+              b.beginPath();
+              b.moveTo(X0, Y(vv));
+              b.lineTo(X0 + W, Y(vv));
+              b.stroke();
+              b.fillStyle = "#444";
+              b.textAlign = "right";
+              b.fillText(vv, X0 - 6, Y(vv) + 4);
+            }
+            b.strokeStyle = "#16233f";
+            b.strokeRect(X0, y0, W, Hh);
+            b.strokeStyle = k ? "#c01c28" : "#7a8797";
+            b.setLineDash([2, 3]);
+            b.beginPath();
+            b.moveTo(X0, Y(k ? -180 : 0));
+            b.lineTo(X0 + W, Y(k ? -180 : 0));
+            b.stroke();
+            b.setLineDash([]);
+            b.save();
+            b.beginPath();
+            b.rect(X0, y0, W, Hh);
+            b.clip();
+            b.strokeStyle = "#2f6fa8";
+            b.lineWidth = 3;
+            b.beginPath();
+            for (let i = 0; i <= 200; i++) {
+              const w = 10 ** (lo + ((hi - lo) * i) / 200);
+              i ? b.lineTo(X(w), Y(f(w))) : b.moveTo(X(w), Y(f(w)));
+            }
+            b.stroke();
+            b.restore();
+            if (m.wc) {
+              b.strokeStyle = "#e8590c";
+              b.lineWidth = 1;
+              b.setLineDash([4, 4]);
+              b.beginPath();
+              b.moveTo(X(m.wc), y0);
+              b.lineTo(X(m.wc), y0 + Hh);
+              b.stroke();
+              b.setLineDash([]);
+              b.fillStyle = "#e8590c";
+              b.beginPath();
+              b.arc(X(m.wc), Y(k ? Lph(kp, kd, m.wc) : 0), 5, 0, 7);
+              b.fill();
+            }
+            b.fillStyle = "#16233f";
+            b.textAlign = "center";
+            b.save();
+            b.translate(X0 - 46, y0 + Hh / 2);
+            b.rotate(-Math.PI / 2);
+            b.fillText(lab, 0, 0);
+            b.restore();
+          });
+          b.fillStyle = "#16233f";
+          b.textAlign = "center";
+          b.fillText("Frequency (rad/s)", X0 + W / 2, 325);
+          b.textAlign = "left";
+          b.fillStyle = "#e8590c";
+          b.fillText(
+            m.wc
+              ? "Gain crossover " +
+                  m.wc.toFixed(2) +
+                  " rad/s · phase margin " +
+                  m.pm.toFixed(0) +
+                  "°"
+              : "No gain crossover in range",
+            X0 + 8,
+            14,
+          );
+        }
+        function paint() {
+          const p = params(),
+            { r, kp, kd } = p,
+            m = margins(kp, kd);
+          const settled = t > 2 && Math.abs(y - r) < 0.15 && Math.abs(v) < 0.2;
+          const lowPM = m.pm !== null && m.pm < 35;
+          em =
+            t === 0
+              ? "hello"
+              : t - gustT < 3
+                ? "tuning"
+                : settled
+                  ? "great"
+                  : lowPM
+                    ? "thinking"
+                    : "working";
+          paintScene(p, r);
+          paintBode(p, m);
+          const zeta = (C0 + kd) / (2 * Math.sqrt(kp));
+          const os =
+            zeta < 1
+              ? Math.exp((-Math.PI * zeta) / Math.sqrt(1 - zeta * zeta)) * 100
+              : 0;
+          const says = {
+            hello:
+              "Hi! I'm DroneBot, ControlBot's flying cousin. Press Start and I'll climb to the target altitude.",
+            working:
+              "I'm climbing. Thrust is Kp times my height error, minus Kd times my climb rate.",
+            tuning:
+              "A gust! Feedback pushes me back to the target. That works because my loop has an integrator, so the final error is zero.",
+            thinking:
+              "My phase margin is low, so I overshoot and bounce. Add some Kd for phase lead!",
+            great:
+              "Hovering at the target. Steady-state error is 0 because my plant already contains an integrator.",
+          }[em];
+          const html = `<b>${says}</b><br>Altitude <b>${y.toFixed(2)}</b> m · Target <b>${r}</b> m · Phase margin <b>${m.pm === null ? "n/a" : m.pm.toFixed(0) + "°"}</b> → predicted overshoot about <b>${os.toFixed(0)}%</b> (damping ratio ζ ≈ ${zeta.toFixed(2)}). The Kd zero adds up to 90° of phase lead; more Kd means a bigger phase margin but a noisier thrust.`;
+          if (html !== lastInfo) {
+            lastInfo = html;
+            $("cinfo").innerHTML = html;
+          }
+          mini.clearRect(0, 0, 140, 104);
+          drawDrone(mini, 70, 98, 0.55, 0, MOOD[em], thrD, rot, phase);
+        }
+        const draw3 = () => {
+          try {
+            paint();
+          } catch (e) {
+            $("cinfo").textContent = "Drone error: " + e.message;
+            console.error(e);
+          }
+        };
+        function loop() {
+          if (!run) return;
+          if (t >= TMAX) {
+            run = false;
+            $("go").textContent = "▶ Start";
+            draw3();
+            return;
+          }
+          sim();
+          requestAnimationFrame(loop);
+        }
+        $("go").onclick = () => {
+          if (t >= TMAX) reset();
+          run = !run;
+          $("go").textContent = run ? "⏸ Pause" : "▶ Start";
+          if (run) loop();
+          else draw3();
+        };
+        $("rst").onclick = () => {
+          run = false;
+          reset();
+          $("go").textContent = "▶ Start";
+          draw3();
+        };
+        $("gust").onclick = () => {
+          if (!run) {
+            if (t >= TMAX) reset();
+            run = true;
+            $("go").textContent = "⏸ Pause";
+            loop();
+          }
+          v -= 4;
+          gustT = t;
+        };
+        ["cr", "ckp", "ckd"].forEach((id) => ($(id).oninput = draw3));
+        document
+          .querySelectorAll('[data-p="p3"]')
+          .forEach((bt) =>
+            bt.addEventListener("click", () => setTimeout(draw3, 0)),
+          );
+        draw3();
+        (function anim() {
+          phase++;
+          thrD += ((t > 0 ? thr : 0) - thrD) * 0.15;
+          rot += 0.22 + 1.1 * thrD + (t > 0 ? 0.25 : 0);
+          if ($("app1").offsetParent !== null) draw3();
+          requestAnimationFrame(anim);
+        })();
+      })();
+
+      // ===== Spring-damper ride application =====
+      (() => {
+        const c = $("s3").getContext("2d"),
+          b = $("s6").getContext("2d"),
+          TMAX = 10,
+          AMP = 5;
+        let t = 0,
+          x = 0,
+          xv = 0,
+          u = 0,
+          up = 0,
+          hist = [],
+          run = false,
+          mode = "bump",
+          bt0 = -9,
+          em = "hello";
+        const IMG = {};
+        ["help", "working", "thinking", "great", "tuning", "hello"].forEach(
+          (n) => {
+            const i = new Image();
+            i.onload = () => {
+              try {
+                paint();
+              } catch (e) {}
+            };
+            i.src = "images/bot-" + n + ".png";
+            IMG[n] = i;
+          },
+        );
+        const num = (id, lo, hi) => {
+          const q = +$(id).value;
+          return Math.min(hi, Math.max(lo, isFinite(q) ? q : lo));
+        };
+        const P = () => ({
+          wn: num("sw", 1, 40),
+          z: num("sz", 0.05, 2),
+          wf: num("swf", 0.5, 80),
+        });
+        const reset = () => {
+          t = 0;
+          x = 0;
+          xv = 0;
+          u = 0;
+          up = 0;
+          hist = [];
+          run = false;
+          bt0 = -9;
+        };
+        const Hm = (wn, z, w) => {
+          const re = wn * wn - w * w,
+            im = 2 * z * wn * w;
+          const nr = wn * wn,
+            ni = 2 * z * wn * w,
+            d = re * re + im * im;
+          return {
+            db: 10 * Math.log10((nr * nr + ni * ni) / d),
+            ph: (Math.atan2(ni, nr) - Math.atan2(im, re)) * R,
+            g: Math.sqrt((nr * nr + ni * ni) / d),
+          };
+        };
+        function road(tt) {
+          // returns [u, u'] in cm
+          if (mode === "shake") {
+            const w = P().wf;
+            return [AMP * Math.sin(w * tt), AMP * w * Math.cos(w * tt)];
+          }
+          const d = tt - bt0,
+            L = 0.5; // half-sine bump 10 cm high, 0.5 s long
+          if (d < 0 || d > L) return [0, 0];
+          return [
+            10 * Math.sin((Math.PI * d) / L),
+            ((10 * Math.PI) / L) * Math.cos((Math.PI * d) / L),
+          ];
+        }
+        function sim() {
+          const { wn, z } = P(),
+            dt = 0.002;
+          for (let i = 0; i < 8; i++) {
+            [u, up] = road(t);
+            const a = wn * wn * (u - x) + 2 * z * wn * (up - xv);
+            xv += a * dt;
+            x += xv * dt;
+            t += dt;
+          }
+          hist.push([t, u, x]);
+        }
+        const gnd = 215,
+          px = (a) => gnd - a * 3.2;
+        function scene(p) {
+          c.setTransform(1, 0, 0, 1, 0, 0);
+          c.clearRect(0, 0, 720, 440);
+          const g = c.createLinearGradient(0, 0, 0, 240);
+          g.addColorStop(0, "#bfe3ff");
+          g.addColorStop(1, "#eef7ff");
+          c.fillStyle = g;
+          c.fillRect(0, 0, 720, 240);
+          c.fillStyle = "#4a5568";
+          c.fillRect(0, 235, 720, 8);
+          const top = px(u),
+            feet = px(x) - 80;
+          // plate and spring/damper
+          c.fillStyle = "#12203b";
+          c.fillRect(300, top - 2, 120, 8);
+          c.strokeStyle = "#8a63d2";
+          c.lineWidth = 3;
+          c.beginPath();
+          c.moveTo(330, top - 2);
+          const n = 9,
+            y1 = top - 2,
+            y2 = feet + 4;
+          for (let i = 1; i <= n; i++)
+            c.lineTo(
+              330 + (i % 2 ? 18 : -18) * (i < n ? 1 : 0),
+              y1 + ((y2 - y1) * i) / n,
+            );
+          c.stroke();
+          c.strokeStyle = "#2a9d8f";
+          c.lineWidth = 5;
+          c.beginPath();
+          c.moveTo(390, y1);
+          c.lineTo(390, (y1 + y2) / 2);
+          c.stroke();
+          c.lineWidth = 2;
+          c.beginPath();
+          c.moveTo(390, (y1 + y2) / 2);
+          c.lineTo(390, y2);
+          c.stroke();
+          const im =
+            IMG[em] && IMG[em].complete && IMG[em].naturalWidth
+              ? IMG[em]
+              : null;
+          if (im) {
+            const hh = 96,
+              ww = (im.naturalWidth / im.naturalHeight) * hh;
+            c.drawImage(im, 360 - ww / 2, feet - hh + 6, ww, hh);
+          }
+          c.fillStyle = "#16233f";
+          c.font = "12px system-ui";
+          c.textAlign = "left";
+          c.fillText("spring", 255, (y1 + y2) / 2);
+          c.fillText("damper", 402, (y1 + y2) / 2);
+          c.fillText(
+            "Road: " +
+              u.toFixed(1) +
+              " cm   ·   ControlBot: " +
+              x.toFixed(1) +
+              " cm",
+            16,
+            24,
+          );
+          // time graph
+          const X0 = 70,
+            Y0 = 262,
+            W = 620,
+            H = 130,
+            xs = (q) => X0 + (q / TMAX) * W,
+            ys = (q) => Y0 + H / 2 - (q / 14) * (H / 2);
+          c.lineWidth = 1;
+          c.textAlign = "right";
+          for (let s = -10; s <= 10; s += 10) {
+            c.strokeStyle = "#d3dbe4";
+            c.beginPath();
+            c.moveTo(X0, ys(s));
+            c.lineTo(X0 + W, ys(s));
+            c.stroke();
+            c.fillStyle = "#444";
+            c.fillText(s, X0 - 6, ys(s) + 4);
+          }
+          c.textAlign = "center";
+          for (let s = 0; s <= TMAX; s += 2) {
+            c.fillStyle = "#444";
+            c.fillText(s, xs(s), Y0 + H + 16);
+          }
+          c.fillText("Time (s)", X0 + W / 2, Y0 + H + 34);
+          c.save();
+          c.translate(X0 - 44, Y0 + H / 2);
+          c.rotate(-Math.PI / 2);
+          c.fillText("Height (cm)", 0, 0);
+          c.restore();
+          c.strokeStyle = "#16233f";
+          c.strokeRect(X0, Y0, W, H);
+          c.save();
+          c.beginPath();
+          c.rect(X0, Y0, W, H);
+          c.clip();
+          [
+            [1, "#d9822b", [6, 4]],
+            [2, "#2f6fa8", []],
+          ].forEach(([k, col, d]) => {
+            c.strokeStyle = col;
+            c.lineWidth = 2.5;
+            c.setLineDash(d);
+            c.beginPath();
+            hist.forEach((q, i) =>
+              i ? c.lineTo(xs(q[0]), ys(q[k])) : c.moveTo(xs(q[0]), ys(q[k])),
+            );
+            c.stroke();
+            c.setLineDash([]);
+          });
+          c.restore();
+          c.textAlign = "left";
+          c.font = "12px system-ui";
+          [
+            ["#d9822b", "Road"],
+            ["#2f6fa8", "ControlBot"],
+          ].forEach((l, i) => {
+            c.fillStyle = l[0];
+            c.fillText("● " + l[1], X0 + 10 + i * 70, Y0 + 14);
+          });
+        }
+        function bode(p) {
+          const { wn, z, wf } = p,
+            X0 = 70,
+            W = 620,
+            Hh = 85,
+            Ys = [14, 130],
+            lo = -1,
+            hi = 2,
+            X = (w) => X0 + ((Math.log10(w) - lo) / (hi - lo)) * W;
+          b.setTransform(1, 0, 0, 1, 0, 0);
+          b.clearRect(0, 0, 720, 250);
+          b.font = "12px system-ui";
+          [
+            [0, -40, 30, 10, (w) => Hm(wn, z, w).db, "Gain (dB)"],
+            [1, -180, 0, 90, (w) => Hm(wn, z, w).ph, "Phase (°)"],
+          ].forEach(([k, mn, mx, st, f, lab]) => {
+            const y0 = Ys[k],
+              Y = (v) =>
+                y0 +
+                Hh -
+                ((Math.max(mn, Math.min(mx, v)) - mn) / (mx - mn)) * Hh;
+            for (let e = lo; e <= hi; e++) {
+              b.strokeStyle = "#d3dbe4";
+              b.lineWidth = 1;
+              b.beginPath();
+              b.moveTo(X(10 ** e), y0);
+              b.lineTo(X(10 ** e), y0 + Hh);
+              b.stroke();
+              if (k) {
+                b.fillStyle = "#444";
+                b.textAlign = "center";
+                b.fillText(String(10 ** e), X(10 ** e), y0 + Hh + 14);
+              }
+            }
+            for (let v = mn; v <= mx; v += st * (k ? 1 : 2)) {
+              b.strokeStyle = "#d3dbe4";
+              b.beginPath();
+              b.moveTo(X0, Y(v));
+              b.lineTo(X0 + W, Y(v));
+              b.stroke();
+              b.fillStyle = "#444";
+              b.textAlign = "right";
+              b.fillText(v, X0 - 6, Y(v) + 4);
+            }
+            b.strokeStyle = "#16233f";
+            b.strokeRect(X0, y0, W, Hh);
+            if (!k) {
+              b.strokeStyle = "#7a8797";
+              b.setLineDash([2, 3]);
+              b.beginPath();
+              b.moveTo(X0, Y(0));
+              b.lineTo(X0 + W, Y(0));
+              b.stroke();
+              b.setLineDash([]);
+            }
+            b.save();
+            b.beginPath();
+            b.rect(X0, y0, W, Hh);
+            b.clip();
+            b.strokeStyle = "#8a63d2";
+            b.lineWidth = 3;
+            b.beginPath();
+            for (let i = 0; i <= 240; i++) {
+              const w = 10 ** (lo + ((hi - lo) * i) / 240);
+              i ? b.lineTo(X(w), Y(f(w))) : b.moveTo(X(w), Y(f(w)));
+            }
+            b.stroke();
+            b.restore();
+            [
+              [wn, "#2a9d8f", 1],
+              [wf, "#e8590c", 1],
+            ].forEach(([w, col]) => {
+              if (w >= 10 ** lo && w <= 10 ** hi) {
+                b.strokeStyle = col;
+                b.lineWidth = 1;
+                b.setLineDash([4, 4]);
+                b.beginPath();
+                b.moveTo(X(w), y0);
+                b.lineTo(X(w), y0 + Hh);
+                b.stroke();
+                b.setLineDash([]);
+                b.fillStyle = col;
+                b.beginPath();
+                b.arc(X(w), Y(f(w)), 5, 0, 7);
+                b.fill();
+              }
+            });
+            b.fillStyle = "#16233f";
+            b.textAlign = "center";
+            b.save();
+            b.translate(X0 - 46, y0 + Hh / 2);
+            b.rotate(-Math.PI / 2);
+            b.fillText(lab, 0, 0);
+            b.restore();
+          });
+          b.fillStyle = "#16233f";
+          b.textAlign = "center";
+          b.fillText("Road frequency (rad/s)", X0 + W / 2, 246);
+          b.textAlign = "left";
+          b.fillStyle = "#2a9d8f";
+          b.fillText("● ωn (resonance)", X0 + 8, 11);
+          b.fillStyle = "#e8590c";
+          b.fillText("● road shaking frequency", X0 + 140, 11);
+        }
+        function paint() {
+          const p = P(),
+            { wn, z, wf } = p,
+            h = Hm(wn, z, wf);
+          let pk = 0;
+          for (let i = 0; i <= 400; i++)
+            pk = Math.max(pk, Hm(wn, z, 10 ** (-1 + (3 * i) / 400)).g);
+          const tail = hist.slice(-120).map((q) => Math.abs(q[2])),
+            mx = tail.length ? Math.max(...tail) : 0;
+          em =
+            t === 0
+              ? "hello"
+              : mode === "shake"
+                ? h.g > 1.5
+                  ? "thinking"
+                  : h.g < 0.7
+                    ? "great"
+                    : "working"
+                : t - bt0 > 0 && t - bt0 < 4
+                  ? z < 0.2
+                    ? "thinking"
+                    : "working"
+                  : "great";
+          scene(p);
+          bode(p);
+          const dB = h.db.toFixed(1),
+            amp = (h.g * AMP).toFixed(1);
+          const says = {
+            hello:
+              "Hi! I'm ControlBot on a spring. Hit the bump, or shake the road.",
+            working:
+              "I'm riding it out. The spring and damper filter the road for me.",
+            thinking:
+              mode === "shake"
+                ? "Whoa! The road is near my resonance, so I'm moving more than the road does!"
+                : "Very bouncy! With low damping I keep oscillating. Try a higher ζ.",
+            great:
+              mode === "shake"
+                ? "Smooth! Road shaking above √2·ωn gets attenuated, so I barely move."
+                : "Settled. A damping ratio around 0.7 gives a quick, calm ride.",
+          }[em];
+          $("sinfo").innerHTML =
+            `<b>${says}</b><br>Resonance peak of this ride: <b>${(20 * Math.log10(pk)).toFixed(1)} dB</b> (×${pk.toFixed(1)}) near ωn = ${wn} rad/s. ` +
+            `At ${wf} rad/s the gain is <b>${dB} dB</b>, so a ${AMP} cm road shake becomes about <b>${amp} cm</b> of body motion` +
+            (h.g > 1.05
+              ? " — amplified!"
+              : h.g < 0.95
+                ? " — reduced."
+                : " — about the same.") +
+            " Above √2·ωn the response rolls off at −20 dB/dec, the same slope a single pole gives.";
+          bot("sbot", em === "hello" ? "help" : em);
+        }
+        const draw = () => {
+          try {
+            paint();
+          } catch (e) {
+            $("sinfo").textContent = "Ride error: " + e.message;
+            console.error(e);
+          }
+        };
+        function loop() {
+          if (!run) return;
+          if (t >= TMAX) {
+            run = false;
+            $("sshake").textContent = "▶ Shake road";
+            draw();
+            return;
+          }
+          sim();
+          draw();
+          requestAnimationFrame(loop);
+        }
+        const start = () => {
+          if (t >= TMAX) reset();
+          if (!run) {
+            run = true;
+            loop();
+          }
+        };
+        $("sbump").onclick = () => {
+          if (mode !== "bump" || t >= TMAX) {
+            reset();
+          }
+          mode = "bump";
+          $("sshake").textContent = "▶ Shake road";
+          bt0 = t + 0.1;
+          start();
+        };
+        $("sshake").onclick = () => {
+          if (mode === "shake" && run) {
+            run = false;
+            $("sshake").textContent = "▶ Shake road";
+            draw();
+            return;
+          }
+          reset();
+          mode = "shake";
+          $("sshake").textContent = "⏸ Stop shaking";
+          start();
+        };
+        $("srst").onclick = () => {
+          reset();
+          $("sshake").textContent = "▶ Shake road";
+          draw();
+        };
+        ["sw", "sz", "swf"].forEach((id) => ($(id).oninput = draw));
+        document
+          .querySelectorAll("[data-a]")
+          .forEach((bt) =>
+            bt.addEventListener("click", () => setTimeout(draw, 0)),
+          );
+        draw();
+      })();
+
+      // ===== Cruise control application =====
+      (() => {
+        const c = $("kc3").getContext("2d"),
+          b = $("kc6").getContext("2d");
+        let t = 0,
+          v = 0,
+          ua = 0,
+          hist = [],
+          run = false,
+          off = 0,
+          em = "hello";
+        const IMG = {};
+        ["help", "working", "thinking", "great", "tuning", "hello"].forEach(
+          (n) => {
+            const i = new Image();
+            i.onload = () => {
+              try {
+                paint();
+              } catch (e) {}
+            };
+            i.src = "images/bot-" + n + ".png";
+            IMG[n] = i;
+          },
+        );
+        const val = (id) => {
+          const x = +$(id).value;
+          return isFinite(x) ? x : 0;
+        };
+        const clampv = (id, lo, hi) => Math.min(hi, Math.max(lo, val(id)));
+        const reset = () => {
+          t = 0;
+          v = 0;
+          ua = 0;
+          hist = [];
+          off = 0;
+        };
+        const rr = (x, y, w, h, r) => {
+          c.beginPath();
+          c.moveTo(x + r, y);
+          c.arcTo(x + w, y, x + w, y + h, r);
+          c.arcTo(x + w, y + h, x, y + h, r);
+          c.arcTo(x, y + h, x, y, r);
+          c.arcTo(x, y, x + w, y, r);
+          c.closePath();
+        };
+        const params = () => ({
+          r: clampv("kcr", 20, 120),
+          kp: clampv("kckp", 1, 200),
+          sl: clampv("kchill", 0, 10),
+        });
+        // loop L(jw) = kp / ((0.5jw+1)(5jw+1))
+        const Lmag = (kp, w) =>
+          20 *
+          Math.log10(kp / Math.sqrt((1 + 0.25 * w * w) * (1 + 25 * w * w)));
+        const Lph = (w) => -(Math.atan(0.5 * w) + Math.atan(5 * w)) * R;
+        function margins(kp) {
+          if (kp <= 1) return { wc: null, pm: null };
+          let lo = 1e-4,
+            hi = 1e3;
+          for (let i = 0; i < 60; i++) {
+            const m = Math.sqrt(lo * hi);
+            Lmag(kp, m) > 0 ? (lo = m) : (hi = m);
+          }
+          const wc = Math.sqrt(lo * hi);
+          return { wc, pm: 180 + Lph(wc) };
+        }
+        function sim() {
+          const { r, kp, sl } = params(),
+            d = 3 * sl,
+            dt = 0.02;
+          for (let i = 0; i < 4; i++) {
+            const u = Math.max(0, Math.min(250, kp * (r - v)));
+            ua += ((u - ua) / 0.5) * dt;
+            v = Math.max(0, v + ((ua - v - d) / 5) * dt);
+            t += dt;
+          }
+          hist.push([t, v]);
+        }
+        function paintScene(p, vss) {
+          const { r, kp, sl } = p;
+          c.setTransform(1, 0, 0, 1, 0, 0);
+          c.clearRect(0, 0, 720, 420);
+          const g = c.createLinearGradient(0, 0, 0, 160);
+          g.addColorStop(0, "#bfe3ff");
+          g.addColorStop(1, "#eef7ff");
+          c.fillStyle = g;
+          c.fillRect(0, 0, 720, 160);
+          c.save();
+          c.beginPath();
+          c.rect(0, 0, 720, 160);
+          c.clip();
+          c.translate(360, 124);
+          c.rotate(-sl * 0.012);
+          c.fillStyle = "#9bd18f";
+          c.fillRect(-600, 8, 1200, 300);
+          c.fillStyle = "#4a5568";
+          c.fillRect(-600, 8, 1200, 28);
+          c.strokeStyle = "#fff";
+          c.lineWidth = 3;
+          c.setLineDash([30, 24]);
+          c.lineDashOffset = off;
+          c.beginPath();
+          c.moveTo(-600, 22);
+          c.lineTo(600, 22);
+          c.stroke();
+          c.setLineDash([]);
+          // speed lines behind the car
+          c.strokeStyle = "rgba(74,134,184,.55)";
+          c.lineWidth = 3;
+          c.lineCap = "round";
+          for (let i = 0; i < 4; i++) {
+            const len = Math.min(120, v * 1.0) * (1 - i * 0.18),
+              yy = -62 + i * 16,
+              sx = -78 - ((off * 3 + i * 40) % 40);
+            if (len > 4) {
+              c.beginPath();
+              c.moveTo(sx, yy);
+              c.lineTo(sx - len, yy);
+              c.stroke();
+            }
+          }
+          c.lineCap = "butt";
+          // ControlBot drives: only his head and shoulders show above the door
+          const bob =
+            v > 1 ? Math.abs(Math.sin(off * 0.4)) * Math.min(2.5, v / 35) : 0;
+          c.save();
+          c.translate(0, -bob);
+          const im =
+            IMG[em] && IMG[em].complete && IMG[em].naturalWidth
+              ? IMG[em]
+              : null;
+          if (im) {
+            const sh = im.naturalHeight * 0.55,
+              hh = 68,
+              ww = (im.naturalWidth / sh) * hh;
+            c.drawImage(
+              im,
+              0,
+              0,
+              im.naturalWidth,
+              sh,
+              -12 - ww / 2,
+              -24 - hh,
+              ww,
+              hh,
+            );
+          }
+          // open-top car body (drawn over the robot's lower edge)
+          c.fillStyle = "#e76f51";
+          rr(-68, -28, 136, 26, 8);
+          c.fill();
+          c.fillStyle = "rgba(0,0,0,.12)";
+          c.fillRect(-14, -28, 2, 24); // door line
+          c.fillStyle = "#b9482f";
+          rr(-8, -20, 14, 4, 2);
+          c.fill(); // door handle
+          c.fillStyle = "#ffd166";
+          c.beginPath();
+          c.arc(64, -17, 3.5, 0, 7);
+          c.fill(); // headlight
+          c.fillStyle = "#c01c28";
+          c.beginPath();
+          c.arc(-64, -17, 3, 0, 7);
+          c.fill(); // tail light
+          // windshield, steering wheel and the robot's black glove
+          c.fillStyle = "rgba(214,236,255,.65)";
+          c.strokeStyle = "#7f9bb5";
+          c.lineWidth = 2;
+          c.beginPath();
+          c.moveTo(24, -28);
+          c.lineTo(36, -52);
+          c.lineTo(41, -52);
+          c.lineTo(34, -28);
+          c.closePath();
+          c.fill();
+          c.stroke();
+          c.strokeStyle = "#222";
+          c.lineWidth = 3;
+          c.save();
+          c.translate(14, -36);
+          c.rotate(0.45);
+          c.beginPath();
+          c.ellipse(0, 0, 3.5, 11, 0, 0, 7);
+          c.stroke();
+          c.restore();
+          c.fillStyle = "#111";
+          c.beginPath();
+          c.arc(11, -45, 4.5, 0, 7);
+          c.fill();
+          c.restore();
+          // wheels (spin faster as the car speeds up)
+          [-40, 42].forEach((x) => {
+            c.fillStyle = "#222";
+            c.beginPath();
+            c.arc(x, -3, 11, 0, 7);
+            c.fill();
+            c.strokeStyle = "#cfd6df";
+            c.lineWidth = 2;
+            for (let k = 0; k < 4; k++) {
+              const an = off * 0.45 + (k * Math.PI) / 2;
+              c.beginPath();
+              c.moveTo(x, -3);
+              c.lineTo(x + 8 * Math.cos(an), -3 + 8 * Math.sin(an));
+              c.stroke();
+            }
+            c.fillStyle = "#cfd6df";
+            c.beginPath();
+            c.arc(x, -3, 3, 0, 7);
+            c.fill();
+          });
+          c.restore();
+          c.fillStyle = "#12203b";
+          c.textAlign = "left";
+          c.font = "700 28px Georgia";
+          c.fillText(v.toFixed(0) + " km/h", 20, 42);
+          c.font = "12px system-ui";
+          c.fillText("Speed", 20, 58);
+          c.textAlign = "right";
+          c.fillText(
+            "Target " + r + " km/h" + (sl ? "  ·  Uphill " + sl + "%" : ""),
+            700,
+            24,
+          );
+          const X0 = 70,
+            Y0 = 190,
+            W = 620,
+            H = 190,
+            xs = (q) => X0 + (q / 40) * W,
+            ys = (q) => Y0 + H - (q / 180) * H;
+          c.lineWidth = 1;
+          c.textAlign = "right";
+          for (let s = 0; s <= 180; s += 30) {
+            c.strokeStyle = "#d3dbe4";
+            c.beginPath();
+            c.moveTo(X0, ys(s));
+            c.lineTo(X0 + W, ys(s));
+            c.stroke();
+            c.fillStyle = "#444";
+            c.fillText(s, X0 - 6, ys(s) + 4);
+          }
+          c.textAlign = "center";
+          for (let s = 0; s <= 40; s += 10) {
+            c.fillStyle = "#444";
+            c.fillText(s, xs(s), Y0 + H + 16);
+          }
+          c.fillText("Time (s)", X0 + W / 2, Y0 + H + 34);
+          c.save();
+          c.translate(X0 - 44, Y0 + H / 2);
+          c.rotate(-Math.PI / 2);
+          c.fillText("Speed (km/h)", 0, 0);
+          c.restore();
+          c.strokeStyle = "#16233f";
+          c.strokeRect(X0, Y0, W, H);
+          c.lineWidth = 2;
+          c.setLineDash([7, 5]);
+          c.strokeStyle = "#d9822b";
+          c.beginPath();
+          c.moveTo(X0, ys(r));
+          c.lineTo(X0 + W, ys(r));
+          c.stroke();
+          c.setLineDash([2, 4]);
+          c.strokeStyle = "#2a9d8f";
+          c.beginPath();
+          c.moveTo(X0, ys(vss));
+          c.lineTo(X0 + W, ys(vss));
+          c.stroke();
+          c.setLineDash([]);
+          c.strokeStyle = "#2f6fa8";
+          c.lineWidth = 3;
+          c.beginPath();
+          hist.forEach((q, i) =>
+            i ? c.lineTo(xs(q[0]), ys(q[1])) : c.moveTo(xs(q[0]), ys(q[1])),
+          );
+          c.stroke();
+          c.textAlign = "left";
+          c.font = "12px system-ui";
+          [
+            ["#2f6fa8", "Speed"],
+            ["#d9822b", "Target"],
+            ["#2a9d8f", "Predicted final speed"],
+          ].forEach((l, i) => {
+            c.fillStyle = l[0];
+            c.fillText("● " + l[1], X0 + 10 + i * 100, Y0 + 16);
+          });
+        }
+        function paintBode(p, m) {
+          const { kp } = p,
+            X0 = 70,
+            W = 620,
+            Hh = 110,
+            Ys = [18, 190],
+            lo = -2,
+            hi = 2;
+          b.setTransform(1, 0, 0, 1, 0, 0);
+          b.clearRect(0, 0, 720, 330);
+          const X = (w) => X0 + ((Math.log10(w) - lo) / (hi - lo)) * W;
+          b.font = "12px system-ui";
+          [
+            [0, -60, 60, 20, Lmag.bind(null, kp), "Magnitude of L (dB)"],
+            [1, -180, 0, 45, Lph, "Phase of L (°)"],
+          ].forEach(([k, mn, mx, st, f, lab]) => {
+            const y0 = Ys[k],
+              Y = (vv) => y0 + Hh - ((vv - mn) / (mx - mn)) * Hh;
+            for (let e = lo; e <= hi; e++) {
+              b.strokeStyle = "#d3dbe4";
+              b.lineWidth = 1;
+              b.beginPath();
+              b.moveTo(X(10 ** e), y0);
+              b.lineTo(X(10 ** e), y0 + Hh);
+              b.stroke();
+              if (k) {
+                b.fillStyle = "#444";
+                b.textAlign = "center";
+                b.fillText(String(10 ** e), X(10 ** e), y0 + Hh + 15);
+              }
+            }
+            for (let vv = mn; vv <= mx; vv += st) {
+              b.strokeStyle = "#d3dbe4";
+              b.beginPath();
+              b.moveTo(X0, Y(vv));
+              b.lineTo(X0 + W, Y(vv));
+              b.stroke();
+              b.fillStyle = "#444";
+              b.textAlign = "right";
+              b.fillText(vv, X0 - 6, Y(vv) + 4);
+            }
+            b.strokeStyle = "#16233f";
+            b.strokeRect(X0, y0, W, Hh);
+            if (k === 0) {
+              b.strokeStyle = "#7a8797";
+              b.setLineDash([2, 3]);
+              b.beginPath();
+              b.moveTo(X0, Y(0));
+              b.lineTo(X0 + W, Y(0));
+              b.stroke();
+              b.setLineDash([]);
+            } else {
+              b.strokeStyle = "#c01c28";
+              b.setLineDash([2, 3]);
+              b.beginPath();
+              b.moveTo(X0, Y(-180));
+              b.lineTo(X0 + W, Y(-180));
+              b.stroke();
+              b.setLineDash([]);
+            }
+            b.save();
+            b.beginPath();
+            b.rect(X0, y0, W, Hh);
+            b.clip();
+            b.strokeStyle = "#2f6fa8";
+            b.lineWidth = 3;
+            b.beginPath();
+            for (let i = 0; i <= 200; i++) {
+              const w = 10 ** (lo + ((hi - lo) * i) / 200);
+              i ? b.lineTo(X(w), Y(f(w))) : b.moveTo(X(w), Y(f(w)));
+            }
+            b.stroke();
+            b.restore();
+            if (m.wc) {
+              b.strokeStyle = "#e8590c";
+              b.lineWidth = 1;
+              b.setLineDash([4, 4]);
+              b.beginPath();
+              b.moveTo(X(m.wc), y0);
+              b.lineTo(X(m.wc), y0 + Hh);
+              b.stroke();
+              b.setLineDash([]);
+              b.fillStyle = "#e8590c";
+              b.beginPath();
+              b.arc(X(m.wc), Y(k ? Lph(m.wc) : 0), 5, 0, 7);
+              b.fill();
+            }
+            b.fillStyle = "#16233f";
+            b.textAlign = "center";
+            b.save();
+            b.translate(X0 - 46, y0 + Hh / 2);
+            b.rotate(-Math.PI / 2);
+            b.fillText(lab, 0, 0);
+            b.restore();
+          });
+          b.fillStyle = "#16233f";
+          b.textAlign = "center";
+          b.fillText("Frequency (rad/s)", X0 + W / 2, 325);
+          b.textAlign = "left";
+          b.fillStyle = "#e8590c";
+          b.fillText(
+            m.wc
+              ? "Gain crossover " +
+                  m.wc.toFixed(2) +
+                  " rad/s · phase margin " +
+                  m.pm.toFixed(0) +
+                  "°"
+              : "Kp ≤ 1: the loop gain never reaches 0 dB",
+            X0 + 8,
+            14,
+          );
+        }
+        function paint() {
+          const p = params(),
+            { r, kp, sl } = p,
+            d = 3 * sl,
+            m = margins(kp);
+          const vss = Math.max(0, (kp * r - d) / (1 + kp));
+          const settled = t > 3 && Math.abs(v - vss) < 0.6;
+          em =
+            t === 0
+              ? "hello"
+              : run
+                ? m.pm !== null && m.pm < 40
+                  ? "thinking"
+                  : sl >= 5 && !settled
+                    ? "tuning"
+                    : settled
+                      ? "great"
+                      : "working"
+                : settled
+                  ? "great"
+                  : m.pm !== null && m.pm < 45
+                    ? "thinking"
+                    : "great";
+          paintScene(p, vss);
+          paintBode(p, m);
+          const zeta = 5.5 / (2 * Math.sqrt(2.5 * (1 + kp)));
+          const os =
+            zeta < 1
+              ? Math.exp((-Math.PI * zeta) / Math.sqrt(1 - zeta * zeta)) * 100
+              : 0;
+          const pmTxt =
+            m.pm === null ? "no gain crossover" : m.pm.toFixed(0) + "°";
+          $("kcinfo").innerHTML =
+            `Target <b>${r}</b> km/h · Speed <b>${v.toFixed(1)}</b> km/h · Error <b>${(r - v).toFixed(1)}</b> km/h<br>` +
+            `Phase margin <b>${pmTxt}</b> → predicted overshoot about <b>${os.toFixed(0)}%</b>. ` +
+            `The loop settles at <b>${vss.toFixed(1)} km/h</b>, leaving a steady-state error of <b>${(r - vss).toFixed(1)} km/h</b>. ` +
+            `A higher Kp shrinks that error but lowers the phase margin; a hill makes the error bigger.`;
+          const says = {
+            hello:
+              "Hi! I'm ControlBot, and I'm driving. Press Start and I'll hold the car at the target speed.",
+            working:
+              "I'm pressing the throttle. Each moment I compare the target speed with the speedometer and adjust.",
+            tuning:
+              "Uphill! The slope pushes back on the car, so I need a bigger error to keep pushing. The gap grows.",
+            thinking:
+              "My phase margin is low, so the speed overshoots and wobbles. Try a smaller Kp!",
+            great:
+              "Cruising. The small gap to the target is the steady-state error of a proportional controller.",
+          }[em];
+          $("kcinfo").innerHTML = `<b>${says}</b><br>` + $("kcinfo").innerHTML;
+          bot("kcbot", em === "hello" ? "help" : em);
+        }
+        const draw3 = () => {
+          try {
+            paint();
+          } catch (e) {
+            $("kcinfo").textContent = "Cruise control error: " + e.message;
+            console.error(e);
+          }
+        };
+        function loop() {
+          if (!run) return;
+          if (t >= 40) {
+            run = false;
+            $("kgo").textContent = "▶ Start";
+            draw3();
+            return;
+          }
+          sim();
+          off += v * 0.08;
+          draw3();
+          requestAnimationFrame(loop);
+        }
+        $("kgo").onclick = () => {
+          if (t >= 40) reset();
+          run = !run;
+          $("kgo").textContent = run ? "⏸ Pause" : "▶ Start";
+          if (run) loop();
+          else draw3();
+        };
+        $("krst").onclick = () => {
+          run = false;
+          reset();
+          $("kgo").textContent = "▶ Start";
+          draw3();
+        };
+        ["kcr", "kckp", "kchill"].forEach((id) => ($(id).oninput = draw3));
+        document
+          .querySelectorAll('[data-p="p3"],[data-a]')
+          .forEach((bt) =>
+            bt.addEventListener("click", () => setTimeout(draw3, 0)),
+          );
+        draw3();
+      })();
+
+      document.querySelectorAll("[data-a]").forEach(
+        (bt) =>
+          (bt.onclick = () => {
+            document.querySelectorAll("[data-a]").forEach((x) => {
+              x.classList.toggle("on", x === bt);
+              $(x.dataset.a).style.display = x === bt ? "" : "none";
+            });
+          }),
+      );
+      animate();
+    </script>
+    <script>
+      // ---- Notes tab ----
+      (function () {
+        const g = (id) => document.getElementById(id);
+        // dB tool
+        const gi = g("ntG"),
+          di = g("ntD");
+        gi.oninput = () => {
+          const v = +gi.value;
+          g("ntdB").textContent =
+            v > 0 ? (20 * Math.log10(v)).toFixed(1) + " dB" : "—";
+        };
+        di.oninput = () => {
+          g("ntGo").textContent = +Math.pow(10, +di.value / 20).toPrecision(4);
+        };
+        // slope calc
+        const sp = g("ntP"),
+          sz = g("ntZ");
+        function slope() {
+          const p = Math.max(0, +sp.value || 0),
+            z = Math.max(0, +sz.value || 0),
+            n = p - z;
+          g("ntSl").innerHTML =
+            "High-frequency slope: <b>" +
+            -20 * n +
+            " dB/dec</b> &nbsp;|&nbsp; final phase: <b>" +
+            -90 * n +
+            "°</b>" +
+            (n < 0
+              ? "<br>More zeros than poles: gain keeps rising (not physically realisable)."
+              : n === 0
+                ? "<br>Equal count: gain levels off."
+                : "");
+        }
+        sp.oninput = sz.oninput = slope;
+        slope();
+        // PM
+        const ph = g("ntPh");
+        ph.oninput = () => {
+          const pm = 180 + +ph.value;
+          g("ntPM").textContent = pm + "°";
+          const s = g("ntPMs");
+          s.textContent =
+            pm > 0
+              ? pm >= 45
+                ? "stable, well damped"
+                : "stable, but oscillatory"
+              : "unstable";
+          s.className = "nt-badge " + (pm > 0 ? "ok" : "bad");
+        };
+        ph.oninput();
+        // building blocks
+        const B = {
+          "Integrator 1/s": {
+            m: (w) => -20 * Math.log10(w),
+            a: (w) => -20 * Math.log10(w),
+            p: (w) => -90,
+            ap: (w) => -90,
+            c: null,
+            t: "Slope <code>−20 dB/dec</code> everywhere, crosses 0 dB at ω = 1. Phase is a constant <code>−90°</code>.",
+          },
+          "Zero (1+s/ωz)": {
+            m: (w) => 10 * Math.log10(1 + w * w),
+            a: (w) => (w < 1 ? 0 : 20 * Math.log10(w)),
+            p: (w) => (Math.atan(w) * 180) / Math.PI,
+            ap: (w) => (w < 0.1 ? 0 : w > 10 ? 90 : 45 + 45 * Math.log10(w)),
+            c: 1,
+            t: "Flat, then slope <code>+20 dB/dec</code> after the corner. Phase rises 0° → <code>+90°</code>, and is +45° at the corner. Real error at corner: 3 dB.",
+          },
+          "Pole 1/(1+s/ωp)": {
+            m: (w) => -10 * Math.log10(1 + w * w),
+            a: (w) => (w < 1 ? 0 : -20 * Math.log10(w)),
+            p: (w) => (-Math.atan(w) * 180) / Math.PI,
+            ap: (w) => (w < 0.1 ? 0 : w > 10 ? -90 : -45 - 45 * Math.log10(w)),
+            c: 1,
+            t: "Flat, then slope <code>−20 dB/dec</code> after the corner. Phase falls 0° → <code>−90°</code>, and is −45° at the corner. Real error at corner: −3 dB.",
+          },
+          "Complex pair": {
+            m: (w) => -10 * Math.log10((1 - w * w) ** 2 + (2 * 0.2 * w) ** 2),
+            a: (w) => (w < 1 ? 0 : -40 * Math.log10(w)),
+            p: (w) => (-Math.atan2(2 * 0.2 * w, 1 - w * w) * 180) / Math.PI,
+            ap: (w) => (w < 1 ? 0 : -180),
+            c: 1,
+            t: "Flat, then slope <code>−40 dB/dec</code>. Phase falls 0° → <code>−180°</code> very sharply when ζ is small. A resonance peak of about <code>1/(2ζ)</code> appears at ωn (shown for ζ = 0.2).",
+          },
+        };
+        let cur = "Pole 1/(1+s/ωp)",
+          show = true;
+        const chips = g("ntChips");
+        Object.keys(B).forEach((k) => {
+          const b = document.createElement("button");
+          b.textContent = k;
+          b.onclick = () => {
+            cur = k;
+            drawB();
+          };
+          chips.appendChild(b);
+        });
+        const tg = document.createElement("button");
+        tg.textContent = "Asymptote: on";
+        tg.onclick = () => {
+          show = !show;
+          drawB();
+        };
+        chips.appendChild(tg);
+        function drawB() {
+          [...chips.children].forEach((b) =>
+            b.classList.toggle("on", b.textContent === cur),
+          );
+          tg.textContent = "Asymptote: " + (show ? "on" : "off");
+          tg.classList.toggle("on", show);
+          const f = B[cur],
+            c = g("ntC"),
+            x = c.getContext("2d"),
+            W = c.width,
+            H = c.height;
+          x.clearRect(0, 0, W, H);
+          const L = 44,
+            T = 12,
+            pw = W - L - 12,
+            ph2 = (H - 36) / 2 - 6;
+          const wx = (w) => L + ((Math.log10(w) + 2) / 4) * pw;
+          const panes = [
+            { y0: T, lo: -60, hi: 40, fn: f.m, an: f.a, lab: "dB" },
+            {
+              y0: T + ph2 + 24,
+              lo: -200,
+              hi: 100,
+              fn: f.p,
+              an: f.ap,
+              lab: "deg",
+            },
+          ];
+          panes.forEach((p) => {
+            const yy = (v) =>
+              p.y0 +
+              ph2 *
+                (1 -
+                  (Math.max(p.lo, Math.min(p.hi, v)) - p.lo) / (p.hi - p.lo));
+            x.strokeStyle = "#cfe0ee";
+            x.lineWidth = 1;
+            x.fillStyle = "#4a86b8";
+            x.font = "10px system-ui";
+            for (let e = -2; e <= 2; e++) {
+              x.beginPath();
+              x.moveTo(wx(10 ** e), p.y0);
+              x.lineTo(wx(10 ** e), p.y0 + ph2);
+              x.stroke();
+              x.fillText(
+                e === 0 ? "1" : "10^" + e,
+                wx(10 ** e) - 8,
+                p.y0 + ph2 + 11,
+              );
+            }
+            x.strokeRect(L, p.y0, pw, ph2);
+            x.fillText(p.lab, 8, p.y0 + 12);
+            const zero = yy(0);
+            x.strokeStyle = "#9bb8d0";
+            x.beginPath();
+            x.moveTo(L, zero);
+            x.lineTo(L + pw, zero);
+            x.stroke();
+            if (show) {
+              x.strokeStyle = "#d9822b";
+              x.lineWidth = 2;
+              x.setLineDash([6, 4]);
+              x.beginPath();
+              for (let i = 0; i <= 200; i++) {
+                const w = 10 ** (-2 + i / 50);
+                i ? x.lineTo(wx(w), yy(p.an(w))) : x.moveTo(wx(w), yy(p.an(w)));
+              }
+              x.stroke();
+              x.setLineDash([]);
+            }
+            x.strokeStyle = "#2f7fc0";
+            x.lineWidth = 2.5;
+            x.beginPath();
+            for (let i = 0; i <= 200; i++) {
+              const w = 10 ** (-2 + i / 50);
+              i ? x.lineTo(wx(w), yy(p.fn(w))) : x.moveTo(wx(w), yy(p.fn(w)));
+            }
+            x.stroke();
+          });
+          g("ntInfo").innerHTML =
+            "<b>" +
+            cur +
+            "</b><p>" +
+            f.t +
+            "</p><p style='color:#d9822b'>- - asymptote &nbsp;<span style='color:#2f7fc0'>— actual</span></p>";
+        }
+        drawB();
+      })();
+    </script>
+  </body>
+</html>
